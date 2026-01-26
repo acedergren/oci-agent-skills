@@ -1,0 +1,336 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - list:
+      - listitem [ref=e3]:
+        - link "Skip to content" [ref=e4] [cursor=pointer]:
+          - /url: "#maincontent"
+      - listitem [ref=e5]:
+        - link "Accessibility Policy" [ref=e6] [cursor=pointer]:
+          - /url: https://www.oracle.com/corporate/accessibility/
+  - generic [ref=e8]:
+    - banner [ref=e10]:
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - link "Oracle" [ref=e14] [cursor=pointer]:
+            - /url: /
+          - link "A-Team Chronicles" [ref=e16] [cursor=pointer]:
+            - /url: https://www.ateam-oracle.com/
+        - generic [ref=e17]:
+          - button "Open Search Field" [ref=e20] [cursor=pointer]: Search
+          - button "Menu" [ref=e23] [cursor=pointer]
+    - generic [ref=e25]:
+      - generic [ref=e26]:
+        - generic [ref=e27]: A-Team Chronicles
+        - generic:
+          - paragraph
+      - generic [ref=e28]:
+        - generic [ref=e29]: "Follow:"
+        - list "Follow:" [ref=e30]:
+          - listitem [ref=e31]:
+            - link " RSS" [ref=e32] [cursor=pointer]:
+              - /url: https://www.ateam-oracle.com/rss
+              - text: 
+              - generic [ref=e33]: RSS
+          - listitem: 
+          - listitem: 殺
+          - listitem: 
+          - listitem: 
+          - listitem: 
+    - generic [ref=e35]:
+      - link "share on facebook" [ref=e36] [cursor=pointer]:
+        - /url: https://www.facebook.com/dialog/share?app_id=209650819625026&href=/www.ateam-oracle.com/post.php
+        - text: 
+      - link "share on twitter" [ref=e37] [cursor=pointer]:
+        - /url: https://twitter.com/share?url=/www.ateam-oracle.com/post.php
+        - text: 殺
+      - link "post to linkedin" [ref=e38] [cursor=pointer]:
+        - /url: https://www.linkedin.com/shareArticle?url=/www.ateam-oracle.com/post.php
+        - text: 
+      - link "send an email" [ref=e39] [cursor=pointer]:
+        - /url: placeholder.html
+        - text: 
+    - generic [ref=e40]:
+      - generic [ref=e43]:
+        - link "Tell Me About" [ref=e45] [cursor=pointer]:
+          - /url: https://www.ateam-oracle.com/category/atm
+        - heading "Building Agents with the OCI OpenAI Package and OCI Generative AI Models" [level=1] [ref=e46]
+        - generic [ref=e47]: January 19, 2026 |7 minute read
+        - generic [ref=e48]:
+          - img "Profile picture of Dipak Chhablani" [ref=e49]
+          - generic [ref=e50]:
+            - link "Dipak Chhablani" [ref=e51] [cursor=pointer]:
+              - /url: /authors/dipak-chhablani
+            - generic [ref=e52]: Principal Solutions Architect | A-Team - Cloud Solution Architects
+        - generic [ref=e53]:
+          - heading "Introduction" [level=2] [ref=e54]
+          - paragraph [ref=e55]:
+            - text: The OCI Generative AI team has introduced the
+            - strong [ref=e56]: OCI OpenAI package
+            - text: ", a Python library that enables developers to invoke models hosted on the OCI Generative AI Service using familiar OpenAI SDK interfaces. The package automatically manages OCI authentication, providing a secure and streamlined connection to OCI-hosted models. By supporting a subset of the OpenAI SDK, it allows teams already experienced with the OpenAI API to integrate their existing workflows with OCI Generative AI more efficiently and reduce onboarding time. Additional documentation is available in the"
+            - link "OCI Generative AI user guide" [ref=e57] [cursor=pointer]:
+              - /url: https://docs.oracle.com/en-us/iaas/Content/generative-ai/oci-openai.htm
+            - text: .
+          - paragraph [ref=e58]:
+            - text: In this blog, we will build a simple
+            - strong [ref=e59]: weather agent
+            - text: ( “Hello World” example for agentic applications) using the OCI OpenAI package across multiple agentic frameworks, including the OpenAI SDK, OpenAI Agents SDK, LangChain 1.0, LangGraph 1.0, and the Microsoft Agent Framework. The
+            - emphasis [ref=e60]:
+              - link "oci-openai" [ref=e61] [cursor=pointer]:
+                - /url: https://github.com/oracle-samples/oci-openai
+            - text: package supports multiple authentication methods for connecting to OCI Generative AI, further details can be found in the project repository. In this blog example, the weather agent uses the
+            - strong [ref=e62]: OciUserPrincipalAuth
+            - text: authentication method to connect to the OCI Generative AI LLM.
+          - heading "OpenAI SDK" [level=2] [ref=e63]
+          - paragraph [ref=e64]:
+            - text: The
+            - strong [ref=e65]: OpenAI SDK
+            - text: is the official client library providing a streamlined interface to OpenAI’s core AI capabilities, including text generation and chat completions. It serves as the foundational layer for interacting with OpenAI models in a reliable, consistent, and developer-friendly manner. The OCI OpenAI package extends this SDK by adding native OCI authentication support. In this implementation, the weather agent is built using the OpenAI Chat Completions API configured to use the xai.grok-3-minimodel hosted on OCI Generative AI. The agent constructs tools and their schemas, then iteratively invokes the Chat Completions API to produce a final answer for the user query.
+          - generic [ref=e66]:
+            - generic [ref=e67]:
+              - link "Copy code snippet" [ref=e69] [cursor=pointer]:
+                - /url: "#copy"
+              - generic [ref=e70]: Copied to Clipboard
+              - generic [ref=e71]: "Error: Could not Copy"
+              - generic [ref=e72]: Copied to Clipboard
+              - generic [ref=e73]: "Error: Could not Copy"
+            - code [ref=e75]: "import httpx from openai import OpenAI from oci_openai import OciUserPrincipalAuth import inspect from pydantic import BaseModel from typing import Optional import json COMPARTMENT_ID=\"AddCompartmentId\" model = \"xai.grok-3-mini\" client = OpenAI( api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.Client( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ), ) class Agent(BaseModel): name: str = \"Agent\" model: str = \"xai.grok-3-mini\" instructions: str = \"You are a helpful Agent\" tools: list = [] def function_to_schema(func) -> dict: type_map = { str: \"string\", int: \"integer\", float: \"number\", bool: \"boolean\", list: \"array\", dict: \"object\", type(None): \"null\", } try: signature = inspect.signature(func) except ValueError as e: raise ValueError( f\"Failed to get signature for function {func.__name__}: {str(e)}\" ) parameters = {} for param in signature.parameters.values(): try: param_type = type_map.get(param.annotation, \"string\") except KeyError as e: raise KeyError( f\"Unknown type annotation {param.annotation} for parameter {param.name}: {str(e)}\" ) parameters[param.name] = {\"type\": param_type} required = [ param.name for param in signature.parameters.values() if param.default == inspect._empty ] return { \"type\": \"function\", \"function\": { \"name\": func.__name__, \"description\": (func.__doc__ or \"\").strip(), \"parameters\": { \"type\": \"object\", \"properties\": parameters, \"required\": required, }, }, } def run_agent(agent, messages): num_init_messages = len(messages) messages = messages.copy() # turn python functions into tools and save a reverse map tool_schemas = [function_to_schema(tool) for tool in agent.tools] tools_map = {tool.__name__: tool for tool in agent.tools} while True: # === 1. get openai completion === response = client.chat.completions.create( model=agent.model, messages=[{\"role\": \"system\", \"content\": agent.instructions}] + messages, tools=tool_schemas or None, ) message = response.choices[0].message messages.append(message) if message.content: # print assistant response print(\"Assistant:\", message.content) if not message.tool_calls: # if finished handling tool calls, break break # === 2. handle tool calls === for tool_call in message.tool_calls: result = execute_tool_call(tool_call, tools_map) result_message = { \"role\": \"tool\", \"tool_call_id\": tool_call.id, \"content\": result, } messages.append(result_message) # ==== 3. return new messages ===== return messages[num_init_messages:] def execute_tool_call(tool_call, tools_map): name = tool_call.function.name args = json.loads(tool_call.function.arguments) print(f\"Assistant: {name}({args})\") # call corresponding function with provided arguments return tools_map[name](**args) def get_weather(city: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" weather_agent = Agent( name=\"Weather Assistant\", instructions=\"You are a helpful weather assistant.\", tools=[get_weather] ) messages = [] user_query=\"What is the weather like in Bangalore today?\" print(\"User:\", user_query) messages.append({\"role\": \"user\", \"content\": user_query}) response = run_agent(weather_agent, messages) print(\"Final Response: \",response[-1].content)"
+            - textbox [ref=e76]
+            - textbox [ref=e77]: "import httpx from openai import OpenAI from oci_openai import OciUserPrincipalAuth import inspect from pydantic import BaseModel from typing import Optional import json COMPARTMENT_ID=\"AddCompartmentId\" model = \"xai.grok-3-mini\" client = OpenAI( api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.Client( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ), ) class Agent(BaseModel): name: str = \"Agent\" model: str = \"xai.grok-3-mini\" instructions: str = \"You are a helpful Agent\" tools: list = [] def function_to_schema(func) -> dict: type_map = { str: \"string\", int: \"integer\", float: \"number\", bool: \"boolean\", list: \"array\", dict: \"object\", type(None): \"null\", } try: signature = inspect.signature(func) except ValueError as e: raise ValueError( f\"Failed to get signature for function {func.__name__}: {str(e)}\" ) parameters = {} for param in signature.parameters.values(): try: param_type = type_map.get(param.annotation, \"string\") except KeyError as e: raise KeyError( f\"Unknown type annotation {param.annotation} for parameter {param.name}: {str(e)}\" ) parameters[param.name] = {\"type\": param_type} required = [ param.name for param in signature.parameters.values() if param.default == inspect._empty ] return { \"type\": \"function\", \"function\": { \"name\": func.__name__, \"description\": (func.__doc__ or \"\").strip(), \"parameters\": { \"type\": \"object\", \"properties\": parameters, \"required\": required, }, }, } def run_agent(agent, messages): num_init_messages = len(messages) messages = messages.copy() # turn python functions into tools and save a reverse map tool_schemas = [function_to_schema(tool) for tool in agent.tools] tools_map = {tool.__name__: tool for tool in agent.tools} while True: # === 1. get openai completion === response = client.chat.completions.create( model=agent.model, messages=[{\"role\": \"system\", \"content\": agent.instructions}] + messages, tools=tool_schemas or None, ) message = response.choices[0].message messages.append(message) if message.content: # print assistant response print(\"Assistant:\", message.content) if not message.tool_calls: # if finished handling tool calls, break break # === 2. handle tool calls === for tool_call in message.tool_calls: result = execute_tool_call(tool_call, tools_map) result_message = { \"role\": \"tool\", \"tool_call_id\": tool_call.id, \"content\": result, } messages.append(result_message) # ==== 3. return new messages ===== return messages[num_init_messages:] def execute_tool_call(tool_call, tools_map): name = tool_call.function.name args = json.loads(tool_call.function.arguments) print(f\"Assistant: {name}({args})\") # call corresponding function with provided arguments return tools_map[name](**args) def get_weather(city: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" weather_agent = Agent( name=\"Weather Assistant\", instructions=\"You are a helpful weather assistant.\", tools=[get_weather] ) messages = [] user_query=\"What is the weather like in Bangalore today?\" print(\"User:\", user_query) messages.append({\"role\": \"user\", \"content\": user_query}) response = run_agent(weather_agent, messages) print(\"Final Response: \",response[-1].content)"
+          - heading "OpenAI Agents SDK" [level=2] [ref=e78]
+          - paragraph [ref=e79]:
+            - text: The
+            - strong [ref=e80]: OpenAI Agents SDK
+            - text: provides a higher-level framework for building agentic applications on top of OpenAI models. It allows developers to define agents capable of reasoning through tasks, invoking tools, and orchestrating multi-step workflows. The SDK supports structured tool calling, function execution, file handling, and state management, enabling agents to autonomously determine next actions based on context. In this blog example, the weather agent development is more
+            - strong [ref=e81]: simplified
+            - text: using the Agents SDK by creating an OCI Generative AI client with the
+            - strong [ref=e82]: AsyncOpenAI
+            - text: API and configuring it through the OpenAIChatCompletionsModel to use the
+            - strong [ref=e83]: xai.grok-3-mini
+            - text: model. The configured model, along with the agent’s instructions and tools, is then passed to the Agent.
+          - generic [ref=e84]:
+            - generic [ref=e85]:
+              - link "Copy code snippet" [ref=e87] [cursor=pointer]:
+                - /url: "#copy"
+              - generic [ref=e88]: Copied to Clipboard
+              - generic [ref=e89]: "Error: Could not Copy"
+              - generic [ref=e90]: Copied to Clipboard
+              - generic [ref=e91]: "Error: Could not Copy"
+            - code [ref=e93]: "import asyncio from agents import Agent, Runner,AsyncOpenAI,function_tool,OpenAIChatCompletionsModel #OpenAIResponsesModel import httpx from oci_openai import OciUserPrincipalAuth COMPARTMENT_ID=\"AddCompartmentId\" # Example for OCI Data Science Model Deployment endpoint client = AsyncOpenAI( api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.AsyncClient( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ) ) model = OpenAIChatCompletionsModel(model=\"xai.grok-3-mini\", openai_client=client) @function_tool def get_weather(city: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" weather_agent = Agent( name=\"Weather Assistant\", instructions=\"You are a helpful weather assistant.\", tools=[get_weather], model=model ) async def main(): result = await Runner.run(weather_agent, input=\"What's the weather in Bangalore?\") print(result.final_output) if __name__ == \"__main__\": asyncio.run(main())"
+            - textbox [ref=e94]
+            - textbox [ref=e95]: "import asyncio from agents import Agent, Runner,AsyncOpenAI,function_tool,OpenAIChatCompletionsModel #OpenAIResponsesModel import httpx from oci_openai import OciUserPrincipalAuth COMPARTMENT_ID=\"AddCompartmentId\" # Example for OCI Data Science Model Deployment endpoint client = AsyncOpenAI( api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.AsyncClient( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ) ) model = OpenAIChatCompletionsModel(model=\"xai.grok-3-mini\", openai_client=client) @function_tool def get_weather(city: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" weather_agent = Agent( name=\"Weather Assistant\", instructions=\"You are a helpful weather assistant.\", tools=[get_weather], model=model ) async def main(): result = await Runner.run(weather_agent, input=\"What's the weather in Bangalore?\") print(result.final_output) if __name__ == \"__main__\": asyncio.run(main())"
+          - heading "LangChain" [level=2] [ref=e96]
+          - paragraph [ref=e97]:
+            - strong [ref=e98]: LangChain
+            - text: provides framework for building applications powered by large language models that simplify prompt management, model interaction, memory handling, data retrieval, and tool integration. LangChain 1.0 represents a significant evolution of the LangChain framework, focusing on simplifying and streamlining the development of AI agents powered by large language models (LLMs). The weather agent is implemented using LangChain’s create_agent API, which is built on top of LangGraph. The OCI
+            - strong [ref=e99]: xai.grok-3-mini
+            - text: model is configured through the ChatOpenAI API and passed into the create_agent function to construct the agent.
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - link "Copy code snippet" [ref=e103] [cursor=pointer]:
+                - /url: "#copy"
+              - generic [ref=e104]: Copied to Clipboard
+              - generic [ref=e105]: "Error: Could not Copy"
+              - generic [ref=e106]: Copied to Clipboard
+              - generic [ref=e107]: "Error: Could not Copy"
+            - code [ref=e109]: "from langchain.agents import create_agent from langchain_openai import ChatOpenAI import httpx from oci_openai import OciUserPrincipalAuth COMPARTMENT_ID=\"AddCompartmentId\" llm = ChatOpenAI( model=\"xai.grok-3-mini\", # for example \"xai.grok-4-fast-reasoning\" api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.Client( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ) ) def get_weather(city: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" weather_agent = create_agent( model=llm, tools=[get_weather], system_prompt=\"You are a helpful weather assistant.\", ) response=weather_agent.invoke( {\"messages\": {\"role\": \"user\", \"content\": \"What is the weather like in Bangalore today?\"}} ) print(response[\"messages\"][-1].content)"
+            - textbox [ref=e110]
+            - textbox [ref=e111]: "from langchain.agents import create_agent from langchain_openai import ChatOpenAI import httpx from oci_openai import OciUserPrincipalAuth COMPARTMENT_ID=\"AddCompartmentId\" llm = ChatOpenAI( model=\"xai.grok-3-mini\", # for example \"xai.grok-4-fast-reasoning\" api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.Client( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ) ) def get_weather(city: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" weather_agent = create_agent( model=llm, tools=[get_weather], system_prompt=\"You are a helpful weather assistant.\", ) response=weather_agent.invoke( {\"messages\": {\"role\": \"user\", \"content\": \"What is the weather like in Bangalore today?\"}} ) print(response[\"messages\"][-1].content)"
+          - heading "LangGraph" [level=2] [ref=e112]
+          - paragraph [ref=e113]:
+            - strong [ref=e114]: LangGraph
+            - text: is a graph-based orchestration framework designed for building stateful, multi-step agentic workflows on top of LangChain. It allows developers to define agents and tools as nodes in a directed graph, enabling precise control over execution order, branching logic, and iterative reasoning loops. It is particularly useful for applications that require deterministic control flow, long-running processes. In this example, the weather agent is constructed using a graph-based approach, where the OCI
+            - strong [ref=e115]: xai.grok-3-mini
+            - text: model is instantiated as a node via ChatOpenAI.
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - link "Copy code snippet" [ref=e119] [cursor=pointer]:
+                - /url: "#copy"
+              - generic [ref=e120]: Copied to Clipboard
+              - generic [ref=e121]: "Error: Could not Copy"
+              - generic [ref=e122]: Copied to Clipboard
+              - generic [ref=e123]: "Error: Could not Copy"
+            - code [ref=e125]: "from langgraph.prebuilt import ToolNode,tools_condition from langchain_core.tools import tool from langgraph.graph import MessagesState,StateGraph, START, END from langchain.messages import SystemMessage,HumanMessage from langchain_openai import ChatOpenAI import httpx from oci_openai import OciUserPrincipalAuth COMPARTMENT_ID=\"AddCompartmentId\" @tool def get_weather(location: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" llm_with_tools = ChatOpenAI( model=\"xai.grok-3-mini\", api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.Client( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ) ).bind_tools([get_weather]) def call_model(state: MessagesState): system_prompt=[SystemMessage(content=\"You are a helpful weather assistant.\")] messages = state[\"messages\"] response = llm_with_tools.invoke(system_prompt+messages) return {\"messages\": [response]} agent_builder = StateGraph(MessagesState) agent_builder.add_node(\"llm\", call_model) agent_builder.add_node(\"tools\", ToolNode([get_weather])) agent_builder.add_edge(START, \"llm\") agent_builder.add_conditional_edges(\"llm\",tools_condition,[\"tools\", END]) agent_builder.add_edge(\"tools\", \"llm\") weather_agent = agent_builder.compile() response = weather_agent.invoke(input={\"messages\": [HumanMessage(\"What is the weather in Bangalore\")]},) print(response[\"messages\"][-1].content)"
+            - textbox [ref=e126]
+            - textbox [ref=e127]: "from langgraph.prebuilt import ToolNode,tools_condition from langchain_core.tools import tool from langgraph.graph import MessagesState,StateGraph, START, END from langchain.messages import SystemMessage,HumanMessage from langchain_openai import ChatOpenAI import httpx from oci_openai import OciUserPrincipalAuth COMPARTMENT_ID=\"AddCompartmentId\" @tool def get_weather(location: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" llm_with_tools = ChatOpenAI( model=\"xai.grok-3-mini\", api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.Client( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ) ).bind_tools([get_weather]) def call_model(state: MessagesState): system_prompt=[SystemMessage(content=\"You are a helpful weather assistant.\")] messages = state[\"messages\"] response = llm_with_tools.invoke(system_prompt+messages) return {\"messages\": [response]} agent_builder = StateGraph(MessagesState) agent_builder.add_node(\"llm\", call_model) agent_builder.add_node(\"tools\", ToolNode([get_weather])) agent_builder.add_edge(START, \"llm\") agent_builder.add_conditional_edges(\"llm\",tools_condition,[\"tools\", END]) agent_builder.add_edge(\"tools\", \"llm\") weather_agent = agent_builder.compile() response = weather_agent.invoke(input={\"messages\": [HumanMessage(\"What is the weather in Bangalore\")]},) print(response[\"messages\"][-1].content)"
+          - heading "Microsoft Agent Framework" [level=2] [ref=e128]
+          - paragraph [ref=e129]:
+            - text: The
+            - strong [ref=e130]: Microsoft Agent Framework
+            - text: ", recently introduced by Microsoft, builds on Semantic Kernel and AutoGen to support the creation of intelligent, task-oriented agents. It provides abstractions for tool invocation, multi-step reasoning, and integration with external systems. In this blog, the weather agent is built by creating an OCI Generative AI client using the"
+            - strong [ref=e131]: AsyncOpenAI
+            - text: API and passing it to an OpenAIChatClient configured with the
+            - strong [ref=e132]: xai.grok-3-mini
+            - text: model. The configured model, along with the agent’s instructions and tools, is then supplied to the Agent.
+          - generic [ref=e133]:
+            - generic [ref=e134]:
+              - link "Copy code snippet" [ref=e136] [cursor=pointer]:
+                - /url: "#copy"
+              - generic [ref=e137]: Copied to Clipboard
+              - generic [ref=e138]: "Error: Could not Copy"
+              - generic [ref=e139]: Copied to Clipboard
+              - generic [ref=e140]: "Error: Could not Copy"
+            - code [ref=e142]: "import asyncio from agent_framework import ChatAgent from agent_framework.openai import OpenAIChatClient import httpx from oci_openai import OciUserPrincipalAuth from openai import AsyncOpenAI def get_weather(city: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" async def main() -> None: # Create your agent COMPARTMENT_ID=\"AddCompartmentId\" oci_client = AsyncOpenAI( api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.AsyncClient( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ) ) chat_client=OpenAIChatClient( async_client = oci_client, model_id=\"xai.grok-3-mini\" ) weather_agent = ChatAgent( name=\"WeatherAgent\", chat_client=chat_client, instructions=\"You are a helpful weather assistant.\", tools=[get_weather] ) query = \"What's the weather like in Bangalore?\" print(f\"User: {query}\") result = await weather_agent.run(query) print(f\"Agent: {result}\\n\") if __name__ == \"__main__\": asyncio.run(main())"
+            - textbox [ref=e143]
+            - textbox [ref=e144]: "import asyncio from agent_framework import ChatAgent from agent_framework.openai import OpenAIChatClient import httpx from oci_openai import OciUserPrincipalAuth from openai import AsyncOpenAI def get_weather(city: str) -> str: \"\"\"Get current temperature for a given city.\"\"\" return f\"The weather in {city} is sunny.\" async def main() -> None: # Create your agent COMPARTMENT_ID=\"AddCompartmentId\" oci_client = AsyncOpenAI( api_key=\"OCI\", base_url=\"https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1\", http_client=httpx.AsyncClient( auth=OciUserPrincipalAuth(profile_name=\"DEFAULT\"), headers={\"CompartmentId\": COMPARTMENT_ID} ) ) chat_client=OpenAIChatClient( async_client = oci_client, model_id=\"xai.grok-3-mini\" ) weather_agent = ChatAgent( name=\"WeatherAgent\", chat_client=chat_client, instructions=\"You are a helpful weather assistant.\", tools=[get_weather] ) query = \"What's the weather like in Bangalore?\" print(f\"User: {query}\") result = await weather_agent.run(query) print(f\"Agent: {result}\\n\") if __name__ == \"__main__\": asyncio.run(main())"
+          - heading "Conclusion" [level=2] [ref=e145]
+          - paragraph [ref=e146]: This blog demonstrated how the OCI OpenAI package makes it easy to build agentic applications on OCI Generative AI using multiple frameworks. By implementing a simple weather agent across the OpenAI SDK, OpenAI Agents SDK, LangChain, LangGraph, and the Microsoft Agent Framework, we highlighted how consistently the OCI OpenAI package integrates with different development approaches. This flexibility allows teams to adopt the framework that best fits their needs while benefiting from OCI’s secure, scalable AI infrastructure.
+          - paragraph [ref=e147]: I would like to acknowledge the support provided by Lyudmil Pelov in the development of this blog.
+          - paragraph
+        - generic [ref=e148]:
+          - heading "Authors" [level=3] [ref=e149]
+          - generic [ref=e151]:
+            - img "Profile picture of Dipak Chhablani" [ref=e153]
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - heading "Dipak Chhablani" [level=4] [ref=e156]
+                - heading "Principal Solutions Architect | A-Team - Cloud Solution Architects" [level=5] [ref=e157]
+                - paragraph [ref=e158]: "The A-Team is comprised of deeply technical Solution Architects and Software Engineers focused on the success of our SaaS customers. Our mission is to enable customer success with Oracle Cloud Technology and Services through multi-disciplined technical expertise. Our value add to our customers is our ability to operate at the points of intersection across our product lines coupled with our ability to operate at the technical boundaries of Oracle’s products. As a part of its charter the A-Team closely partners with its product development counterparts across the entire SaaS organisation and contributes heavily to multiple engineering efforts. As a member of Cloud Solution Architects A-Team, my area of work involves PaaS for SaaS, PaaS, SaaS. My work focuses on Solution architecture involving Application integration, Extensions, Application Performance Monitoring, Digital Assistant, Infrastructure, AI, Blockchain & Data Integration aspects of Oracle cloud solutions. Roles Played: Cloud Solution Technical Architect, Leadership, Consulting, Project Management, Pre-Sales, People Management, Training and Mentoring."
+              - generic [ref=e159] [cursor=pointer]: Show more
+      - generic [ref=e162]:
+        - generic [ref=e163]:
+          - link " Previous post" [ref=e164] [cursor=pointer]:
+            - /url: https://www.ateam-oracle.com/bridging-overlapping-subnets-on-oci-using-palo-alto-firewalls
+            - generic [ref=e165]: 
+            - paragraph [ref=e166]: Previous post
+          - heading "Bridging Overlapping Subnets on OCI Using Palo Alto Firewalls" [level=4] [ref=e167]
+          - generic [ref=e168]:
+            - link "Arvind Bassan" [ref=e169] [cursor=pointer]:
+              - /url: /authors/arvind-bassan
+            - text: "| 2 minute read"
+        - generic [ref=e170]:
+          - link "Next post " [ref=e171] [cursor=pointer]:
+            - /url: https://www.ateam-oracle.com/beyond-monitoring-ai-driven-fusion-ess-job-health-risk-observatory-operational-intelligence-for-ess-jobs-with-oci-log-analytics
+            - paragraph [ref=e172]: Next post
+            - generic [ref=e173]: 
+          - 'heading "Beyond Monitoring : AI-Driven Fusion ESS Job Health & Risk Observatory - Operational Intelligence for ESS Jobs with OCI Log Analytics" [level=4] [ref=e174]'
+          - generic [ref=e175]:
+            - link "Ranveer Tiwari" [ref=e176] [cursor=pointer]:
+              - /url: /authors/ranveer-tiwari
+            - text: "| 2 minute read"
+    - generic [ref=e177]:
+      - navigation "Footer" [ref=e178]:
+        - generic "Resources for" [ref=e180]:
+          - heading [level=4] [ref=e181]: Resources for
+          - list "Resources for" [ref=e182]:
+            - listitem [ref=e183]:
+              - link "About" [ref=e184] [cursor=pointer]:
+                - /url: https://www.oracle.com/corporate/
+            - listitem [ref=e185]:
+              - link "Careers" [ref=e186] [cursor=pointer]:
+                - /url: https://www.oracle.com/corporate/careers/
+            - listitem [ref=e187]:
+              - link "Developers" [ref=e188] [cursor=pointer]:
+                - /url: https://developer.oracle.com
+            - listitem [ref=e189]:
+              - link "Investors" [ref=e190] [cursor=pointer]:
+                - /url: https://investor.oracle.com/home/default.aspx
+            - listitem [ref=e191]:
+              - link "Partners" [ref=e192] [cursor=pointer]:
+                - /url: https://www.oracle.com/partner/
+            - listitem [ref=e193]:
+              - link "Startups" [ref=e194] [cursor=pointer]:
+                - /url: https://www.oracle.com/startup/
+        - generic "Why Oracle" [ref=e196]:
+          - heading [level=4] [ref=e197]: Why Oracle
+          - list "Why Oracle" [ref=e198]:
+            - listitem [ref=e199]:
+              - link "Analyst Reports" [ref=e200] [cursor=pointer]:
+                - /url: https://www.oracle.com/corporate/analyst-reports.html
+            - listitem [ref=e201]:
+              - link "Best CRM" [ref=e202] [cursor=pointer]:
+                - /url: https://www.oracle.com/cx/what-is-crm/
+            - listitem [ref=e203]:
+              - link "Cloud Economics" [ref=e204] [cursor=pointer]:
+                - /url: https://www.oracle.com/cloud/economics/
+            - listitem [ref=e205]:
+              - link "Corporate Responsibility" [ref=e206] [cursor=pointer]:
+                - /url: https://www.oracle.com/corporate/citizenship/
+            - listitem [ref=e207]:
+              - link "Security Practices" [ref=e208] [cursor=pointer]:
+                - /url: https://www.oracle.com/corporate/security-practices/
+        - generic "Learn" [ref=e210]:
+          - heading [level=4] [ref=e211]: Learn
+          - list "Learn" [ref=e212]:
+            - listitem [ref=e213]:
+              - link "What is Customer Service?" [ref=e214] [cursor=pointer]:
+                - /url: https://www.oracle.com/cx/service/what-is-customer-service/
+            - listitem [ref=e215]:
+              - link "What is ERP?" [ref=e216] [cursor=pointer]:
+                - /url: https://www.oracle.com/erp/what-is-erp/
+            - listitem [ref=e217]:
+              - link "What is Marketing Automation?" [ref=e218] [cursor=pointer]:
+                - /url: https://www.oracle.com/cx/marketing/automation/what-is-marketing-automation/
+            - listitem [ref=e219]:
+              - link "What is Procurement?" [ref=e220] [cursor=pointer]:
+                - /url: https://www.oracle.com/erp/what-is-procurement/
+            - listitem [ref=e221]:
+              - link "What is Talent Management?" [ref=e222] [cursor=pointer]:
+                - /url: https://www.oracle.com/human-capital-management/talent-management/what-is-talent-management/
+            - listitem [ref=e223]:
+              - link "What is VM?" [ref=e224] [cursor=pointer]:
+                - /url: https://www.oracle.com/cloud/compute/virtual-machines/what-is-virtual-machine/
+        - generic "What's New" [ref=e226]:
+          - heading [level=4] [ref=e227]: What's New
+          - list "What's New" [ref=e228]:
+            - listitem [ref=e229]:
+              - link "Try Oracle Cloud Free Tier" [ref=e230] [cursor=pointer]:
+                - /url: https://www.oracle.com/cloud/free/?source=:ow:o:h:nav:050120SiteFooter&intcmp=:ow:o:h:nav:050120SiteFooter
+            - listitem [ref=e231]:
+              - link "Oracle Sustainability" [ref=e232] [cursor=pointer]:
+                - /url: https://www.oracle.com/solutions/green/
+            - listitem [ref=e233]:
+              - link "Oracle COVID-19 Response" [ref=e234] [cursor=pointer]:
+                - /url: https://www.oracle.com/corporate/covid-19.html
+            - listitem [ref=e235]:
+              - link "Oracle and SailGP" [ref=e236] [cursor=pointer]:
+                - /url: https://www.oracle.com/sailgp/
+            - listitem [ref=e237]:
+              - link "Oracle and Premier League" [ref=e238] [cursor=pointer]:
+                - /url: https://www.oracle.com/premier-league/
+            - listitem [ref=e239]:
+              - link "Oracle and Red Bull Racing Honda" [ref=e240] [cursor=pointer]:
+                - /url: https://www.oracle.com/redbullracing/
+        - generic "Contact Us" [ref=e242]:
+          - heading [level=4] [ref=e243]: Contact Us
+          - list "Contact Us" [ref=e244]:
+            - listitem [ref=e245]:
+              - link "US Sales 1.800.633.0738" [ref=e246] [cursor=pointer]:
+                - /url: tel:18006330738
+            - listitem [ref=e247]:
+              - link "How can we help?" [ref=e248] [cursor=pointer]:
+                - /url: https://www.oracle.com/corporate/contact/
+            - listitem [ref=e249]:
+              - link "Subscribe to Oracle Content" [ref=e250] [cursor=pointer]:
+                - /url: https://go.oracle.com/subscriptions
+            - listitem [ref=e251]:
+              - link "Try Oracle Cloud Free Tier" [ref=e252] [cursor=pointer]:
+                - /url: https://www.oracle.com/cloud/free/?source=:ow:o:h:nav:050120SiteFooter&intcmp=:ow:o:h:nav:050120SiteFooter
+            - listitem [ref=e253]:
+              - link "Events" [ref=e254] [cursor=pointer]:
+                - /url: https://www.oracle.com/events/
+            - listitem [ref=e255]:
+              - link "News" [ref=e256] [cursor=pointer]:
+                - /url: https://www.oracle.com/news/
+      - navigation "Site info" [ref=e258]:
+        - list [ref=e259]:
+          - listitem [ref=e260]:
+            - link "© 2026 Oracle" [ref=e261] [cursor=pointer]:
+              - /url: https://www.oracle.com/legal/copyright.html
+          - listitem [ref=e262]:
+            - link "PrivacyDo Not Sell My Info" [ref=e263] [cursor=pointer]:
+              - /url: https://www.oracle.com/legal/privacy/
+              - text: Privacy
+              - link "Do Not Sell My Info" [ref=e264]:
+                - /url: https://www.oracle.com/legal/privacy/privacy-choices.html
+            - text: /
+          - listitem [ref=e265]:
+            - complementary "Open Cookie Preferences Modal" [ref=e266]: Cookie Preferences
+          - listitem [ref=e267]:
+            - link "Ad Choices" [ref=e268] [cursor=pointer]:
+              - /url: https://www.oracle.com/legal/privacy/privacy-policy.html#advertising
+          - listitem [ref=e269]:
+            - link "Careers" [ref=e270] [cursor=pointer]:
+              - /url: https://www.oracle.com/corporate/careers/
+  - dialog "Your choices regarding the use of cookies on this site" [ref=e273]:
+    - iframe [active] [ref=e275]:
+      

@@ -1,0 +1,66 @@
+# Oracle Cloud Infrastructure Services
+
+> Comprehensive documentation for OCI services used in Claude Code skills
+
+## Core Services
+
+- [OCI CLI Documentation](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/)
+- [OCI Python SDK](https://oracle-cloud-infrastructure-python-sdk.readthedocs.io/en/latest/)
+- [OCI REST API](https://docs.oracle.com/en-us/iaas/api/)
+
+## Compute
+
+- [Compute Overview](https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/computeoverview.htm)
+- [CLI Compute Reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/compute.html)
+- [Instance Shapes](https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm)
+- [Boot Volumes](https://docs.oracle.com/en-us/iaas/Content/Block/Concepts/bootvolumes.htm)
+
+## Networking
+
+- [VCN Overview](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/overview.htm)
+- [CLI Network Reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/network.html)
+- [Security Lists](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/securitylists.htm)
+- [Network Security Groups](https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/networksecuritygroups.htm)
+
+## Database
+
+- [Autonomous Database](https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/adboverview.htm)
+- [CLI Database Reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/db.html)
+- [DB Systems](https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/overview.htm)
+- [Exadata](https://docs.oracle.com/en-us/iaas/Content/Database/Concepts/exaoverview.htm)
+
+## Monitoring & Observability
+
+- [Monitoring Overview](https://docs.oracle.com/en-us/iaas/Content/Monitoring/Concepts/monitoringoverview.htm)
+- [CLI Monitoring Reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/monitoring.html)
+- [Metrics](https://docs.oracle.com/en-us/iaas/Content/Monitoring/Concepts/monitoringoverview.htm#Available)
+- [Alarms](https://docs.oracle.com/en-us/iaas/Content/Monitoring/Tasks/managingalarms.htm)
+- [Logging](https://docs.oracle.com/en-us/iaas/Content/Logging/Concepts/loggingoverview.htm)
+
+## Secrets Management
+
+- [Vault Overview](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm)
+- [CLI Vault Reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/vault.html)
+- [Secrets](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/managingsecrets.htm)
+- [Keys](https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Tasks/managingkeys.htm)
+
+## Generative AI
+
+- [GenAI Service Overview](https://docs.oracle.com/en-us/iaas/Content/generative-ai/overview.htm)
+- [CLI GenAI Reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/generative-ai.html)
+- [Foundation Models](https://docs.oracle.com/en-us/iaas/Content/generative-ai/pretrained-models.htm)
+- [Text Generation](https://docs.oracle.com/en-us/iaas/Content/generative-ai/generate-text.htm)
+
+## IAM & Identity
+
+- [IAM Overview](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/overview.htm)
+- [CLI IAM Reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/iam.html)
+- [Policies](https://docs.oracle.com/en-us/iaas/Content/Identity/Concepts/policies.htm)
+- [Dynamic Groups](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingdynamicgroups.htm)
+
+## Optional Resources
+
+- [OCI Architecture Center](https://docs.oracle.com/solutions/)
+- [OCI Best Practices](https://docs.oracle.com/en-us/iaas/Content/General/Reference/aqswhitepapers.htm)
+- [Security Best Practices](https://docs.oracle.com/en-us/iaas/Content/Security/Reference/oci_security.htm)
+- [Cost Management](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/billingoverview.htm)

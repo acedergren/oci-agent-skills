@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "oci-api": {
+      "description": "Oracle Cloud Infrastructure API access via MCP",
+      "disabled": false
+    },
+    "context7": {
+      "description": "Up-to-date documentation retrieval for OCI CLI and services",
+      "disabled": false
+    }
+  }
+}

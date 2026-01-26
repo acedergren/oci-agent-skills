@@ -1,0 +1,38 @@
+# Oracle A-Team Chronicles
+
+> Expert technical guidance, best practices, and real-world solutions from Oracle's A-Team architects and engineers
+
+## About A-Team
+
+The A-Team is Oracle's central outbound technical team comprised of enterprise architects, solution specialists, and software engineers. They provide best practices, tips, and guidance from real-world customer engagements.
+
+- **Main Site**: https://www.ateam-oracle.com/
+- **Oracle Blogs**: https://blogs.oracle.com/ateam/
+
+## Identity & Security
+
+- [IAM and Security Category](https://www.ateam-oracle.com/category/atm-identity-access-management-and-security)
+- [IDCS Integration](https://docs.oracle.com/en/cloud/paas/identity-cloud/ateam-chronicles.html)
+
+## Fusion Applications
+
+- [Fusion Apps and Microsoft Teams Integration](https://blogs.oracle.com/ateam/post/oracle-fusion-applications-and-microsoft-teams-integration-now-available)
+
+## Middleware & Integration
+
+- [WebCenter Resources](https://www.ateam-oracle.com/webcenter-atc)
+- [Integration Cloud Articles](https://oracle-integration.cloud/tag/a-team/)
+- [GoldenGate and Data Integration](https://www.ateam-oracle.com/category/fusion-middleware-data-integration-goldengate)
+
+## OCI Infrastructure
+
+<!-- Add OCI-specific A-Team articles here -->
+
+## Database
+
+<!-- Add database-related A-Team articles here -->
+
+## Optional Resources
+
+- [A-Team Introduction](https://blogs.oracle.com/post/ateam-intro)
+- [A-Team Website Announcement](https://community.oracle.com/mosc/discussion/3317499/new-a-team-website-www-ateam-oracle-com)

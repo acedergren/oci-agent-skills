@@ -1,0 +1,41 @@
+{
+  "name": "oracle-cloud-ops",
+  "owner": {
+    "name": "OCI Cloud Operations Plugin",
+    "email": "support@example.com"
+  },
+  "description": "Marketplace for Oracle Cloud Infrastructure operations and automation plugins",
+  "plugins": [
+    {
+      "name": "oci-cloud-ops",
+      "source": ".",
+      "description": "Oracle Cloud Infrastructure operations plugin with intelligent agent skills for managing compute, networking, databases, monitoring, secrets, GenAI services, and infrastructure as code. Includes 800+ CLI commands, Python SDK examples, and best practices.",
+      "version": "1.0.0",
+      "author": {
+        "name": "OCI Cloud Operations Team",
+        "email": "support@example.com"
+      },
+      "license": "MIT",
+      "keywords": [
+        "oracle",
+        "oci",
+        "cloud",
+        "infrastructure",
+        "devops",
+        "compute",
+        "networking",
+        "database",
+        "autonomous-database",
+        "monitoring",
+        "vault",
+        "secrets",
+        "genai",
+        "ai",
+        "iam",
+        "terraform",
+        "infrastructure-as-code"
+      ],
+      "category": "cloud-operations"
+    }
+  ]
+}
