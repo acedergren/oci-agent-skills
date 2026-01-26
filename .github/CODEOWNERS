@@ -1,0 +1,31 @@
+# CODEOWNERS file for OCI Agent Skills
+# Define who should review changes to different parts of the codebase
+
+# Core plugin configuration - requires owner review
+/.claude-plugin/               @acedergren
+/.mcp.json                     @acedergren
+/plugin.json                   @acedergren
+/marketplace.json              @acedergren
+
+# Security and governance - requires owner review
+/SECURITY.md                   @acedergren
+/AGENTS.md                     @acedergren
+/LICENSE                       @acedergren
+
+# Documentation - requires owner review for accuracy
+/README.md                     @acedergren
+/docs/                         @acedergren
+
+# All skills require review for security and accuracy
+/skills/                       @acedergren
+/skills/compute-management/    @acedergren
+/skills/networking-management/ @acedergren
+/skills/database-management/   @acedergren
+/skills/monitoring-operations/ @acedergren
+/skills/secrets-management/    @acedergren
+/skills/genai-services/        @acedergren
+/skills/iam-identity-management/ @acedergren
+/skills/finops-cost-optimization/ @acedergren
+
+# GitHub configuration
+/.github/                      @acedergren
