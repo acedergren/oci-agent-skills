@@ -469,14 +469,16 @@ oci usage-api subscription get \
 - Slack/Teams integration for anomalies
 - PagerDuty for critical cost events
 
-## MCP Server Tools
+## MCP Server Tools (Optional)
 
-This skill leverages these MCP servers for enhanced capabilities:
+This skill provides full functionality using OCI CLI commands. Optional MCP servers enhance capabilities with real-time data:
 
-1. **oracle-oci-usage**: Cost and usage data retrieval
-2. **oracle-oci-pricing**: Real-time pricing lookups
-3. **oracle-oci-resource-search**: Find resources for optimization
-4. **oracle-oci-cloud-guard**: Security-related cost issues
+1. **oracle-oci-usage**: Automated cost and usage data retrieval (vs CLI queries)
+2. **oracle-oci-pricing**: Real-time pricing lookups (vs manual calculations)
+3. **oracle-oci-resource-search**: Fast cross-compartment search (vs sequential queries)
+4. **oracle-oci-cloud-guard**: Automated security recommendations (vs manual review)
+
+**Note**: These servers require local installation. See [MCP Setup Guide](../../docs/MCP_SETUP.md). All functionality works without them using standard OCI CLI commands.
 
 ## When to Use This Skill
 

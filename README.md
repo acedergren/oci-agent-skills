@@ -23,12 +23,17 @@ This plugin provides expert-level guidance and complete CLI command references f
 
 ### 🔌 MCP Server Integration
 
+**Core Servers (Pre-configured)**
 - **OCI API Server**: Direct access to OCI APIs through MCP
 - **Context7**: Retrieves up-to-date OCI documentation and references
+
+**Optional Servers** (Require [local setup](docs/MCP_SETUP.md))
 - **OCI Pricing**: Real-time pricing lookups by SKU or product name
 - **OCI Usage**: Cost and usage analytics for FinOps automation
 - **OCI Resource Search**: Cross-compartment resource discovery
 - **OCI Cloud Guard**: Security issues and recommendations
+
+*Note: Plugin provides full functionality without optional servers. See [MCP Setup Guide](docs/MCP_SETUP.md) for installation.*
 
 ### 📚 Complete CLI References
 
