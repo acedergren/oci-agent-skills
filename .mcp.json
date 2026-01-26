@@ -7,6 +7,39 @@
     "context7": {
       "description": "Up-to-date documentation retrieval for OCI CLI and services",
       "disabled": false
+    },
+    "oracle-oci-pricing": {
+      "command": "uvx",
+      "args": ["oracle.oci-pricing-mcp-server@latest"],
+      "description": "Real-time OCI pricing lookups by SKU or product name with currency conversion",
+      "disabled": false
+    },
+    "oracle-oci-usage": {
+      "command": "uvx",
+      "args": ["oracle.oci-usage-mcp-server@latest"],
+      "description": "Cost and usage analytics for FinOps automation",
+      "disabled": false,
+      "env": {
+        "OCI_CONFIG_PROFILE": "DEFAULT"
+      }
+    },
+    "oracle-oci-resource-search": {
+      "command": "uvx",
+      "args": ["oracle.oci-resource-search-mcp-server@latest"],
+      "description": "Cross-compartment and cross-service resource discovery",
+      "disabled": false,
+      "env": {
+        "OCI_CONFIG_PROFILE": "DEFAULT"
+      }
+    },
+    "oracle-oci-cloud-guard": {
+      "command": "uvx",
+      "args": ["oracle.oci-cloud-guard-mcp-server@latest"],
+      "description": "Cloud Guard security issues and recommendations",
+      "disabled": false,
+      "env": {
+        "OCI_CONFIG_PROFILE": "DEFAULT"
+      }
     }
   }
 }

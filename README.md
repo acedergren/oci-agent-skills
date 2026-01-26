@@ -4,7 +4,7 @@ Comprehensive Oracle Cloud Infrastructure (OCI) operations plugin with intellige
 
 ## Overview
 
-This plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. It includes 9 detailed skills covering compute, networking, databases, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, and official best practices from Oracle.
+This plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. It includes 10 detailed skills covering compute, networking, databases, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, FinOps/cost optimization, and official best practices from Oracle.
 
 ## Features
 
@@ -18,13 +18,17 @@ This plugin provides expert-level guidance and complete CLI command references f
 - **Generative AI**: Foundation models, embeddings, chat, and fine-tuning
 - **IAM & Identity**: Users, groups, policies, dynamic groups, and IDCS integration
 - **Infrastructure as Code**: Terraform, Resource Manager, and Landing Zones
+- **FinOps & Cost Optimization**: Usage analytics, anomaly detection, budgets, and cost intelligence
 - **Best Practices**: Official Oracle guidance, Well-Architected Framework, CIS compliance
 
 ### 🔌 MCP Server Integration
 
 - **OCI API Server**: Direct access to OCI APIs through MCP
 - **Context7**: Retrieves up-to-date OCI documentation and references
-- **DeepWiki**: Access to comprehensive OCI documentation
+- **OCI Pricing**: Real-time pricing lookups by SKU or product name
+- **OCI Usage**: Cost and usage analytics for FinOps automation
+- **OCI Resource Search**: Cross-compartment resource discovery
+- **OCI Cloud Guard**: Security issues and recommendations
 
 ### 📚 Complete CLI References
 
@@ -142,6 +146,17 @@ Activate when working with:
 - Access troubleshooting
 
 **Example**: "Create a policy for developers to manage compute"
+
+### FinOps & Cost Optimization
+Activate when working with:
+- Cost and usage reporting
+- Budget management and alerts
+- Anomaly detection with ADB ML
+- Resource optimization and right-sizing
+- Reserved capacity planning
+- Pricing lookups and estimates
+
+**Example**: "Show my top spending services and identify idle resources"
 
 ## Usage Examples
 
@@ -324,7 +339,21 @@ For issues or questions:
 
 ## Version History
 
-### 1.0.0 (2024-01-26)
+### 1.2.0 (2026-01-26)
+- Added FinOps & Cost Optimization skill
+- Integrated 4 additional MCP servers (pricing, usage, resource-search, cloud-guard)
+- Cost intelligence with ADB ML-based anomaly detection
+- Budget management and alerting
+- Resource optimization workflows
+- Based on Oracle A-Team Chronicles FinOps series
+
+### 1.1.0 (2026-01-26)
+- Enhanced GenAI skill with OCI OpenAI package integration
+- Added agent building patterns for 5 frameworks
+- Added Oracle best practices skill
+- Well-Architected Framework guidance
+
+### 1.0.0 (2026-01-26)
 - Initial release
 - 7 comprehensive skills covering major OCI services
 - MCP integration (oci-api, context7)
