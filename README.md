@@ -1,6 +1,6 @@
-# OCI Cloud Operations Plugin for Claude Code
+# OCI Agent Skills for Claude Code
 
-Comprehensive Oracle Cloud Infrastructure (OCI) operations plugin with intelligent agent skills for managing cloud resources through Claude Code.
+Comprehensive Oracle Cloud Infrastructure (OCI) agent skills plugin for Claude Code - intelligent automation for managing cloud resources across compute, networking, databases, monitoring, and more.
 
 ## Overview
 
@@ -24,14 +24,14 @@ This plugin provides expert-level guidance and complete CLI command references f
 ### 🔌 MCP Server Integration
 
 **Core Servers (Pre-configured)**
-- **OCI API Server**: Direct access to OCI APIs through MCP
+- **OCI API**: Direct access to OCI APIs through MCP
 - **Context7**: Retrieves up-to-date OCI documentation and references
 
 **Optional Servers** (Require [local setup](docs/MCP_SETUP.md))
 - **OCI Pricing**: Real-time pricing lookups by SKU or product name
 - **OCI Usage**: Cost and usage analytics for FinOps automation
 - **OCI Resource Search**: Cross-compartment resource discovery
-- **OCI Cloud Guard**: Security issues and recommendations
+- **OCI Cloud Guard**: Cloud security issues and recommendations
 
 *Note: Plugin provides full functionality without optional servers. See [MCP Setup Guide](docs/MCP_SETUP.md) for installation.*
 
@@ -49,7 +49,7 @@ Each skill includes:
 
 1. Copy this plugin to your Claude Code plugins directory:
 ```bash
-cp -r oci-cloud-ops ~/.claude/plugins/
+cp -r oci-agent-skills ~/.claude/plugins/
 ```
 
 2. Restart Claude Code or reload plugins
@@ -64,7 +64,7 @@ The OCI skills should now be available automatically.
 ## Plugin Structure
 
 ```
-oci-cloud-ops/
+oci-agent-skills/
 ├── .claude-plugin/
 │   └── plugin.json           # Plugin manifest
 ├── .mcp.json                 # MCP server configuration
@@ -299,6 +299,135 @@ To disable an MCP server, edit `.mcp.json`:
 - Verify servers are not disabled
 - Restart Claude Code
 - Check server logs for errors
+
+## Using OCI Agent Skills with Other AI Coding Assistants
+
+While OCI Agent Skills is a Claude Code plugin, the underlying knowledge, CLI commands, patterns, and best practices are valuable for any AI-powered development tool. Here's how to leverage this content with other platforms:
+
+### GitHub Copilot
+
+GitHub Copilot integrates with VS Code, JetBrains IDEs, and GitHub Codespaces. You can leverage OCI Agent Skills knowledge in several ways:
+
+**In Copilot Chat:**
+- Copy OCI CLI commands from this documentation into Copilot Chat with context: "I need to execute this OCI command: `oci compute instance list...` - explain what it does and how to use it"
+- Ask Copilot to generate Python SDK code using the patterns documented in the skills
+- Request IAM policy generation based on the examples in the IAM skill
+- Use cost optimization queries from the FinOps skill to build cost analysis scripts
+
+**In Code Generation:**
+- Reference OCI CLI documentation within code comments to help Copilot generate appropriate commands
+- Include skill examples in docstrings to guide Copilot's code suggestions
+- Create a `.copilot-instructions` file at project root with OCI best practices from this documentation
+
+**Example Copilot Chat Usage:**
+```
+Me: I need to list all running Autonomous Databases in my production compartment.
+    Here's the OCI CLI command structure from oci-agent-skills:
+    oci db autonomous-database list --compartment-id <ocid>
+
+    Can you help me write a Python script that does this using the OCI SDK?
+
+Copilot: [Generates Python code using OCI SDK based on the CLI pattern you provided]
+```
+
+### Opencode
+
+Opencode is an open-source IDE plugin for extending AI capabilities. To integrate OCI Agent Skills knowledge:
+
+**Setup:**
+1. Clone or download the OCI Agent Skills repository: `git clone https://github.com/acedergren/oci-agent-skills.git`
+2. Reference the skill files in your Opencode custom knowledge base
+3. Configure Opencode to index the `skills/` directory for local context
+
+**Usage:**
+- OCI CLI commands from skills become available in Opencode's context window
+- Cost optimization and monitoring patterns guide Opencode's recommendations
+- IAM policy examples inform security-focused code generation
+- Infrastructure as Code templates accelerate Terraform/Resource Manager scaffolding
+
+**Knowledge Transfer:**
+```markdown
+# OCI Agent Skills Reference
+- Compute: skills/compute-management/SKILL.md
+- Networking: skills/networking-management/SKILL.md
+- Database: skills/database-management/SKILL.md
+- Monitoring: skills/monitoring-operations/SKILL.md
+- FinOps: skills/finops-cost-optimization/SKILL.md
+```
+
+### Codex and OpenAI API
+
+For Codex or any OpenAI API-based tools, create a custom system prompt that incorporates OCI knowledge:
+
+**System Prompt Template:**
+```
+You are an expert Oracle Cloud Infrastructure (OCI) engineer.
+Use these resources when helping with OCI tasks:
+
+1. CLI Commands: [Include relevant CLI examples from skills/*/SKILL.md]
+2. Best Practices: [Include security, cost, operational best practices]
+3. Code Patterns: [Include Python SDK examples from documentation]
+4. IAM Policies: [Include policy templates from iam-identity-management skill]
+
+When generating OCI code, always:
+- Use latest OCI SDK patterns
+- Include error handling examples
+- Reference security best practices
+- Suggest monitoring and cost optimization
+```
+
+**API Usage Example:**
+```python
+import openai
+
+# Load OCI knowledge from documentation
+with open('skills/compute-management/SKILL.md', 'r') as f:
+    oci_knowledge = f.read()
+
+# Create system prompt with OCI context
+system_prompt = f"""You are an OCI expert. Reference this knowledge:
+{oci_knowledge}
+
+Always provide CLI commands and SDK examples with explanations."""
+
+response = openai.ChatCompletion.create(
+    model="code-davinci-002",
+    messages=[
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": "Generate an OCI compute instance launch script"}
+    ]
+)
+```
+
+### General Cross-Platform Usage Tips
+
+1. **Extract Reusable Content:**
+   - Copy CLI commands and adapt them to your AI assistant's format
+   - Use code examples as templates for your assistant's code generation
+   - Reference best practices as guidelines in custom prompts
+
+2. **Version Management:**
+   - Keep a copy of specific skill versions your team uses
+   - Track changes in OCI services using the version history
+   - Update your custom prompts when new skills are released
+
+3. **Custom Knowledge Bases:**
+   - For enterprise teams, export skills content to internal wikis
+   - Build custom documentation combining OCI Agent Skills with your organization's standards
+   - Create domain-specific prompts for your AI assistant using skill patterns
+
+4. **Maximizing AI Effectiveness:**
+   - Provide context from relevant skills when asking AI assistants OCI questions
+   - Include CLI command examples from skills to guide code generation
+   - Reference specific best practices sections for security-focused work
+   - Share the FinOps skill content for cost-related guidance
+
+### Contributing Improvements
+
+If you enhance these skills for use with other platforms, consider contributing back:
+- Share integration patterns for Copilot, Opencode, or other tools
+- Document best practices for using OCI Agent Skills in your AI assistant
+- Report issues or suggest improvements via GitHub issues
 
 ## Contributing
 

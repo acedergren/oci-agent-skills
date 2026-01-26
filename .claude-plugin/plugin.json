@@ -1,13 +1,13 @@
 {
-  "name": "oci-cloud-ops",
+  "name": "oci-agent-skills",
   "version": "1.2.0",
-  "description": "Oracle Cloud Infrastructure operations plugin with intelligent agent skills for managing compute, networking, databases, monitoring, secrets, GenAI, IAM, and infrastructure as code",
+  "description": "Oracle Cloud Infrastructure agent skills for intelligent cloud operations - comprehensive skills for compute, networking, databases, monitoring, secrets, GenAI, IAM, and infrastructure as code",
   "author": {
-    "name": "OCI Cloud Operations Team",
+    "name": "OCI Agent Skills Team",
     "email": "support@example.com"
   },
-  "homepage": "https://github.com/acedergren/agent-skill-oci",
-  "repository": "https://github.com/acedergren/agent-skill-oci",
+  "homepage": "https://github.com/acedergren/oci-agent-skills",
+  "repository": "https://github.com/acedergren/oci-agent-skills",
   "keywords": [
     "oracle",
     "oci",
