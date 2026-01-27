@@ -12,7 +12,15 @@ Comprehensive Oracle Cloud Infrastructure (OCI) agent skills plugin for Claude C
 
 ## ⚡ Quick Start
 
-### Install from Claude Code Marketplace
+### Quickest: Using OpenSkills CLI
+
+```bash
+npx skills add acedergren/oci-agent-skills
+```
+
+That's it! The OCI skills are now available.
+
+### Alternative: Claude Code Marketplace
 
 ```bash
 # Add the marketplace (one-time)
@@ -22,7 +30,7 @@ Comprehensive Oracle Cloud Infrastructure (OCI) agent skills plugin for Claude C
 /plugin install oci-agent-skills
 ```
 
-That's it! The OCI skills are now available in Claude Code.
+Both methods install the same plugin - choose whichever is more convenient for your workflow.
 
 ### First Steps
 
@@ -89,9 +97,23 @@ Each skill includes:
 
 ## Installation
 
-### Recommended: Claude Code Marketplace (Easiest)
+### Option 1: OpenSkills CLI (Recommended)
 
-The easiest way to install is through the Claude Code Marketplace:
+The quickest way to install:
+
+```bash
+npx skills add acedergren/oci-agent-skills
+```
+
+**Benefits:**
+- ✅ Single command installation
+- ✅ Works with Claude Code and other AI agents
+- ✅ Automatic skill syncing
+- ✅ Easy to manage with `npx skills` commands
+
+### Option 2: Claude Code Marketplace
+
+Install through Claude Code's native marketplace:
 
 ```bash
 # Add the marketplace (one-time setup)
@@ -102,12 +124,11 @@ The easiest way to install is through the Claude Code Marketplace:
 ```
 
 **Benefits:**
-- ✅ Automatic updates when new skills are released
-- ✅ Easy management through Claude Code
-- ✅ Works across all your projects
-- ✅ Community support and feedback
+- ✅ Integrated into Claude Code
+- ✅ Automatic updates
+- ✅ Easy management through Claude Code UI
 
-### Alternative: Manual Installation
+### Option 3: Manual Installation
 
 If you prefer to manage the plugin locally:
 
