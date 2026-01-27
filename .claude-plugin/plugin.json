@@ -32,6 +32,5 @@
     "finops",
     "cost-optimization"
   ],
-  "license": "MIT",
-  "category": "cloud-operations"
+  "license": "MIT"
 }
