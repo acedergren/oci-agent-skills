@@ -1,10 +1,10 @@
 {
   "name": "oci-agent-skills",
   "version": "1.2.0",
-  "description": "Oracle Cloud Infrastructure agent skills for intelligent cloud operations - 10 specialized skills plus OCI Cloud Architect orchestrator agent for designing, implementing, and managing complete cloud solutions across compute, networking, databases, monitoring, secrets, GenAI, IAM, and infrastructure as code",
+  "description": "Community-maintained Oracle Cloud Infrastructure agent skills for intelligent cloud operations (not an official Oracle project) - 10 specialized skills plus OCI Cloud Architect orchestrator agent for designing, implementing, and managing complete cloud solutions across compute, networking, databases, monitoring, secrets, GenAI, IAM, and infrastructure as code",
   "author": {
-    "name": "OCI Agent Skills Team",
-    "email": "support@example.com"
+    "name": "Alexander Cedergren",
+    "email": "alex@solutionsedge.io"
   },
   "homepage": "https://github.com/acedergren/oci-agent-skills",
   "repository": "https://github.com/acedergren/oci-agent-skills",
