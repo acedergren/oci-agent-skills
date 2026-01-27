@@ -1,32 +1,59 @@
 {
   "mcpServers": {
     "oci-api": {
+      "command": "oci-api-mcp",
       "description": "Oracle Cloud Infrastructure API access via MCP",
-      "disabled": false
+      "disabled": false,
+      "_comment": "Core MCP server - provided by Claude Code plugin"
     },
     "context7": {
+      "command": "context7",
       "description": "Up-to-date documentation retrieval for OCI CLI and services",
-      "disabled": false
+      "disabled": false,
+      "_comment": "Core MCP server - provided by Claude Code plugin"
     },
     "oracle-oci-pricing": {
-      "description": "Real-time OCI pricing lookups by SKU or product name with currency conversion (requires local oracle/mcp installation)",
+      "command": "uv",
+      "args": ["run", "oracle.oci-pricing-mcp-server"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "description": "Real-time OCI pricing lookups by SKU or product name with currency conversion",
       "disabled": true,
-      "_comment": "To enable: Clone oracle/mcp repo and update command path. See docs/MCP_SETUP.md"
+      "_comment": "To enable: 1) Clone oracle/mcp repo locally 2) Build with 'make build' 3) Set disabled=false. See docs/MCP_SETUP.md for details."
     },
     "oracle-oci-usage": {
-      "description": "Cost and usage analytics for FinOps automation (requires local oracle/mcp installation)",
+      "command": "uv",
+      "args": ["run", "oracle.oci-usage-mcp-server"],
+      "env": {
+        "OCI_CONFIG_PROFILE": "DEFAULT",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "description": "Cost and usage analytics for FinOps automation (requires OCI authentication)",
       "disabled": true,
-      "_comment": "To enable: Clone oracle/mcp repo and update command path. See docs/MCP_SETUP.md"
+      "_comment": "Setup: See docs/MCP_SETUP.md - requires OCI CLI authentication"
     },
     "oracle-oci-resource-search": {
-      "description": "Cross-compartment and cross-service resource discovery (requires local oracle/mcp installation)",
+      "command": "uv",
+      "args": ["run", "oracle.oci-resource-search-mcp-server"],
+      "env": {
+        "OCI_CONFIG_PROFILE": "DEFAULT",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "description": "Cross-compartment and cross-service resource discovery",
       "disabled": true,
-      "_comment": "To enable: Clone oracle/mcp repo and update command path. See docs/MCP_SETUP.md"
+      "_comment": "Setup: See docs/MCP_SETUP.md - requires oracle/mcp repo cloned locally"
     },
     "oracle-oci-cloud-guard": {
-      "description": "Cloud Guard security issues and recommendations (requires local oracle/mcp installation)",
+      "command": "uv",
+      "args": ["run", "oracle.oci-cloud-guard-mcp-server"],
+      "env": {
+        "OCI_CONFIG_PROFILE": "DEFAULT",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "description": "Cloud Guard security issues and recommendations",
       "disabled": true,
-      "_comment": "To enable: Clone oracle/mcp repo and update command path. See docs/MCP_SETUP.md"
+      "_comment": "Setup: See docs/MCP_SETUP.md - requires oracle/mcp repo cloned locally and OCI auth"
     }
   }
 }
