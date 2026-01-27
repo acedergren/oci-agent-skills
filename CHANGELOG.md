@@ -1,9 +1,55 @@
 # Changelog
 
-All notable changes to the OCI Cloud Operations Plugin will be documented in this file.
+All notable changes to OCI Agent Skills will be documented in this file.
+
+**Community Project**: OCI Agent Skills is a community-maintained project created and maintained by Alexander Cedergren. It is not an official Oracle product.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.2.0] - 2026-01-26
+
+### Added
+- Community project status clarification and publication to Claude Code Marketplace
+- Updated author information: Alexander Cedergren (alex@solutionsedge.io)
+- Clear disclaimer that this is not an official Oracle product
+- FinOps & Cost Optimization skill with advanced cost analysis
+- 4 additional MCP servers for enhanced functionality:
+  - OCI Pricing: Real-time SKU-based pricing lookups
+  - OCI Usage: Cost and usage analytics for FinOps
+  - OCI Resource Search: Cross-compartment resource discovery
+  - OCI Cloud Guard: Security posture recommendations
+
+### Enhanced
+- Marketplace publication with proper schema configuration
+- Plugin manifest with community-maintained status
+- Documentation updated to reflect community authorship
+
+### Technical
+- Resolved marketplace schema validation issues
+- Updated plugin JSON structure for Claude Code compatibility
+
+## [1.1.0] - 2026-01-26
+
+### Added
+- Enhanced Generative AI Services skill
+  - OCI OpenAI Package integration
+  - Multi-provider agent building patterns (LangChain, LlamaIndex, AutoGen, Semantic Kernel, Vercel AI)
+  - Advanced prompt engineering examples
+  - RAG (Retrieval Augmented Generation) patterns
+
+- Oracle Best Practices Skill
+  - Well-Architected Framework principles
+  - Operational excellence patterns
+  - Reliability and high availability guidance
+  - Performance optimization recommendations
+  - Cost optimization strategies
+  - Security and compliance best practices
+
+### Enhanced
+- GenAI skill with comprehensive model examples
+- Added reference architectures for AI/ML workloads
+- Expanded CIS OCI Foundations Benchmark coverage
 
 ## [1.0.0] - 2026-01-26
 
@@ -108,21 +154,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned for 1.1.0
+### Planned for 1.3.0
 - Container and Kubernetes (OKE) management skill
 - Functions and serverless operations
 - API Gateway configuration
 - Data integration and streaming services
-- Advanced cost analysis and optimization tools
 
-### Planned for 1.2.0
+### Planned for 1.4.0
 - Visual architecture diagram generation
 - Multi-cloud comparison (OCI vs AWS vs Azure)
-- Migration planning tools
-- Disaster recovery automation
+- Migration planning and assessment tools
+- Disaster recovery and business continuity automation
 
 ---
 
 ## Version History Summary
 
-- **1.0.0** (2026-01-26): Initial release with 8 skills, MCP integration, and comprehensive documentation
+**Community-Maintained Project by Alexander Cedergren**
+
+- **1.2.0** (2026-01-26): Community clarification, marketplace publication, FinOps skill, additional MCP servers
+- **1.1.0** (2026-01-26): Enhanced GenAI integration, Oracle best practices skill
+- **1.0.0** (2026-01-26): Initial release with 8 skills, MCP integration, comprehensive documentation
