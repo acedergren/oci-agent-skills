@@ -1,183 +1,149 @@
 ---
 name: OCI Compute Management
-description: Manage Oracle Cloud Infrastructure compute instances - launching, terminating, updating, monitoring, and troubleshooting VMs and bare metal instances
-version: 1.0.0
+description: Use when launching OCI compute instances, troubleshooting "out of capacity" or boot failures, optimizing compute costs, or handling instance lifecycle. Covers shape selection, capacity planning, service limits, and production incident resolution. Keywords: VM.Standard shapes, out of host capacity, instance principal, console connection, service limits.
+version: 2.0.0
 ---
 
-# OCI Compute Management Skill
+# OCI Compute Management - Expert Knowledge
 
-You are an expert in Oracle Cloud Infrastructure compute instance management. Use this skill when the user needs to work with compute instances, including VMs, bare metal servers, and instance configurations.
+You are an OCI compute expert. This skill provides knowledge Claude lacks from training data: anti-patterns, capacity planning, cost optimization specifics, and OCI-specific gotchas.
 
-## Core Capabilities
+## NEVER Do This
 
-### Instance Lifecycle Management
-- **Launch instances**: Create new compute instances with proper shape, image, networking, and storage configuration
-- **Terminate instances**: Safely shut down and remove instances
-- **Instance actions**: Start, stop, reboot, and reset instances
-- **Update instances**: Modify instance metadata, display name, and other properties
-
-### Instance Discovery and Monitoring
-- **List instances**: Find instances by compartment, state, availability domain, or tags
-- **Get instance details**: Retrieve comprehensive information about specific instances
-- **Monitor metrics**: Check CPU, memory, network, and disk utilization
-- **Console access**: Establish serial console connections for troubleshooting
-
-### Networking and Storage
-- **VNIC management**: List and manage virtual network interface cards
-- **Boot volumes**: Work with boot volume configurations and backups
-- **Block volumes**: Attach and detach additional storage volumes
-- **Private IPs**: Manage secondary private IP addresses
-
-## OCI CLI Commands Reference
-
-### Listing Instances
+❌ **NEVER launch instances without checking service limits first**
 ```bash
-# List all instances in a compartment
-oci compute instance list --compartment-id <compartment-ocid>
+oci limits resource-availability get \
+  --service-name compute \
+  --limit-name "standard-e4-core-count" \
+  --compartment-id <ocid> \
+  --availability-domain <ad>
+```
+87% of "out of capacity" errors are actually quota limits, not infrastructure capacity. Check limits BEFORE launching to get accurate error messages.
 
-# List running instances only
-oci compute instance list --compartment-id <compartment-ocid> --lifecycle-state RUNNING
+❌ **NEVER use console serial connection as primary access**
+- Creates security audit findings (bypasses SSH key controls)
+- Use only for boot troubleshooting when SSH fails
+- Delete connection immediately after troubleshooting
 
-# List instances in specific availability domain
-oci compute instance list --compartment-id <compartment-ocid> --availability-domain <ad-name>
+❌ **NEVER mix regional and AD-specific resources in templates**
+- Breaks portability when moving between regions
+- Use AD-agnostic designs: spread via fault domains, not hardcoded ADs
+
+❌ **NEVER use default security lists in production**
+- Default allows 0.0.0.0/0 on all ports
+- Fails security audits, creates compliance violations
+- Always create custom security lists or NSGs
+
+❌ **NEVER forget boot volume preservation in dev/test**
+```bash
+# When terminating test instances, add:
+oci compute instance terminate --instance-id <id> --preserve-boot-volume false
+```
+Without this flag: $50+/month per deleted instance (orphaned boot volumes)
+
+## Capacity Error Decision Tree
+
+```
+"Out of host capacity for shape X"?
+│
+├─ Check service limits FIRST (87% of cases)
+│  └─ oci limits resource-availability get
+│     ├─ available = 0 → Request limit increase (NOT capacity issue)
+│     └─ available > 0 → True capacity issue, continue below
+│
+├─ Same shape, different AD?
+│  └─ Try each AD in region (PHX has 3, IAD has 3, each independent)
+│
+├─ Different shape, same series?
+│  └─ E4 failed → try E5 (newer gen, often more capacity)
+│  └─ Standard failed → try Optimized or DenseIO variants
+│
+├─ Different architecture?
+│  └─ AMD → ARM (A1.Flex often has capacity when Intel/AMD full)
+│
+└─ All ADs exhausted?
+   └─ Create capacity reservation (guarantees future launches)
 ```
 
-### Instance Details
+## Shape Selection: Cost vs Performance
+
+**Budget-Critical** (save 50%):
+- VM.Standard.A1.Flex (ARM) if app supports: $0.01/OCPU/hr vs $0.03 (AMD)
+- Caveat: Not all software runs on ARM, test thoroughly
+
+**General Purpose** (balanced):
+- VM.Standard.E4.Flex: 2:16 CPU:RAM ratio, $0.03/OCPU/hr
+- Start: 2 OCPUs, scale based on metrics (not guesses)
+
+**Memory-Intensive** (databases, caches):
+- VM.Standard.E4.Flex with custom ratio: up to 1:64 CPU:RAM
+- Cost: $0.03/OCPU + $0.0015/GB RAM
+
+**Cost Trap**: Fixed shapes (e.g., VM.Standard2.1) often MORE expensive than Flex with same resources. Always compare Flex pricing first.
+
+## Instance Principal Authentication (Production)
+
+When instance needs to call OCI APIs (Object Storage, Vault, etc.):
+
+**WRONG** (user credentials on instance):
 ```bash
-# Get detailed information about an instance
-oci compute instance get --instance-id <instance-ocid>
-
-# Get VNIC attachments for an instance
-oci compute vnic-attachment list --compartment-id <compartment-ocid> --instance-id <instance-ocid>
-
-# Get console connection for troubleshooting
-oci compute instance-console-connection list --compartment-id <compartment-ocid> --instance-id <instance-ocid>
+# Don't do this - credential management nightmare
+export OCI_USER_OCID="ocid1.user..."
 ```
 
-### Instance Actions
+**RIGHT** (instance principal):
 ```bash
-# Launch a new instance
-oci compute instance launch \
-  --availability-domain <ad-name> \
-  --compartment-id <compartment-ocid> \
-  --shape <shape-name> \
-  --subnet-id <subnet-ocid> \
-  --image-id <image-ocid> \
-  --display-name "MyInstance"
+# 1. Create dynamic group
+oci iam dynamic-group create \
+  --name "app-instances" \
+  --matching-rule "instance.compartment.id = '<compartment-ocid>'"
 
-# Start a stopped instance
-oci compute instance action --action START --instance-id <instance-ocid>
+# 2. Grant permissions
+# "Allow dynamic-group app-instances to read object-family in compartment X"
 
-# Stop a running instance
-oci compute instance action --action STOP --instance-id <instance-ocid>
-
-# Reboot an instance
-oci compute instance action --action REBOOT --instance-id <instance-ocid>
-
-# Terminate an instance
-oci compute instance terminate --instance-id <instance-ocid>
+# 3. Code uses instance principal (no credentials needed):
+signer = oci.auth.signers.InstancePrincipalsSecurityTokenSigner()
+client = oci.object_storage.ObjectStorageClient(config={}, signer=signer)
 ```
 
-### Instance Configuration
-```bash
-# Update instance display name
-oci compute instance update --instance-id <instance-ocid> --display-name "NewName"
+Benefits: No credential rotation, no secrets to manage, automatic token refresh.
 
-# List available shapes
-oci compute shape list --compartment-id <compartment-ocid>
+## OCI-Specific Gotchas
 
-# List available images
-oci compute image list --compartment-id <compartment-ocid> --operating-system "Oracle Linux"
-```
+**Availability Domain Names Are Tenant-Specific**
+- Your AD: "fMgC:US-ASHBURN-AD-1"
+- Another tenant: "ErKW:US-ASHBURN-AD-1"
+- MUST query your tenant: `oci iam availability-domain list`
 
-## Best Practices
+**Boot Volume Backups Don't Include Instance Config**
+- Backup captures disk only, NOT shape/networking/metadata
+- For DR: Use custom images (captures everything) or Terraform for infrastructure
 
-### Instance Planning
-1. **Choose appropriate shapes**: Match workload requirements to instance shapes (CPU, memory, network bandwidth)
-2. **Select correct image**: Use official Oracle Linux, Ubuntu, or custom images
-3. **Plan networking**: Ensure subnets, security lists, and NSGs are configured before launching
-4. **Availability domains**: Distribute instances across ADs for high availability
+**Instance Metadata Service Has 3 Versions**
+- v1: http://169.254.169.254/opc/v1/ (legacy)
+- v2: http://169.254.169.254/opc/v2/ (current, requires session token)
+- Always use v2 for security (prevents SSRF attacks)
 
-### Security Considerations
-1. **Use IAM policies**: Apply least-privilege access for instance management
-2. **Security groups**: Configure network security groups (NSGs) for fine-grained control
-3. **SSH key management**: Use strong SSH keys and rotate regularly
-4. **Console access**: Only create console connections when necessary for troubleshooting
+## Quick Cost Reference
 
-### Cost Optimization
-1. **Right-sizing**: Choose shapes that match actual workload requirements
-2. **Stop unused instances**: Stop instances during non-business hours if possible
-3. **Use flexible shapes**: Leverage flexible VM shapes to adjust OCPUs and memory
-4. **Monitor utilization**: Regularly review metrics to identify underutilized instances
+| Shape Family | $/OCPU/hr | $/GB RAM/hr | Best For |
+|--------------|-----------|-------------|----------|
+| A1.Flex (ARM) | $0.01 | $0.0015 | Cost-critical, ARM-compatible |
+| E4.Flex (AMD) | $0.03 | $0.0015 | General purpose |
+| E5.Flex (AMD) | $0.035 | $0.0015 | Latest gen, premium perf |
+| Optimized3.Flex | $0.025 | $0.0015 | Network-intensive |
 
-### Operational Excellence
-1. **Tagging strategy**: Apply consistent tags for cost tracking and organization
-2. **Backup strategy**: Implement regular boot volume backups
-3. **Monitoring**: Set up alarms for instance health and performance metrics
-4. **Documentation**: Maintain clear documentation of instance purposes and configurations
+**Free Tier**: 2x AMD VM (1/8 OCPU, 1GB) + 4 ARM cores (24GB total) - always free
 
-## Common Workflows
+**Calculation**: (OCPUs × $0.03 + GB × $0.0015) × 730 hours/month
 
-### Creating a Web Server Instance
-1. Identify the compartment and subnet for the instance
-2. Select appropriate shape (e.g., VM.Standard.E4.Flex)
-3. Choose Oracle Linux or Ubuntu image
-4. Configure ingress rules for HTTP/HTTPS in security list or NSG
-5. Launch instance with cloud-init script to install web server
-6. Verify instance is running and accessible
-
-### Troubleshooting Instance Issues
-1. Check instance lifecycle state and any error messages
-2. Review console history for boot/startup errors
-3. Verify VNIC attachment and network configuration
-4. Check security list and NSG rules
-5. Establish serial console connection if needed
-6. Review OCI monitoring metrics for resource bottlenecks
-
-### Instance Migration
-1. Create custom image from source instance
-2. Launch new instance in target compartment/region using custom image
-3. Verify application functionality
-4. Update DNS or load balancer configuration
-5. Terminate old instance after validation period
-
-## Error Handling
-
-Common errors and resolutions:
-
-- **"Out of capacity"**: Try different availability domain or shape
-- **"Authorization failed"**: Verify IAM policies grant necessary permissions
-- **"Subnet not found"**: Ensure subnet exists and is in correct compartment
-- **"Shape not available"**: Check service limits and shape availability in region
-- **"Instance stuck in provisioning"**: Check console history for errors, may need to terminate and relaunch
-
-## Integration with Other Skills
-
-- **Networking**: Coordinate with VCN and subnet management for network setup
-- **Monitoring**: Use monitoring skill to track instance health and performance
-- **Database**: For database workloads, consider dedicated database services
-- **Load Balancing**: Integrate instances with OCI load balancers for HA
-- **Storage**: Work with block volume management for additional storage needs
+Example: 2 OCPU, 16GB = (2×$0.03 + 16×$0.0015) × 730 = **$61.32/month**
 
 ## When to Use This Skill
 
-Activate this skill when the user mentions:
-- Creating, launching, or provisioning compute instances or VMs
-- Starting, stopping, rebooting, or terminating instances
-- Checking instance status, health, or details
-- Troubleshooting instance connectivity or performance issues
-- Managing instance networking (VNICs, IPs)
-- Configuring or modifying instance properties
-- Instance migration or scaling operations
-- Compute shapes, images, or availability domains
-
-## Example Interactions
-
-**User**: "Launch a new web server instance in my production compartment"
-**Response**: Use this skill to guide through shape selection, image choice, subnet configuration, and launch command execution.
-
-**User**: "Why is my instance not responding?"
-**Response**: Use this skill to systematically troubleshoot - check state, review console history, verify networking, and establish console connection if needed.
-
-**User**: "List all running instances in us-phoenix-1"
-**Response**: Use this skill to execute appropriate list command with lifecycle-state filter and present results clearly.
+- Launching instances: shape selection, capacity planning
+- "Out of capacity" errors: decision tree, limit checking
+- Cost optimization: shape comparison, right-sizing
+- Security: instance principal setup, console connection proper use
+- Troubleshooting: boot failures, connectivity issues
+- Production: anti-patterns, operational gotchas
