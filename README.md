@@ -1,6 +1,34 @@
 # OCI Agent Skills for Claude Code
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://code.claude.com)
+[![GitHub Marketplace](https://img.shields.io/badge/Available%20on-Claude%20Code%20Marketplace-blue)](https://code.claude.com/docs/en/discover-plugins)
+[![Skills Count](https://img.shields.io/badge/Skills-10-brightgreen)](#skills-reference)
+
 Comprehensive Oracle Cloud Infrastructure (OCI) agent skills plugin for Claude Code - intelligent automation for managing cloud resources across compute, networking, databases, monitoring, and more.
+
+## ⚡ Quick Start
+
+### Install from Claude Code Marketplace
+
+```bash
+# Add the marketplace (one-time)
+/plugin marketplace add acedergren/oci-agent-skills
+
+# Install the plugin
+/plugin install oci-agent-skills
+```
+
+That's it! The OCI skills are now available in Claude Code.
+
+### First Steps
+
+Try these prompts in Claude Code:
+
+1. **Compute**: "Help me launch an OCI compute instance for a web server"
+2. **Networking**: "I need to create a VCN with public and private subnets"
+3. **Database**: "Create an Autonomous Database for my application"
+4. **FinOps**: "Show me my top spending services and optimization opportunities"
 
 ## Overview
 
@@ -47,19 +75,41 @@ Each skill includes:
 
 ## Installation
 
-1. Copy this plugin to your Claude Code plugins directory:
+### Recommended: Claude Code Marketplace (Easiest)
+
+The easiest way to install is through the Claude Code Marketplace:
+
 ```bash
-cp -r oci-agent-skills ~/.claude/plugins/
+# Add the marketplace (one-time setup)
+/plugin marketplace add acedergren/oci-agent-skills
+
+# Install the plugin
+/plugin install oci-agent-skills
 ```
 
-2. Restart Claude Code or reload plugins
+**Benefits:**
+- ✅ Automatic updates when new skills are released
+- ✅ Easy management through Claude Code
+- ✅ Works across all your projects
+- ✅ Community support and feedback
 
-3. Verify installation:
+### Alternative: Manual Installation
+
+If you prefer to manage the plugin locally:
+
 ```bash
-claude code /help
+# Clone the repository
+git clone https://github.com/acedergren/oci-agent-skills.git ~/.claude/plugins/oci-agent-skills
+
+# Restart Claude Code
 ```
 
-The OCI skills should now be available automatically.
+Then verify installation:
+```bash
+/help
+```
+
+You should see OCI skills listed.
 
 ## Plugin Structure
 
@@ -429,15 +479,54 @@ If you enhance these skills for use with other platforms, consider contributing 
 - Document best practices for using OCI Agent Skills in your AI assistant
 - Report issues or suggest improvements via GitHub issues
 
+## Community
+
+### Report Issues & Suggest Features
+
+Found a bug or have an idea? Help us improve!
+
+- **🐛 Report bugs**: [Open an issue](https://github.com/acedergren/oci-agent-skills/issues) with details
+- **💡 Suggest features**: [Request new skills](https://github.com/acedergren/oci-agent-skills/issues) or enhancements
+- **❤️ Share feedback**: Use the discussions tab to share how you're using OCI Agent Skills
+
+### Get Help
+
+- **Troubleshooting**: Check the [Troubleshooting](#troubleshooting) section above
+- **CLI Issues**: See [OCI CLI Reference](https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/)
+- **SDK Help**: Browse [OCI Python SDK docs](https://oracle-cloud-infrastructure-python-sdk.readthedocs.io/)
+- **Community Forums**: [OCI Community](https://community.oracle.com/customerconnect/categories/oci)
+
 ## Contributing
+
+We welcome contributions from the community! Help us expand OCI Agent Skills:
+
+### For Users
+- Share your use cases and success stories
+- Test new features and report feedback
+- Suggest improvements or new skills
+- Help other users in discussions and issues
+
+### For Contributors
 
 To add new skills or enhance existing ones:
 
-1. Create skill directory under `skills/`
-2. Add `SKILL.md` with YAML frontmatter
-3. Include comprehensive CLI examples
-4. Document best practices
-5. Add troubleshooting section
+1. **Fork and clone** the repository
+2. **Create a branch** for your changes
+3. **Add skill directory** under `skills/`
+4. **Create `SKILL.md`** with YAML frontmatter following [AGENTS.md](./AGENTS.md)
+5. **Include comprehensive** CLI examples, SDK patterns, best practices
+6. **Add troubleshooting** section with common errors
+7. **Test thoroughly** against current OCI CLI/SDK versions
+8. **Open a pull request** with detailed description
+
+**Contribution Guidelines:**
+- Follow the [AGENTS.md](./AGENTS.md) standards
+- Review [SECURITY.md](./SECURITY.md) for security requirements
+- Update version numbers following [semantic versioning](https://semver.org/)
+- Ensure commands are tested and documented
+- Include IAM policy examples where applicable
+
+See [AGENTS.md](./AGENTS.md) for detailed skill architecture and coding conventions.
 
 ## Resources
 
@@ -463,13 +552,36 @@ To add new skills or enhance existing ones:
 
 MIT License - See LICENSE file for details
 
-## Support
+## Community Resources
 
-For issues or questions:
-1. Check skill documentation for common patterns
-2. Review troubleshooting sections
-3. Consult OCI documentation via Context7
-4. Open an issue with detailed description
+### Stay Updated
+- **Watch the repo** for release notifications
+- **Star on GitHub** to show your support
+- **Follow updates** to stay informed about new skills
+
+### Learn from Examples
+- Check skill documentation for common patterns
+- Review [resources section](#resources) for official guides
+- Look at troubleshooting sections for solutions
+- Search closed issues for common questions
+
+### Connect with Others
+- **GitHub Issues**: Ask questions, report bugs, suggest features
+- **GitHub Discussions**: Share experiences and best practices
+- **Oracle Community**: Connect with broader OCI community
+- **Claude Code Docs**: Learn about Claude Code capabilities
+
+## Made For Community
+
+OCI Agent Skills is built by the community, for the community. This project aims to make Oracle Cloud Infrastructure accessible and powerful for everyone using Claude Code.
+
+**Questions or feedback?** 
+- 🎯 **Found a bug?** [Report it](https://github.com/acedergren/oci-agent-skills/issues)
+- 💬 **Have ideas?** [Start a discussion](https://github.com/acedergren/oci-agent-skills/discussions)
+- 📚 **Want to contribute?** [Read our contributing guide](#contributing)
+- ⭐ **Like this project?** [Star us on GitHub](https://github.com/acedergren/oci-agent-skills)!
+
+---
 
 ## Version History
 
