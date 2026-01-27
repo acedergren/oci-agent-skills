@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://code.claude.com)
 [![GitHub Marketplace](https://img.shields.io/badge/Available%20on-Claude%20Code%20Marketplace-blue)](https://code.claude.com/docs/en/discover-plugins)
-[![Skills Count](https://img.shields.io/badge/Skills-10-brightgreen)](#skills-reference)
+[![Skills Count](https://img.shields.io/badge/Skills-10%2B1%20Agent-brightgreen)](#skills-reference)
 
 Comprehensive Oracle Cloud Infrastructure (OCI) agent skills plugin for Claude Code - intelligent automation for managing cloud resources across compute, networking, databases, monitoring, and more.
 
@@ -32,12 +32,13 @@ Try these prompts in Claude Code:
 
 ## Overview
 
-This plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. It includes 10 detailed skills covering compute, networking, databases, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, FinOps/cost optimization, and official best practices from Oracle.
+This plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. It includes **10 detailed skills** plus an **OCI Cloud Architect orchestrator agent** for intelligent multi-service automation. Skills cover compute, networking, databases, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, FinOps/cost optimization, and official best practices from Oracle.
 
 ## Features
 
 ### 🎯 Comprehensive Skills Coverage
 
+**10 Specialized Skills:**
 - **Compute Management**: Launch, manage, and troubleshoot compute instances
 - **Networking**: VCN, subnet, security group, and gateway configuration
 - **Database Management**: Autonomous Database, DB Systems, Exadata, and PDBs
@@ -48,6 +49,14 @@ This plugin provides expert-level guidance and complete CLI command references f
 - **Infrastructure as Code**: Terraform, Resource Manager, and Landing Zones
 - **FinOps & Cost Optimization**: Usage analytics, anomaly detection, budgets, and cost intelligence
 - **Best Practices**: Official Oracle guidance, Well-Architected Framework, CIS compliance
+
+**🤖 Intelligent Orchestrator Agent:**
+- **OCI Cloud Architect**: Multi-skill coordinator for complex, end-to-end cloud solutions
+  - Designs comprehensive architectures spanning multiple OCI services
+  - Coordinates implementation across compute, networking, database, security, and monitoring
+  - Troubleshoots complex multi-service issues systematically
+  - Applies best practices and security compliance throughout
+  - Optimizes for cost, performance, and operational excellence
 
 ### 🔌 MCP Server Integration
 
@@ -116,9 +125,12 @@ You should see OCI skills listed.
 ```
 oci-agent-skills/
 ├── .claude-plugin/
-│   └── plugin.json           # Plugin manifest
+│   ├── plugin.json           # Plugin manifest
+│   └── marketplace.json      # Marketplace metadata
 ├── .mcp.json                 # MCP server configuration
-├── skills/                   # Auto-activating skills
+├── agents/                   # Orchestrator agents
+│   └── oci-cloud-architect.md   # Multi-skill orchestration agent
+├── skills/                   # 10 Auto-activating specialist skills
 │   ├── compute-management/
 │   │   └── SKILL.md
 │   ├── networking-management/
@@ -131,7 +143,13 @@ oci-agent-skills/
 │   │   └── SKILL.md
 │   ├── genai-services/
 │   │   └── SKILL.md
-│   └── iam-identity-management/
+│   ├── iam-identity-management/
+│   │   └── SKILL.md
+│   ├── infrastructure-as-code/
+│   │   └── SKILL.md
+│   ├── finops-cost-optimization/
+│   │   └── SKILL.md
+│   └── best-practices/
 │       └── SKILL.md
 └── README.md
 ```
@@ -212,6 +230,54 @@ Activate when working with:
 - Pricing lookups and estimates
 
 **Example**: "Show my top spending services and identify idle resources"
+
+## Orchestrator Agent
+
+### OCI Cloud Architect
+
+The **OCI Cloud Architect** is an intelligent orchestrator agent that coordinates the 10 specialist skills to handle complex, multi-service cloud architecture scenarios. It automatically activates when you need end-to-end solutions that span multiple OCI services.
+
+**When the agent activates:**
+- Designing comprehensive cloud architectures
+- Planning infrastructure spanning multiple services
+- Troubleshooting complex, multi-service issues
+- Optimizing entire workloads for performance and cost
+- Implementing best practices across multiple services
+
+**Multi-Skill Coordination Examples:**
+
+1. **Three-Tier Application Architecture**
+   - Uses: Compute, Networking, Database, Monitoring, Security, IAM
+   - Designs web tier, app tier, database tier with security
+   - Configures networking between tiers
+   - Sets up monitoring and alerting across all services
+   - Applies IAM policies for least-privilege access
+   - Optimizes for cost and performance
+
+2. **Disaster Recovery Setup**
+   - Uses: Database, Compute, Networking, Monitoring
+   - Plans primary and standby regions
+   - Configures failover mechanisms
+   - Monitors replication health
+   - Documents recovery procedures
+
+3. **Secure Multi-Environment Setup**
+   - Uses: Networking, IAM, Secrets, Compute, Monitoring
+   - Creates dev, staging, production compartments
+   - Configures network isolation
+   - Sets up environment-specific IAM policies
+   - Manages secrets per environment
+   - Implements cross-environment monitoring
+
+**How It Differs from Individual Skills:**
+
+| Aspect | Individual Skills | Orchestrator Agent |
+|--------|---|---|
+| **Scope** | Single service (compute, database, etc.) | Multiple services together |
+| **Planning** | Commands for one service | End-to-end architecture |
+| **Coordination** | Independent | Coordinates between skills |
+| **Use Case** | "Create a database" | "Build a secure 3-tier app" |
+| **Best Practices** | Service-specific | Cross-service, holistic |
 
 ## Usage Examples
 
