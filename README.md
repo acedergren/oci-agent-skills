@@ -1,4 +1,14 @@
-# OCI Agent Skills for Claude Code
+<div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/oci-skills-banner.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/oci-skills-banner.svg">
+  <img alt="OCI AGENT SKILLS" src="assets/oci-skills-banner.svg" width="700">
+</picture>
+
+**Expert Oracle Cloud Infrastructure automation for Claude Code**
+
+</div>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://code.claude.com)
