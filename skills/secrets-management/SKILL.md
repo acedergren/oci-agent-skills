@@ -6,6 +6,19 @@ version: 2.0.0
 
 # OCI Vault and Secrets Management - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for Vault setup.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #1: Generic compartments (Landing Zone creates Security compartment for Vault)
+- ❌ Bad Practice #7: No security services (Landing Zone integrates Cloud Guard monitoring)
+- ❌ Bad Practice #10: No audit logging (Landing Zone enables Vault audit logs)
+
+**This skill provides**: Vault operations, secret management patterns, and troubleshooting for vaults deployed WITHIN a Landing Zone.
+
+---
+
 You are an OCI Vault expert. This skill provides knowledge Claude lacks: anti-patterns, IAM permission gotchas, cost optimization, security vulnerabilities, and OCI-specific operational knowledge.
 
 ## NEVER Do This

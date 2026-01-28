@@ -33,6 +33,53 @@ This skill provides OCI-specific landing zone patterns that differ from AWS/Azur
 
 ---
 
+## 🚨 Top 10 OCI Bad Practices - Solved by Landing Zones
+
+### Why Landing Zones Matter
+
+Without a proper Landing Zone, organizations commonly make these critical mistakes. OCI Landing Zones solve all 10:
+
+| # | Bad Practice | Impact | Landing Zone Solution |
+|---|--------------|--------|----------------------|
+| **1** | **Using a couple of generic compartments** (or no compartments) | No governance, cost allocation impossible, blast radius = entire tenancy | **Hierarchical compartments**: Network/Security/Workloads structure with policy inheritance |
+| **2** | **Using Administrator group for daily operations** | No least privilege, audit trail useless, compliance violations | **Granular IAM policies**: Per-compartment, per-role policies with principle of least privilege |
+| **3** | **Internet breakout from spoke networks** | Egress cost waste ($3k-5k/month), no egress filtering, data exfiltration risk | **Hub-spoke topology**: Centralized egress via NAT/Firewall in hub VCN |
+| **4** | **Poor network segmentation** | Dev can access prod, lateral movement in breach, no environment isolation | **Separate compartments + VCNs**: Dev/Test/Prod isolation with Security Zones |
+| **5** | **Internet-wide open ports** (22, 3389, 8080) | Direct attack surface, brute force attempts, breach entry point | **Security Lists/NSGs**: Default deny, explicit allow only from bastion/VPN |
+| **6** | **Default security rules and route tables** | Overly permissive, not aligned to architecture, security drift | **IaC-managed rules**: Explicit, version-controlled, CIS Benchmark aligned |
+| **7** | **Limited use of OCI security services** | Manual security, no proactive detection, violations found after breach | **Integrated security**: Cloud Guard, Security Zones, VSS, OSMS, NFW, WAF enabled by default |
+| **8** | **Creating your own Terraform modules** | Reinventing wheel, unmaintained, no CIS compliance, inconsistent patterns | **Official OCI modules**: Battle-tested, Oracle-maintained, CIS certified |
+| **9** | **Public exposure of services** (buckets, databases, compute with public IPs) | Data breaches, compliance violations, unauthorized access | **Security Zones**: Deny public IPs, deny public buckets, encryption enforced |
+| **10** | **No logging, monitoring, notifications** | Blind to incidents, no audit trail, compliance failures, long MTTR | **Observability stack**: VCN Flow Logs, Audit Logs, Cloud Guard, Alarms, Notifications |
+
+### Cost Impact: With vs Without Landing Zone
+
+**Without Landing Zone (Annual Waste):**
+- Egress via IG instead of SG: **$36k-52k/year**
+- Flat compartments (no optimization): **$50k-100k/year** (cannot identify waste)
+- No Security Zones (breach): **$100k-$10M+** (average breach cost)
+- Manual Terraform maintenance: **$50k-100k/year** (engineer time)
+- **Total avoidable cost**: **$236k-$10.2M+/year**
+
+**With Landing Zone:**
+- One-time setup: **$10k-30k** (mostly planning/design)
+- Annual maintenance: **$5k-10k** (Terraform updates)
+- **ROI**: 10x-100x+ in first year
+
+### Compliance Impact
+
+**Regulatory frameworks requiring Landing Zone patterns:**
+- **PCI-DSS**: Network segmentation (#1, #3, #4, #5)
+- **HIPAA**: Encryption, logging, access controls (#7, #9, #10)
+- **SOC 2**: Least privilege, monitoring, change management (#2, #6, #10)
+- **ISO 27001**: Information security controls (all 10)
+- **CIS OCI Foundations**: 100+ controls (Landing Zone implements 80%+)
+
+**Without Landing Zone**: Compliance audit failures, remediation costs $100k-500k
+**With Landing Zone**: CIS Benchmark aligned by default, audit-ready
+
+---
+
 You are an OCI Landing Zone architect. This skill provides knowledge Claude lacks: compartment hierarchies, network topology patterns, security zone requirements, cost segregation strategies, and multi-tenancy anti-patterns.
 
 ## NEVER Do This

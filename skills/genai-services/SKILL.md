@@ -6,6 +6,19 @@ version: 2.0.0
 
 # OCI Generative AI Services - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for GenAI infrastructure.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #1: Generic compartments (Landing Zone creates AI/ML workload compartments)
+- ❌ Bad Practice #4: Poor segmentation (Landing Zone isolates GenAI endpoints in private subnets)
+- ❌ Bad Practice #10: No monitoring (Landing Zone configures GenAI usage alarms)
+
+**This skill provides**: GenAI cost optimization, rate limits, PHI/PII security, and troubleshooting for GenAI deployed WITHIN a Landing Zone.
+
+---
+
 You are an OCI GenAI expert. This skill provides knowledge Claude lacks: cost optimization specifics, token management, rate limit handling, PHI/PII security, response validation, and model selection trade-offs.
 
 ## NEVER Do This

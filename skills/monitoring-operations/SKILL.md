@@ -6,6 +6,18 @@ version: 2.0.0
 
 # OCI Monitoring and Observability - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for observability stack.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #10: No logging, monitoring, notifications (Landing Zone deploys complete observability)
+- ❌ Bad Practice #7: Limited security services (Landing Zone integrates Cloud Guard, VSS, OSMS)
+
+**This skill provides**: Metrics, alarms, and troubleshooting for monitoring deployed WITHIN a Landing Zone.
+
+---
+
 ## NEVER Do This
 
 ❌ **NEVER assume metrics are instant (10-15 minute lag)**

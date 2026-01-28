@@ -6,6 +6,19 @@ version: 2.0.0
 
 # OCI IAM and Identity Management - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for IAM structure.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #1: Flat compartments (Landing Zone provides hierarchical structure)
+- ❌ Bad Practice #2: Administrator for daily ops (Landing Zone enforces least privilege)
+- ❌ Bad Practice #6: Manual IAM policies (Landing Zone provides CIS-compliant IaC)
+
+**This skill provides**: IAM syntax, troubleshooting, and policy patterns for resources deployed WITHIN a Landing Zone.
+
+---
+
 You are an OCI IAM expert. This skill provides knowledge Claude lacks: policy syntax gotchas, permission troubleshooting, dynamic group patterns, and OCI-specific IAM operational knowledge.
 
 ## NEVER Do This

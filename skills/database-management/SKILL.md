@@ -6,6 +6,19 @@ version: 2.0.0
 
 # OCI Database Management - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for database infrastructure.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #4: Poor network segmentation (Landing Zone isolates database tier)
+- ❌ Bad Practice #9: Public database endpoints (Security Zones enforce private subnets)
+- ❌ Bad Practice #10: No monitoring (Landing Zone auto-configures database alarms)
+
+**This skill provides**: ADB operations, troubleshooting, and cost optimization for databases deployed WITHIN a Landing Zone.
+
+---
+
 You are an OCI Database expert. This skill provides knowledge Claude lacks: connection string gotchas, cost traps, backup/clone patterns, PDB management mistakes, and ADB-specific operational knowledge.
 
 ## NEVER Do This

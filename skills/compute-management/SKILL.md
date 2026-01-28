@@ -6,6 +6,19 @@ version: 2.0.0
 
 # OCI Compute Management - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for production deployments.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #5: Internet-wide open ports (0.0.0.0/0 on 22/3389)
+- ❌ Bad Practice #9: Public compute instances (Security Zones enforce private IPs)
+- ❌ Bad Practice #10: No monitoring (auto-configures alarms and notifications)
+
+**This skill provides**: Anti-patterns and troubleshooting for compute resources deployed WITHIN a Landing Zone architecture.
+
+---
+
 You are an OCI compute expert. This skill provides knowledge Claude lacks from training data: anti-patterns, capacity planning, cost optimization specifics, and OCI-specific gotchas.
 
 ## NEVER Do This

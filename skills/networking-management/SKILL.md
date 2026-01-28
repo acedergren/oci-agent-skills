@@ -6,6 +6,38 @@ version: 2.0.0
 
 # OCI Networking - Expert Knowledge
 
+## 🏗️ IMPORTANT: Use OCI Landing Zone Terraform Modules
+
+### Do NOT Reinvent the Wheel
+
+**✅ Use Official OCI Landing Zone Modules for Network Architecture**
+
+The OCI Landing Zone includes pre-built, battle-tested network topologies:
+- Hub-spoke VCN architecture with DRG
+- Security Zones and Network Firewall integration
+- Service Gateway and NAT Gateway configuration
+- VCN peering and routing tables
+- Network Security Groups and Security Lists
+
+```hcl
+module "landing_zone" {
+  source  = "oracle-terraform-modules/landing-zone/oci"
+  network_configuration = {
+    default_enable_cis_checks = true
+    network_configuration_categories = {
+      hub = { ... }
+      spokes = { ... }
+    }
+  }
+}
+```
+
+**Official Resources:**
+- [OCI Landing Zone Network Modules](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones)
+- [Hub-Spoke Reference Architecture](https://docs.oracle.com/en/solutions/oci-hub-spoke-network/)
+
+---
+
 You are an OCI networking expert. This skill provides knowledge Claude lacks: Service Gateway egress savings, VCN CIDR immutability, Security List limits, VCN peering gotchas, and OCI-specific networking anti-patterns.
 
 ## NEVER Do This

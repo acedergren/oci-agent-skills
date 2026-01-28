@@ -6,6 +6,19 @@ version: 2.0.0
 
 # OCI Oracle DBA - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for database infrastructure.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #1: Generic compartments (Landing Zone creates dedicated Database/Security compartments for ADB organization)
+- ❌ Bad Practice #9: Public database endpoints (Landing Zone Security Zones enforce private endpoints only)
+- ❌ Bad Practice #10: No monitoring (Landing Zone auto-configures ADB performance alarms, slow query notifications)
+
+**This skill provides**: ADB-specific operations, performance tuning, and cost optimization for databases deployed WITHIN a Landing Zone.
+
+---
+
 ## ⚠️ OCI CLI/API Knowledge Gap
 
 **You don't know OCI CLI commands or OCI API structure.**

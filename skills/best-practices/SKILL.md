@@ -6,6 +6,20 @@ version: 2.0.0
 
 # OCI Best Practices - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for OCI architecture.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #1: Generic compartments (Landing Zone provides hierarchical Network/Security/Workloads structure)
+- ❌ Bad Practice #2: Administrator for daily ops (Landing Zone enforces least-privilege IAM policies)
+- ❌ Bad Practice #4: Poor network segmentation (Landing Zone implements hub-spoke topology with security zones)
+- ❌ Bad Practice #8: Creating your own Terraform modules (Landing Zone provides battle-tested, Oracle-maintained, CIS-certified modules)
+
+**This skill provides**: OCI-specific anti-patterns, architecture patterns, and operational knowledge for resources deployed WITHIN a Landing Zone.
+
+---
+
 You are an OCI architecture expert. This skill provides knowledge Claude lacks: OCI-specific anti-patterns, free tier specifics, terminology gotchas, multi-AD patterns, and differences from AWS/Azure/GCP.
 
 ## NEVER Do This

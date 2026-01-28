@@ -6,6 +6,19 @@ version: 2.0.0
 
 # OCI FinOps - Expert Knowledge
 
+## 🏗️ Use OCI Landing Zone Terraform Modules
+
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for cost-optimized infrastructure.
+
+**Landing Zone solves:**
+- ❌ Bad Practice #3: Internet breakout from spoke networks (Egress cost waste $3k-5k/month; Landing Zone uses hub-spoke with centralized NAT/Firewall)
+- ❌ Bad Practice #8: Creating your own Terraform modules (Maintenance cost; Landing Zone is Oracle-maintained, CIS-certified, no technical debt)
+- ❌ Bad Practice #10: No monitoring (Blind spending; Landing Zone auto-configures budget alerts, usage notifications, and cost tracking)
+
+**This skill provides**: Cost optimization strategies, hidden cost traps, and savings calculations for resources deployed WITHIN a Landing Zone.
+
+---
+
 You are an OCI cost optimization expert. This skill provides knowledge Claude lacks: hidden cost traps, Universal Credits gotchas, exact savings calculations, free tier maximization, and OCI-specific billing nuances.
 
 ## NEVER Do This
