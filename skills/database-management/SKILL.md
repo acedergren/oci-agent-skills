@@ -337,6 +337,24 @@ oci db pluggable-database unplug --pdb-id <ocid>
 # Charges continue until DELETE
 ```
 
+## Progressive Loading References
+
+### OCI Database Cloud Service CLI
+
+**WHEN TO LOAD** [`oci-dbcs-cli.md`](references/oci-dbcs-cli.md):
+- Creating or managing DB Systems (VM, RAC, Exadata)
+- Configuring Data Guard for disaster recovery
+- Patching and maintenance operations
+- Backup and recovery procedures
+- ExaDB-D and ExaDB-C@C operations
+
+**Do NOT load** for:
+- Autonomous Database operations (use oracle-dba skill)
+- Connection troubleshooting (decision tree above)
+- Cost calculations (tables above)
+
+---
+
 ## When to Use This Skill
 
 - Connection issues: wallet errors, service name confusion, network troubleshooting

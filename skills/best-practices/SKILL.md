@@ -433,6 +433,24 @@ Use case: Production, PCI-DSS, healthcare (mandatory controls)
 
 **Gotcha**: Security Zones can break existing automation (test in dev first)
 
+## Progressive Loading References
+
+### OCI Well-Architected Checklist
+
+**WHEN TO LOAD** [`oci-well-architected-checklist.md`](references/oci-well-architected-checklist.md):
+- Running compliance checks against OCI tenancy
+- Preparing for CIS OCI Foundations Benchmark audit
+- Implementing automated security scanning
+- Creating remediation scripts for common findings
+- Setting up monitoring for drift detection
+
+**Do NOT load** for:
+- Quick anti-pattern reference (NEVER list above covers it)
+- Architecture decisions (covered in this skill)
+- Understanding OCI terminology (tables above)
+
+---
+
 ## When to Use This Skill
 
 - Architecture design: Multi-AD patterns, compartment strategy, VCN sizing

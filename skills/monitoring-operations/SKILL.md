@@ -80,6 +80,21 @@ CPUUtilization[5m].mean() > 80
 Trigger delay: 5 minutes (fires after 5 consecutive breaches)
 ```
 
+❌ **NEVER create alarms without notification channels**
+```
+# WRONG - alarm fires but nobody knows
+oci monitoring alarm create ... --destinations '[]'
+
+# RIGHT - always link to notification topic
+oci monitoring alarm create ... --destinations '["<notification-topic-ocid>"]'
+```
+Cost impact: Undetected outages cost $5,000-50,000/hour in production
+
+❌ **NEVER ignore Cloud Guard findings (security audit failure)**
+- Cloud Guard detects misconfigurations BEFORE they become incidents
+- Integrate Cloud Guard → Notifications → Email/Slack/PagerDuty
+- Cost impact: $100,000+ per security breach vs $0 for proactive remediation
+
 ## Metric Namespace Gotchas
 
 **OCI Metrics Use Service-Specific Namespaces:**

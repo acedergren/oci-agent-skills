@@ -467,6 +467,24 @@ oci os bucket list --all --fields approximateCount,approximateSize
 
 **Estimated monthly savings**: $100-500 for typical tenancy (cleanup waste)
 
+## Progressive Loading References
+
+### OCI Cost Management CLI
+
+**WHEN TO LOAD** [`oci-cost-cli.md`](references/oci-cost-cli.md):
+- Setting up budgets and alert rules
+- Querying usage reports via CLI
+- Managing service limits and quotas
+- Implementing tagging for cost allocation
+- Downloading detailed cost reports
+
+**Do NOT load** for:
+- Quick cost calculations (tables and examples above)
+- Understanding cost traps (NEVER list above)
+- Shape pricing comparisons (covered above)
+
+---
+
 ## When to Use This Skill
 
 - Unexpected bills: Investigating charges, finding cost spikes

@@ -99,6 +99,16 @@ ANY {instance.freeform-tags.environment = 'production'}
 # RIGHT - use separate administrative groups with clear hierarchy
 ```
 
+❌ **NEVER use "any-user" in production policies (security audit failure)**
+```
+# WRONG - grants access to ALL users including future unknown users
+Allow any-user to read buckets in tenancy
+
+# RIGHT - explicit group membership
+Allow group DataReaders to read buckets in compartment SharedData
+```
+Cost impact: $10,000+ per compliance violation finding in SOC2/HIPAA audits
+
 ## IAM Permission Troubleshooting
 
 ### "404 - NotAuthorizedOrNotFound"

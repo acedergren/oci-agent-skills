@@ -80,6 +80,11 @@ oci compute instance terminate --instance-id <id> --preserve-boot-volume false
 ```
 Without this flag: $50+/month per deleted instance (orphaned boot volumes)
 
+❌ **NEVER enable public IP on production instances**
+- Use bastion service or private endpoints for access
+- Cost impact: $500-5000+ per security incident from exposed instances
+- Landing Zone Security Zones automatically block this pattern
+
 ## Capacity Error Decision Tree
 
 ```

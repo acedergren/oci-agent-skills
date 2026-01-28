@@ -408,6 +408,24 @@ resource "oci_core_instance" "web" {
 
 **Benefit**: Cost reporting by CostCenter, Environment, Project in OCI Console
 
+## Progressive Loading References
+
+### OCI Terraform Patterns
+
+**WHEN TO LOAD** [`oci-terraform-patterns.md`](references/oci-terraform-patterns.md):
+- Setting up provider configuration (multi-region, auth methods)
+- Resource Manager stack operations via CLI
+- Common resource patterns (VCN, compute, ADB)
+- State management with Object Storage backend
+- Landing Zone module usage examples
+
+**Do NOT load** for:
+- Quick provider gotchas (NEVER list above)
+- Understanding when to use Landing Zone (covered above)
+- Lifecycle management patterns (covered above)
+
+---
+
 ## When to Use This Skill
 
 - Writing Terraform: provider configuration, resource dependencies, lifecycle
