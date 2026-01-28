@@ -1,340 +1,377 @@
 ---
 name: OCI Networking Management
-description: Manage Oracle Cloud Infrastructure networking components - VCNs, subnets, security lists, route tables, gateways, and network security groups
-version: 1.0.0
+description: Use when designing OCI networks, troubleshooting connectivity, optimizing egress costs, or configuring VCN security. Covers Service Gateway cost savings, VCN CIDR immutability, Security List vs NSG tradeoffs, VCN peering limitations, and Load Balancer subnet requirements. Keywords: egress costs service gateway, VCN CIDR cannot change, security list limit 5, local peering same region, LB subnet too small.
+version: 2.0.0
 ---
 
-# OCI Networking Management Skill
+# OCI Networking - Expert Knowledge
 
-You are an expert in Oracle Cloud Infrastructure virtual networking. Use this skill when the user needs to work with VCNs, subnets, security rules, routing, or network gateways.
+You are an OCI networking expert. This skill provides knowledge Claude lacks: Service Gateway egress savings, VCN CIDR immutability, Security List limits, VCN peering gotchas, and OCI-specific networking anti-patterns.
 
-## Core Capabilities
+## NEVER Do This
 
-### VCN Management
-- **Create VCNs**: Design and provision Virtual Cloud Networks with proper CIDR blocks
-- **Manage VCNs**: Update, list, and delete VCNs across compartments
-- **VCN peering**: Configure local and remote VCN peering for cross-VCN communication
+❌ **NEVER route Oracle service traffic via Internet Gateway (expensive)**
+```
+Service Gateway routing saves egress costs:
 
-### Subnet Management
-- **Create subnets**: Define public and private subnets with appropriate CIDR ranges
-- **Configure subnets**: Manage subnet properties, route tables, and security lists
-- **Subnet planning**: Design subnet topology for multi-tier applications
+# WRONG - route Object Storage via Internet Gateway
+Route: 0.0.0.0/0 → Internet Gateway
+Cost: 10 TB to Object Storage = $85/month egress
 
-### Security Configuration
-- **Security lists**: Define ingress and egress rules for network traffic control
-- **Network security groups (NSGs)**: Create fine-grained security rules for specific resources
-- **Rule management**: Add, update, and remove security rules with proper protocols and ports
+# RIGHT - route Oracle services via Service Gateway
+Route: <oci-services-cidr> → Service Gateway
+Cost: 10 TB to Object Storage = $0 (FREE!)
 
-### Gateways and Routing
-- **Internet gateway**: Enable public internet access for VCN resources
-- **NAT gateway**: Allow outbound internet access for private subnets
-- **Service gateway**: Connect to Oracle services without internet routing
-- **Dynamic routing gateway (DRG)**: Enable VPN and FastConnect connectivity
-- **Route tables**: Configure routing rules for traffic flow
+Savings example (database backups to Object Storage):
+- Without Service Gateway: 20 TB/month × $0.0085/GB = $170/month
+- With Service Gateway: $0/month
+- Annual savings: $2,040
 
-## OCI CLI Commands Reference
-
-### VCN Operations
-```bash
-# List all VCNs in a compartment
-oci network vcn list --compartment-id <compartment-ocid>
-
-# Get VCN details
-oci network vcn get --vcn-id <vcn-ocid>
-
-# Create a new VCN
-oci network vcn create \
-  --compartment-id <compartment-ocid> \
-  --cidr-block "10.0.0.0/16" \
-  --display-name "ProductionVCN" \
-  --dns-label "prodvcn"
-
-# Update VCN display name
-oci network vcn update --vcn-id <vcn-ocid> --display-name "NewName"
-
-# Delete a VCN
-oci network vcn delete --vcn-id <vcn-ocid>
+Service Gateway supports:
+✓ Object Storage (all tiers)
+✓ Autonomous Database (for private endpoint ADB)
+✓ Oracle Services Network (OSN)
 ```
 
-### Subnet Operations
-```bash
-# List subnets in a VCN
-oci network subnet list --compartment-id <compartment-ocid> --vcn-id <vcn-ocid>
+**Critical**: Service Gateway egress is FREE, Internet Gateway egress is CHARGED
 
-# Get subnet details
-oci network subnet get --subnet-id <subnet-ocid>
+❌ **NEVER forget VCN CIDR cannot be changed (immutable)**
+```
+# WRONG - create VCN with /24, plan to expand later
+oci network vcn create --cidr-block "10.0.0.0/24"
+# Cannot expand to /16 later (OCI limitation!)
 
-# Create a public subnet
-oci network subnet create \
-  --compartment-id <compartment-ocid> \
-  --vcn-id <vcn-ocid> \
-  --cidr-block "10.0.1.0/24" \
-  --display-name "PublicSubnet" \
-  --dns-label "public" \
-  --prohibit-public-ip-on-vnic false
+# If you run out of IPs:
+1. Create new VCN with larger CIDR
+2. Migrate all resources (hours of downtime)
+3. Update DNS, security rules, route tables
+4. Delete old VCN
 
-# Create a private subnet
-oci network subnet create \
-  --compartment-id <compartment-ocid> \
-  --vcn-id <vcn-ocid> \
-  --cidr-block "10.0.2.0/24" \
-  --display-name "PrivateSubnet" \
-  --dns-label "private" \
-  --prohibit-public-ip-on-vnic true
+Migration cost: Hours of downtime, IP address changes, extensive reconfiguration
 
-# Update subnet
-oci network subnet update --subnet-id <subnet-ocid> --display-name "NewSubnetName"
+# RIGHT - plan for growth from day 1
+oci network vcn create --cidr-block "10.0.0.0/16"
+# Room for 256 /24 subnets, 65,536 IPs total
+
+Best practice: Use /16 for VCNs, /24 for subnets
 ```
 
-### Security List Operations
-```bash
-# List security lists
-oci network security-list list --compartment-id <compartment-ocid> --vcn-id <vcn-ocid>
+❌ **NEVER exceed 5 Security Lists per subnet (hard limit)**
+```
+OCI limit: Maximum 5 security lists per subnet
 
-# Get security list details
-oci network security-list get --security-list-id <seclist-ocid>
+# Problem: Complex app with many tiers
+Subnet needs rules for:
+- Web traffic (80, 443)
+- SSH access
+- Monitoring agents
+- Database clients
+- Logging services
+... 10+ security lists needed? IMPOSSIBLE!
 
-# Create security list (requires JSON file for complex rules)
-oci network security-list create \
-  --compartment-id <compartment-ocid> \
-  --vcn-id <vcn-ocid> \
-  --display-name "WebServerSecList" \
-  --ingress-security-rules '[{"protocol":"6","source":"0.0.0.0/0","tcpOptions":{"destinationPortRange":{"max":443,"min":443}}}]'
+# WRONG - try to add 6th security list
+oci network subnet update \
+  --subnet-id <ocid> \
+  --security-list-ids '["<sl1>","<sl2>","<sl3>","<sl4>","<sl5>","<sl6>"]'
+# FAILS: "Maximum security lists (5) exceeded"
 
-# Update security list rules
-oci network security-list update \
-  --security-list-id <seclist-ocid> \
-  --ingress-security-rules file://ingress-rules.json \
-  --egress-security-rules file://egress-rules.json
+# RIGHT - use Network Security Groups (NSGs) instead
+NSG limits:
+- 5 NSGs per resource (same as security lists)
+- 120 rules per NSG (vs unlimited in security lists)
+- Unlimited NSGs per VCN
+
+Migration strategy:
+1. Security Lists: Baseline rules (internet, DNS, ICMP)
+2. NSGs: Application-specific rules (app tier → DB tier)
 ```
 
-### Network Security Group Operations
-```bash
-# List NSGs
-oci network nsg list --compartment-id <compartment-ocid> --vcn-id <vcn-ocid>
+**Best practice**: Security Lists for subnet-wide rules, NSGs for resource-specific rules
 
-# Get NSG details
-oci network nsg get --nsg-id <nsg-ocid>
+❌ **NEVER assume VCN peering supports transitive routing**
+```
+Scenario: VCN-A ↔ VCN-B ↔ VCN-C (peered)
 
-# Create NSG
-oci network nsg create \
-  --compartment-id <compartment-ocid> \
-  --vcn-id <vcn-ocid> \
-  --display-name "DatabaseNSG"
+# WRONG assumption: A can reach C via B
+VCN-A instance: ping <VCN-C-instance>
+# FAILS! Transitive routing NOT supported
 
-# List NSG rules
-oci network nsg rules list --nsg-id <nsg-ocid>
+# OCI VCN peering is NON-TRANSITIVE:
+VCN-A can reach: VCN-B only
+VCN-C can reach: VCN-B only
+VCN-A CANNOT reach VCN-C
 
-# Add NSG rule
-oci network nsg rules add \
-  --nsg-id <nsg-ocid> \
-  --security-rules '[{"direction":"INGRESS","protocol":"6","source":"10.0.0.0/16","tcpOptions":{"destinationPortRange":{"max":1521,"min":1521}}}]'
+# RIGHT - explicit peering required
+Create peering: VCN-A ↔ VCN-C
+Now A can reach C directly
+
+Peering types:
+1. Local peering: Same region, FREE
+2. Remote peering: Cross-region, requires DRG ($0.01/hr)
+
+Cost impact (3-VCN mesh):
+- Without transitive: 3 peerings (A-B, B-C, A-C)
+- Remote peering: 3 × $7.30/month = $21.90/month
 ```
 
-### Gateway Operations
-```bash
-# Create Internet Gateway
-oci network internet-gateway create \
-  --compartment-id <compartment-ocid> \
-  --vcn-id <vcn-ocid> \
-  --is-enabled true \
-  --display-name "InternetGateway"
+❌ **NEVER use /27 or smaller for Load Balancer subnets**
+```
+Load Balancer subnet requirements:
+- Minimum /24 CIDR (256 IPs)
+- 2 subnets in different ADs (for HA)
+- Each subnet needs space for:
+  * LB frontends (1-5 IPs)
+  * LB backends (dynamic scaling)
+  * Reserved IPs (5-10 per subnet)
 
-# Create NAT Gateway
-oci network nat-gateway create \
-  --compartment-id <compartment-ocid> \
-  --vcn-id <vcn-ocid> \
-  --display-name "NATGateway"
+# WRONG - /27 subnet for LB
+oci network subnet create --cidr-block "10.0.1.0/27"
+# Only 32 IPs total (27 usable after OCI reserves 5)
+# LB creation FAILS: "Insufficient IP space"
+
+# RIGHT - /24 minimum
+oci network subnet create --cidr-block "10.0.1.0/24"
+# 256 IPs, room for scaling
+
+Gotcha: LB reserves IPs even when not scaling (future capacity)
+```
+
+❌ **NEVER delete default route table (breaks subnets)**
+```
+Every VCN has a default route table (auto-created):
+- Cannot be deleted (while VCN exists)
+- Can be modified
+
+# WRONG - try to delete default route table
+oci network route-table delete --rt-id <default-rt-ocid>
+# FAILS: "Cannot delete default route table"
+
+# Workaround: Create custom route tables for subnets
+1. Create new route table
+2. Associate subnet with new route table
+3. Leave default route table unused (orphaned but exists)
+```
+
+❌ **NEVER assume Security Lists are stateless (they're stateful!)**
+```
+Common confusion: OCI Security Lists vs AWS Security Groups
+
+OCI Security Lists: STATEFUL
+- Ingress rule allows TCP 443 → auto-allows response traffic
+- No need for explicit egress rule for responses
+
+AWS Security Groups: Also STATEFUL (same behavior)
+AWS Network ACLs: STATELESS (different, requires both directions)
+
+# WRONG (from AWS NACL habit): Add both ingress and egress
+Security List ingress: Allow TCP 443 from 0.0.0.0/0
+Security List egress: Allow TCP 1024-65535 to 0.0.0.0/0  # Unnecessary!
+
+# RIGHT - ingress rule only
+Security List ingress: Allow TCP 443 from 0.0.0.0/0
+# Response traffic auto-allowed (stateful)
+```
+
+## Networking Cost Optimization
+
+### Service Gateway Savings
+
+**Scenario: Database backups to Object Storage**
+
+```
+Monthly backup: 30 TB uploaded to Object Storage
+
+Without Service Gateway (via Internet Gateway):
+- Route: 0.0.0.0/0 → Internet Gateway
+- Egress cost: 30,000 GB × $0.0085/GB = $255/month
+- Ingress: FREE (always free in OCI)
+
+With Service Gateway:
+- Route: <oci-services-cidr> → Service Gateway
+- Egress cost: $0 (FREE!)
+- Ingress: FREE
+
+Annual savings: $255 × 12 = $3,060/year
+```
+
+**Service Gateway routing example**:
+```bash
+# Get OCI Services CIDR for your region
+oci network service list --all
 
 # Create Service Gateway
 oci network service-gateway create \
-  --compartment-id <compartment-ocid> \
+  --compartment-id <ocid> \
   --vcn-id <vcn-ocid> \
-  --services '[{"serviceId":"<service-ocid>"}]' \
+  --services '[{"serviceId":"<all-services-ocid>"}]' \
   --display-name "ServiceGateway"
 
-# List gateways
-oci network internet-gateway list --compartment-id <compartment-ocid> --vcn-id <vcn-ocid>
-oci network nat-gateway list --compartment-id <compartment-ocid> --vcn-id <vcn-ocid>
-oci network service-gateway list --compartment-id <compartment-ocid> --vcn-id <vcn-ocid>
+# Add route in private subnet route table
+# Destination: <oci-services-cidr> (e.g., all-phx-services-in-oracle-services-network)
+# Target: Service Gateway OCID
 ```
 
-### Route Table Operations
-```bash
-# List route tables
-oci network route-table list --compartment-id <compartment-ocid> --vcn-id <vcn-ocid>
+### FastConnect vs VPN Cost Comparison
 
-# Get route table details
-oci network route-table get --rt-id <route-table-ocid>
+```
+Scenario: Hybrid cloud connectivity, 500 GB/month data transfer
 
-# Create route table
-oci network route-table create \
-  --compartment-id <compartment-ocid> \
-  --vcn-id <vcn-ocid> \
-  --display-name "PublicRouteTable" \
-  --route-rules '[{"destination":"0.0.0.0/0","networkEntityId":"<igw-ocid>"}]'
+VPN (Site-to-Site):
+- VPN tunnel: $0.05/hr × 730 hrs = $36.50/month
+- Data processed: FREE (no per-GB charge)
+- Egress: 500 GB × $0.0085/GB = $4.25/month
+Total: $40.75/month
 
-# Update route table
-oci network route-table update \
-  --rt-id <route-table-ocid> \
-  --route-rules file://route-rules.json
+FastConnect (1 Gbps):
+- Port: $1,100/month (flat rate)
+- Data transfer: FREE (unlimited)
+Total: $1,100/month
+
+Breakeven: When egress > 126 GB/month, consider FastConnect
+Or: When predictable latency required (FastConnect = 5-20ms, VPN = 30-50ms)
+
+VPN use case: Dev/test, <100 GB/month
+FastConnect use case: Production, >500 GB/month, low latency
 ```
 
-## Best Practices
+## VCN Design Anti-Patterns
 
-### Network Design
-1. **CIDR planning**: Choose non-overlapping CIDR blocks (avoid conflicts with on-premises networks)
-2. **Subnet segmentation**: Use separate subnets for different tiers (web, app, database)
-3. **Public vs private**: Minimize public subnets, use private subnets with NAT gateway
-4. **Availability domains**: Distribute subnets across ADs for high availability
+**Anti-pattern: Single subnet for all tiers**
 
-### Security
-1. **Least privilege**: Apply restrictive security rules, only open necessary ports
-2. **NSG over security lists**: Use NSGs for resource-specific security (more flexible)
-3. **Stateful rules**: Leverage stateful rules to automatically allow return traffic
-4. **Regular audits**: Review and update security rules periodically
-5. **Source restriction**: Limit SSH/RDP access to known IP ranges
+```
+# WRONG - web, app, DB in one subnet
+Subnet: 10.0.1.0/24 (all resources)
+Security: Broad security list (many open ports)
+Risk: Lateral movement, no segmentation
 
-### Routing
-1. **Default route**: Configure default route (0.0.0.0/0) to internet gateway for public subnets
-2. **Service gateway**: Route Oracle service traffic through service gateway (avoid egress charges)
-3. **NAT gateway**: Use NAT gateway for private subnet internet access (updates, patches)
-4. **Route table associations**: Verify subnets use correct route tables
+# RIGHT - subnet per tier
+Subnet 1: 10.0.1.0/24 (web tier, public)
+Subnet 2: 10.0.2.0/24 (app tier, private)
+Subnet 3: 10.0.3.0/24 (DB tier, private)
 
-### Scalability
-1. **VCN size**: Use /16 CIDR blocks for flexibility (supports up to 65,536 IPs)
-2. **Subnet sizing**: Allocate adequate IP space for growth
-3. **Reserve ranges**: Keep some CIDR space reserved for future expansion
-4. **VCN peering**: Plan for multi-VCN architecture if needed
+NSGs:
+- Web NSG: Allow 80/443 from internet
+- App NSG: Allow 8080 from Web NSG only
+- DB NSG: Allow 1521 from App NSG only
 
-## Common Workflows
-
-### Creating a Three-Tier Application Network
-1. Create VCN with /16 CIDR block (e.g., 10.0.0.0/16)
-2. Create internet gateway and NAT gateway
-3. Create three subnets:
-   - Public subnet for load balancers (10.0.1.0/24)
-   - Private subnet for app servers (10.0.2.0/24)
-   - Private subnet for databases (10.0.3.0/24)
-4. Configure route tables:
-   - Public: default route to internet gateway
-   - Private: default route to NAT gateway
-5. Create NSGs:
-   - Load balancer NSG: allow 80/443 from internet
-   - App server NSG: allow app port from LB NSG
-   - Database NSG: allow 1521/3306 from app NSG
-6. Associate subnets with route tables and NSGs
-
-### Enabling Private Instance Internet Access
-1. Create NAT gateway in VCN
-2. Update private subnet route table
-3. Add route: destination 0.0.0.0/0, target NAT gateway
-4. Verify private instances can reach internet
-5. Confirm no inbound access from internet
-
-### Implementing Network Segmentation
-1. Identify application components and security requirements
-2. Create separate NSGs for each component tier
-3. Define security rules allowing only necessary traffic between tiers
-4. Remove broad security list rules
-5. Associate NSGs with compute instances or other resources
-6. Test connectivity and adjust rules as needed
-
-## Security Rule Patterns
-
-### Common Ingress Rules
-```json
-// Allow HTTP from internet
-{
-  "protocol": "6",
-  "source": "0.0.0.0/0",
-  "tcpOptions": {
-    "destinationPortRange": {"max": 80, "min": 80}
-  }
-}
-
-// Allow HTTPS from internet
-{
-  "protocol": "6",
-  "source": "0.0.0.0/0",
-  "tcpOptions": {
-    "destinationPortRange": {"max": 443, "min": 443}
-  }
-}
-
-// Allow SSH from specific IP
-{
-  "protocol": "6",
-  "source": "203.0.113.0/24",
-  "tcpOptions": {
-    "destinationPortRange": {"max": 22, "min": 22}
-  }
-}
-
-// Allow MySQL from app subnet
-{
-  "protocol": "6",
-  "source": "10.0.2.0/24",
-  "tcpOptions": {
-    "destinationPortRange": {"max": 3306, "min": 3306}
-  }
-}
+Benefits:
+✓ Blast radius containment
+✓ Granular security
+✓ Clear network segmentation
+✓ Compliance (PCI-DSS, HIPAA)
 ```
 
-### Common Egress Rules
-```json
-// Allow all outbound (default)
-{
-  "protocol": "all",
-  "destination": "0.0.0.0/0"
-}
+**Anti-pattern: /28 subnets (too small)**
 
-// Allow HTTPS to Oracle services
-{
-  "protocol": "6",
-  "destination": "<oci-services-cidr>",
-  "tcpOptions": {
-    "destinationPortRange": {"max": 443, "min": 443}
-  }
-}
+```
+# WRONG - tiny subnets
+VCN: 10.0.0.0/16
+Subnets: /28 (16 IPs each, 11 usable after OCI reserves 5)
+
+Problem: No room for scaling
+- 10 instances = 10 IPs
+- Add 2 more instances? No space!
+- Must create new subnet, migrate resources
+
+# RIGHT - adequate sizing
+VCN: 10.0.0.0/16
+Subnets: /24 (256 IPs each, 251 usable)
+
+Sizing guide:
+- Small app: /26 (64 IPs, 59 usable)
+- Medium app: /24 (256 IPs, 251 usable)
+- Large app: /23 (512 IPs, 507 usable)
+- Load Balancer: /24 minimum (hard requirement)
 ```
 
-## Error Handling
+## VCN Peering Gotchas
 
-Common errors and resolutions:
+**Local Peering** (same region):
+```
+Cost: FREE
+Latency: <1ms (same as within VCN)
+Use case: Multi-VCN design (security boundaries)
 
-- **"CIDR overlap"**: Choose non-overlapping CIDR blocks for subnets
-- **"Route table in use"**: Cannot delete route table associated with subnets
-- **"Security list in use"**: Update subnet to use different security list before deletion
-- **"Gateway not attached"**: Verify gateway is created and enabled
-- **"Invalid CIDR"**: Ensure CIDR notation is correct (e.g., 10.0.0.0/24)
+Setup:
+1. Create Local Peering Gateway (LPG) in each VCN
+2. Connect LPGs (bidirectional)
+3. Add routes in each VCN:
+   VCN-A route: <VCN-B-CIDR> → LPG
+   VCN-B route: <VCN-A-CIDR> → LPG
 
-## Integration with Other Skills
+Limitation: Same region only (cannot peer Phoenix ↔ Ashburn)
+```
 
-- **Compute**: Coordinate subnet and security group setup for instance launches
-- **Load Balancing**: Configure subnets and security rules for load balancers
-- **Database**: Set up private subnets and security rules for database systems
-- **VPN/FastConnect**: Work with DRG for hybrid connectivity
+**Remote Peering** (cross-region):
+```
+Cost: $0.01/hr per DRG connection = $7.30/month
+Latency: Geography-dependent (Phoenix ↔ Ashburn = ~70ms)
+Use case: Multi-region DR, global applications
+
+Setup:
+1. Create DRG in each region
+2. Attach DRG to VCN (each region)
+3. Create Remote Peering Connection (RPC) on each DRG
+4. Connect RPCs (cross-region)
+5. Add routes in each VCN
+
+Cost example (3 regions interconnected):
+- 3 DRG attachments: 3 × $7.30/month = $21.90/month
+```
+
+**Transitive routing NOT supported**:
+```
+VCN-A ↔ VCN-B ↔ On-Premises (via VPN)
+
+# WRONG assumption: A can reach on-premises via B
+VCN-A → VCN-B → On-Prem (FAILS!)
+
+# RIGHT - hub-and-spoke with DRG
+VCN-A → DRG ← On-Premises
+VCN-B → DRG ← On-Premises
+
+DRG acts as router (supports transitive)
+All VCNs can reach on-premises
+All VCNs can reach each other
+```
+
+## Security List vs NSG Decision Matrix
+
+| Use Case | Use Security Lists | Use NSGs |
+|----------|-------------------|----------|
+| **Subnet-wide baseline** (DNS, NTP, ICMP) | ✓ | |
+| **Internet egress** (all resources) | ✓ | |
+| **Application tier isolation** (app → DB) | | ✓ |
+| **Resource-specific rules** (this DB only) | | ✓ |
+| **Complex app** (>5 security lists needed) | | ✓ |
+| **Instance-level security** (per-instance rules) | | ✓ |
+
+**Recommended pattern**:
+```
+1 Security List per subnet (baseline):
+- Allow all egress
+- Allow ICMP (ping)
+- Allow DNS (UDP 53)
+- Allow NTP (if needed)
+
+Multiple NSGs per VCN (application):
+- Web NSG: Allow 80/443 from internet
+- App NSG: Allow 8080 from Web NSG
+- DB NSG: Allow 1521 from App NSG
+- Monitor NSG: Allow 9090 from management subnet
+
+Assign:
+- All instances: Security List (via subnet)
+- Web instances: Web NSG
+- App instances: App NSG
+- DB instances: DB NSG + Monitor NSG
+```
 
 ## When to Use This Skill
 
-Activate this skill when the user mentions:
-- Creating or configuring VCNs, subnets, or network topology
-- Setting up or modifying security lists, NSGs, or firewall rules
-- Configuring gateways (internet, NAT, service, DRG)
-- Managing route tables or routing configuration
-- Network connectivity issues or troubleshooting
-- Network security hardening or compliance
-- CIDR blocks, IP addresses, or network planning
-- VCN peering or multi-VCN architectures
-
-## Example Interactions
-
-**User**: "Create a VCN for my new application with public and private subnets"
-**Response**: Use this skill to design proper CIDR allocation, create VCN with gateways, set up subnets with appropriate route tables and security rules.
-
-**User**: "I need to allow HTTPS traffic to my web servers"
-**Response**: Use this skill to add appropriate ingress rules to security list or NSG for port 443.
-
-**User**: "How do I give my private instances internet access?"
-**Response**: Use this skill to explain NAT gateway setup and route table configuration.
+- Network design: VCN planning, subnet sizing, CIDR allocation
+- Cost optimization: Service Gateway setup, FastConnect vs VPN
+- Security: NSG vs Security List selection, network segmentation
+- Troubleshooting: Connectivity issues, routing problems, peering
+- High availability: Multi-AD subnet design, Load Balancer requirements
+- Hybrid connectivity: VPN, FastConnect, DRG configuration
