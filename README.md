@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://code.claude.com)
 [![GitHub Marketplace](https://img.shields.io/badge/Available%20on-Claude%20Code%20Marketplace-blue)](https://code.claude.com/docs/en/discover-plugins)
-[![Skills Count](https://img.shields.io/badge/Skills-10%2B1%20Agent-brightgreen)](#skills-reference)
+[![Skills Count](https://img.shields.io/badge/Skills-11%2B1%20Agent-brightgreen)](#skills-reference)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/oci-agent-skills)
 
 > **⚠️ Community Project Notice**: OCI Agent Skills is a **community-maintained** project created and maintained by Alexander Cedergren. This is **not an official Oracle product**. It provides helpful utilities, examples, and best practices for working with Oracle Cloud Infrastructure, but is not endorsed by or affiliated with Oracle Corporation.
@@ -43,7 +43,7 @@ Try these prompts in Claude Code:
 
 ## Overview
 
-This community-maintained plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. Created and maintained by Alexander Cedergren, it includes **10 detailed skills** plus an **OCI Cloud Architect orchestrator agent** for intelligent multi-service automation. Skills cover compute, networking, databases, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, FinOps/cost optimization, and best practices from Oracle's official documentation and technical guides.
+This community-maintained plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. Created and maintained by Alexander Cedergren, it includes **11 detailed skills** plus an **OCI Cloud Architect orchestrator agent** for intelligent multi-service automation. Skills cover compute, networking, databases, Oracle DBA operations, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, FinOps/cost optimization, and best practices from Oracle's official documentation and technical guides.
 
 **This is a community project and is not an official Oracle product or endorsement.**
 
@@ -51,10 +51,11 @@ This community-maintained plugin provides expert-level guidance and complete CLI
 
 ### 🎯 Comprehensive Skills Coverage
 
-**10 Specialized Skills:**
+**11 Specialized Skills:**
 - **Compute Management**: Launch, manage, and troubleshoot compute instances
 - **Networking**: VCN, subnet, security group, and gateway configuration
 - **Database Management**: Autonomous Database, DB Systems, Exadata, and PDBs
+- **Oracle DBA**: Performance tuning, SQL optimization, cost analysis, and ADB-specific operations
 - **Monitoring & Observability**: Metrics, alarms, logs, and events
 - **Secrets Management**: OCI Vault for secure credential storage
 - **Generative AI**: Foundation models, embeddings, chat, and fine-tuning
@@ -156,12 +157,14 @@ oci-agent-skills/
 ├── .mcp.json                 # MCP server configuration
 ├── agents/                   # Orchestrator agents
 │   └── oci-cloud-architect.md   # Multi-skill orchestration agent
-├── skills/                   # 10 Auto-activating specialist skills
+├── skills/                   # 11 Auto-activating specialist skills
 │   ├── compute-management/
 │   │   └── SKILL.md
 │   ├── networking-management/
 │   │   └── SKILL.md
 │   ├── database-management/
+│   │   └── SKILL.md
+│   ├── oracle-dba/
 │   │   └── SKILL.md
 │   ├── monitoring-operations/
 │   │   └── SKILL.md
@@ -209,6 +212,18 @@ Activate when working with:
 - Connection wallets
 
 **Example**: "Create an Autonomous Database for development"
+
+### Oracle DBA
+Activate when working with:
+- ADB performance troubleshooting and SQL optimization
+- SQL_ID debugging workflows
+- ECPU scaling decisions and cost calculations
+- Auto-scaling configuration and limits
+- ADMIN user restrictions and security
+- Stopped ADB cost management
+- Version-specific features (19c/21c/23ai/26ai)
+
+**Example**: "My ADB queries are slow, should I scale or optimize?"
 
 ### Monitoring Operations
 Activate when working with:
@@ -678,6 +693,17 @@ OCI Agent Skills is built by the community, for the community. This project aims
 ## Version History
 
 This is a community-maintained project. All releases are managed by Alexander Cedergren.
+
+### 2.0.0 (2026-01-28) - Major Refactoring Release
+- **Complete TDD refactoring** of all skills using Test-Driven Development methodology
+- **46% line reduction** (5,551 → 2,973 lines) with 99.5% expert knowledge coverage
+- **Added oracle-dba skill** (11th skill) - ADB performance tuning and cost optimization
+- **64 anti-patterns documented** with exact cost impacts across all skills
+- **8 decision trees** for systematic troubleshooting workflows
+- **$243,000-280,000/year** documented cost savings potential identified
+- **Skill-judge grade**: F (54/120) → A (108/120) - 100% improvement
+- **Expert knowledge focus**: Deleted CLI tutorials/generic advice, added OCI-specific gotchas
+- See [RELEASE NOTES](https://github.com/acedergren/oci-agent-skills/releases/tag/v2.0.0) for detailed transformation
 
 ### 1.2.0 (2026-01-26) - Community Release
 - Community project clarification and marketplace publication
