@@ -33,11 +33,11 @@ Successfully refactored all 11 OCI Agent Skills using TDD methodology, achieving
 | 8 | best-practices | 520 | 404 | 22% | 100% | ✅ Tested |
 | 9 | finops-cost-optimization | 512 | 440 | 14% | 100% | ✅ Tested |
 | 10 | networking-management | 341 | 378 | +11%* | 100% | ✅ Tested |
-| 11 | oracle-dba | 259 | 282 | +9%* | 95% | ✅ Tested |
+| 11 | oracle-dba | 259 | 385 | +49%* | 95% | ✅ Tested + SQLcl |
 
-*Content increased but 75-90% was replaced with expert knowledge
+*Content increased but includes progressive loading (251 lines in references/)
 
-**Overall:** 5,810 → 3,255 lines (44% reduction), 98% average coverage
+**Overall:** 5,810 → 3,506 lines (40% reduction), 98% average coverage
 
 ---
 
@@ -160,6 +160,35 @@ Successfully refactored all 11 OCI Agent Skills using TDD methodology, achieving
 2. Update marketplace
 3. Monitor production usage
 4. Collect feedback
+
+---
+
+## Post-Release Enhancement: SQLcl Integration
+
+**Date:** 2026-01-28 (post v2.0.0 release)
+
+### Problem
+Initial oracle-dba skill referenced Oracle MCP servers which:
+- Required complex setup (download 26ai docs, build index, run MCP server)
+- Added token overhead (MCP tool invocation)
+- Created external dependencies
+
+### Solution
+**Direct SQLcl Integration** - eliminated MCP middleware by:
+1. Created `sqlcl-workflows.md` reference (251 lines)
+2. Shows how to use SQLcl directly via Bash tool
+3. Progressive loading - only loaded when executing database operations
+
+### Value
+- **No setup**: SQLcl ships with Oracle, already available
+- **Token efficient**: Uses existing Bash tool, no MCP overhead
+- **Practical workflows**: 15 common patterns (top SQL, execution plans, wait events, exports)
+- **Self-contained**: No external dependencies
+
+### Updated Metrics
+- **Lines**: 259 → 385 (main) + 251 (reference) = 636 total
+- **Progressive loading**: Only ~385 lines loaded initially
+- **Coverage**: 95% expert knowledge maintained
 
 ---
 

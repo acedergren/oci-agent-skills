@@ -349,6 +349,32 @@ Recommendation: Use automatic backups, manual only for long-term archival
 | `ORA-30036: unable to extend segment` | Tablespace full (DATA auto-managed) | ADB auto-extends, if error persists → contact support |
 | `ORA-01031: insufficient privileges` | ADMIN user trying restricted operation | Use ADMIN only for allowed operations (see restrictions) |
 
+## Advanced Operations (Progressive Loading)
+
+### SQLcl Direct Database Access
+
+**WHEN TO LOAD** [`sqlcl-workflows.md`](references/sqlcl-workflows.md):
+- Need to execute SQL queries directly via Bash
+- Want to get execution plans, wait events, or active sessions
+- Performing SQL tuning tasks (DBMS_SQLTUNE)
+- Exporting/importing data with Data Pump
+- Generating DDL for schema objects
+
+**Example**: Finding top SQL by elapsed time
+```bash
+sql admin/password@adb_high <<EOF
+SELECT sql_id, elapsed_time/executions/1000 AS avg_ms
+FROM v\$sql WHERE executions > 0
+ORDER BY elapsed_time DESC FETCH FIRST 10 ROWS ONLY;
+EXIT;
+EOF
+```
+
+**Do NOT load** for:
+- Standard troubleshooting advice - covered in this skill's decision trees
+- Cost calculations - exact formulas provided above
+- Anti-patterns - NEVER list covers common mistakes
+
 ## When to Use This Skill
 
 - Performance issues: Slow queries, high CPU, scaling decisions
