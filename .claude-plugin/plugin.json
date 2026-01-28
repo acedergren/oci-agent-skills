@@ -1,7 +1,7 @@
 {
   "name": "oci-agent-skills",
-  "version": "1.2.0",
-  "description": "Community-maintained Oracle Cloud Infrastructure agent skills for intelligent cloud operations (not an official Oracle project) - 10 specialized skills plus OCI Cloud Architect orchestrator agent for designing, implementing, and managing complete cloud solutions across compute, networking, databases, monitoring, secrets, GenAI, IAM, and infrastructure as code",
+  "version": "2.2.3",
+  "description": "Community-maintained Oracle Cloud Infrastructure agent skills for AI coding agents - 13 specialized skills plus OCI Cloud Architect orchestrator for compute, networking, databases, DBA operations, monitoring, secrets, GenAI, IAM, IaC, FinOps, Landing Zones, and Events automation",
   "author": {
     "name": "Alexander Cedergren",
     "email": "alex@solutionsedge.io"
@@ -11,17 +11,18 @@
   "keywords": [
     "oracle",
     "oci",
+    "oracle-cloud",
+    "oracle-cloud-infrastructure",
     "cloud",
     "cloud-architecture",
     "infrastructure",
     "infrastructure-as-code",
     "devops",
-    "orchestration",
-    "multi-service-coordination",
     "compute",
     "networking",
     "database",
     "autonomous-database",
+    "dba",
     "monitoring",
     "vault",
     "secrets",
@@ -30,7 +31,10 @@
     "iam",
     "terraform",
     "finops",
-    "cost-optimization"
+    "cost-optimization",
+    "landing-zones",
+    "events",
+    "agent-skills"
   ],
   "license": "MIT"
 }
