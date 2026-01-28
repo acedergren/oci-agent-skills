@@ -1,20 +1,23 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="assets/oci-skills-banner.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/oci-skills-banner.svg">
-  <img alt="OCI AGENT SKILLS" src="assets/oci-skills-banner.svg" width="700">
-</picture>
+```
+  ██████╗  ██████╗██╗     █████╗  ██████╗ ███████╗███╗   ██╗████████╗    ███████╗██╗  ██╗██╗██╗     ██╗     ███████╗
+ ██╔═══██╗██╔════╝██║    ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝    ██╔════╝██║ ██╔╝██║██║     ██║     ██╔════╝
+ ██║   ██║██║     ██║    ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║       ███████╗█████╔╝ ██║██║     ██║     ███████╗
+ ██║   ██║██║     ██║    ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║       ╚════██║██╔═██╗ ██║██║     ██║     ╚════██║
+ ╚██████╔╝╚██████╗██║    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║       ███████║██║  ██╗██║███████╗███████╗███████║
+  ╚═════╝  ╚═════╝╚═╝    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝       ╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚══════╝
+```
 
 **Expert Oracle Cloud Infrastructure automation for Claude Code**
 
-</div>
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://code.claude.com)
-[![GitHub Marketplace](https://img.shields.io/badge/Available%20on-Claude%20Code%20Marketplace-blue)](https://code.claude.com/docs/en/discover-plugins)
+[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://claude.ai/code)
+[![Skills.sh](https://img.shields.io/badge/Skills.sh-Install-C74634)](https://skills.sh/acedergren/oci-agent-skills)
 [![Skills Count](https://img.shields.io/badge/Skills-13%2B1%20Agent-brightgreen)](#skills-reference)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/oci-agent-skills)
+
+</div>
 
 > **⚠️ Community Project Notice**: OCI Agent Skills is a **community-maintained** project created and maintained by Alexander Cedergren. This is **not an official Oracle product**. It provides helpful utilities, examples, and best practices for working with Oracle Cloud Infrastructure, but is not endorsed by or affiliated with Oracle Corporation.
 
