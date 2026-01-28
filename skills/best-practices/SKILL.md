@@ -1,519 +1,403 @@
 ---
 name: OCI Best Practices and Architecture
-description: Oracle Cloud Infrastructure best practices covering security, cost optimization, performance, operational excellence, and reliability. Based on official Oracle guidance and OCI Well-Architected Framework.
-version: 1.0.0
+description: Use when architecting OCI solutions, migrating from AWS/Azure, designing multi-AD deployments, or avoiding common OCI anti-patterns. Covers VCN sizing mistakes, Cloud Guard gotchas, free tier specifics, OCI terminology confusion, and multi-AD patterns. Keywords: VCN CIDR too small, compartment strategy, security list vs NSG, regional subnet, always-free limits.
+version: 2.0.0
 ---
 
-# OCI Best Practices and Architecture Skill
+# OCI Best Practices - Expert Knowledge
 
-You are an expert in Oracle Cloud Infrastructure best practices and well-architected framework principles. This skill provides official Oracle guidance for security, cost, performance, operations, and reliability based on https://www.oracle.com/cloud/oci-best-practices-guide/ and https://docs.oracle.com/solutions/.
+You are an OCI architecture expert. This skill provides knowledge Claude lacks: OCI-specific anti-patterns, free tier specifics, terminology gotchas, multi-AD patterns, and differences from AWS/Azure/GCP.
 
-## Core Best Practice Categories
+## NEVER Do This
 
-1. **Security** - Zero trust, IAM, encryption, Cloud Guard
-2. **Cost Optimization** - Right-sizing, reserved capacity, monitoring
-3. **Performance** - Shape selection, caching, network optimization
-4. **Operational Excellence** - IaC, monitoring, CI/CD, automation
-5. **Reliability** - HA, DR, backups, multi-AD architecture
+❌ **NEVER use /24 or smaller VCN CIDR (cannot expand)**
+```
+# WRONG - VCN too small, cannot expand later (OCI limitation)
+oci network vcn create --cidr-block "10.0.0.0/24"
+# Only 256 IPs total, exhausted quickly
 
-## Security Best Practices
+# WRONG - copying AWS habit (/16 VPC default)
+# OCI supports larger: /16 to /30
 
-### Zero Trust Architecture
-- Never trust, always verify principle
-- Implement identity domains with MFA
-- Use microsegmentation with NSGs
-- Encrypt all data at rest and in transit
-- Enable Cloud Guard for threat detection
+# RIGHT - start with /16, plan for growth
+oci network vcn create --cidr-block "10.0.0.0/16"
+# 65,536 IPs, room for 256 /24 subnets
 
-### CIS OCI Foundations Benchmark
-```bash
-# Deploy CIS-compliant landing zone
-oci resource-manager stack create \
-  --compartment-id <compartment-ocid> \
-  --config-source <cis-template-zip> \
-  --display-name "CIS-Landing-Zone"
-
-# Key controls:
-✓ Least privilege IAM policies
-✓ MFA for all users
-✓ Security zones enabled
-✓ Encryption by default
-✓ Audit logging active
-✓ Network security groups
+# CRITICAL: OCI VCNs CANNOT be resized after creation
+# Must create new VCN and migrate if too small
 ```
 
-### Preventive Controls
-- **OCI Network Firewall**: Perimeter protection with layer 7 inspection
-- **Security Zones**: Enforce policies at infrastructure level
-- **WAF**: Protect internet-facing applications from OWASP Top 10
-- **DDoS Prevention**: Built-in layer 3/4/7 protection
+**Migration cost**: Recreating VCN = hours of downtime, IP changes, security rule updates
 
-### Detective Controls
-- **Oracle Cloud Guard**: Continuous monitoring and automated response
-- **Vulnerability Scanning**: Regular OS and app scanning
-- **Data Safe**: Database security assessments and auditing
-- **Logging Analytics**: Centralized log aggregation and analysis
-
-## Cost Optimization
-
-### Right-Sizing Strategy
+❌ **NEVER use AD-specific subnets (breaks multi-AD HA)**
 ```
-Workload          | Start With        | Scale Based On
-Development       | VM.Standard.E4.Flex (1 OCPU) | CPU >70%
-Production        | VM.Standard.E4.Flex (2 OCPU) | Sustained metrics
-Cost-optimized    | VM.Standard.A1.Flex (Arm)    | 40% savings
-HPC/GPU           | BM.GPU4.8                    | Workload needs
+# WRONG - subnet tied to single AD
+oci network subnet create \
+  --vcn-id <vcn-ocid> \
+  --cidr-block "10.0.1.0/24" \
+  --availability-domain "fMgC:US-ASHBURN-AD-1"  # AD-specific!
+
+# Problem: Can't launch instances in other ADs, no HA
+
+# RIGHT - regional subnet (works in all ADs)
+oci network subnet create \
+  --vcn-id <vcn-ocid> \
+  --cidr-block "10.0.1.0/24"
+  # No --availability-domain flag = regional
+  # Instances can be in any AD in region
 ```
 
-### Free Tier Resources
+**Gotcha**: Some old OCI guides show AD-specific subnets (deprecated pattern)
+
+❌ **NEVER confuse Security Lists vs NSGs (different use cases)**
 ```
-Always Free (no time limit):
-✓ 2 Autonomous Databases (1 OCPU each)
-✓ 2 AMD Compute VMs (1/8 OCPU, 1GB)
-✓ 4 Arm Ampere A1 cores (24GB total)
-✓ 200GB Block Storage
-✓ 10GB Object Storage + 10GB Archive
-✓ Load Balancer (10 Mbps)
+OCI has TWO network security mechanisms:
 
-Strategy: Use for dev/test/POC
-```
+Security Lists (stateful, subnet-level):
+- Applied to ALL resources in subnet
+- Use for: Broad rules (internet egress, DNS)
+- Limit: 5 per subnet
+- Changes: Affect all instances in subnet
 
-### Storage Tiering
-```bash
-# Lifecycle policy for automatic tiering
-oci os object-lifecycle-policy put \
-  --bucket-name <bucket> \
-  --items '[{
-    "name":"ArchiveOldLogs",
-    "action":"ARCHIVE",
-    "timeAmount":90,
-    "timeUnit":"DAYS",
-    "objectNameFilter":{"inclusionPrefixes":["logs/"]}
-  }]'
+Network Security Groups (NSG, resource-level):
+- Applied to specific resources
+- Use for: Granular rules (app tier → DB tier)
+- Limit: 5 per resource, 120 rules per NSG
+- Changes: Affect only tagged resources
 
-# Cost comparison:
-Standard Storage:    $0.0255/GB/month
-Infrequent Access:   $0.0125/GB/month (51% savings)
-Archive Storage:     $0.0024/GB/month (91% savings)
+# WRONG - using Security Lists for app-specific rules
+Security List: Allow app-tier → database (applies to ENTIRE subnet)
+
+# RIGHT - use NSG for app-tier resources
+NSG "app-tier": Allow egress to NSG "db-tier" on port 1521
+# Only instances in app-tier NSG can reach DB
 ```
 
-### Budget Monitoring
-```bash
-# Set budget with alerts
-oci budgets budget create \
-  --compartment-id <compartment-ocid> \
-  --amount 1000 \
-  --reset-period MONTHLY \
-  --targets '["<compartment-ocid>"]' \
-  --alert-rule-recipients '{"emailRecipients":["team@example.com"]}'
+**Best practice**: Security Lists for baseline (internet, DNS), NSGs for application-specific rules
 
-# Track costs by tags
-Tags: Environment, CostCenter, Owner, Application
+❌ **NEVER assume single-AD deployment is acceptable (no SLA)**
+```
+OCI Availability Domains (ADs):
+- 3 ADs per region (most regions)
+- Isolated fault domains
+- <1ms latency between ADs
+
+# WRONG - all resources in single AD
+All instances in AD-1 → AD failure = complete outage
+
+# RIGHT - distribute across ADs
+Production instances: AD-1, AD-2, AD-3
+Load balancer: Automatically multi-AD
+Database: Autonomous (auto 3-AD) or RAC (2+ nodes)
+
+SLA impact:
+Single-AD: NO SLA (OCI doesn't guarantee)
+Multi-AD: 99.95% SLA
 ```
 
-## Performance Excellence
+**Critical**: Oracle **refuses** SLA claims for single-AD deployments in regions with 3 ADs
 
-### Compute Performance
+❌ **NEVER hardcode AD names (tenant-specific)**
 ```
-Shape Selection Guide:
-✓ VM.Standard.E4.Flex: General purpose, flexible
-✓ VM.DenseIO.E4: High IOPS workloads
-✓ BM.Standard.E4: Bare metal for maximum performance
-✓ VM.GPU.A10: AI/ML inference
-✓ BM.GPU.A100: Training large models
+# WRONG - AD names are tenant-specific, not portable
+availability_domain = "fMgC:US-ASHBURN-AD-1"  # Only works in YOUR tenancy!
 
-Start small, scale based on metrics (not guesses)
-```
+# Another tenant's AD name for same physical AD:
+availability_domain = "xYzA:US-ASHBURN-AD-1"  # Different prefix!
 
-### Block Volume Performance
-```bash
-# Ultra High Performance volume
-oci bv volume create \
-  --compartment-id <compartment-ocid> \
-  --availability-domain <ad> \
-  --size-in-gbs 1000 \
-  --vpus-per-gb 20  # 255 IOPS/GB, 300K IOPS max
-
-Performance Tiers:
-Balanced:              60 IOPS/GB
-Higher Performance:    75 IOPS/GB
-Ultra High:            90-255 IOPS/GB
-```
-
-### Network Optimization
-```
-Best Practices:
-✓ Regional subnets for flexibility
-✓ Adequate CIDR space (/16 VCN, /24 subnets)
-✓ FastConnect for predictable latency
-✓ Place resources in same AD for <1ms latency
-✓ Use flexible load balancers
-
-Latency Guide:
-Same AD:          <1ms
-Different AD:     1-2ms
-Cross-region:     Geography-dependent
-FastConnect:      5-20ms (vs 30-50ms internet)
-```
-
-### Caching Strategies
-```
-Implementation:
-✓ Redis/Memcached for session data
-✓ Database query result caching
-✓ CDN for static content
-✓ Browser caching headers
-✓ OCI Object Storage with CDN
-
-Benefits: 10-100x faster, reduced DB load, lower costs
-```
-
-## Operational Excellence
-
-### Infrastructure as Code
-```hcl
-# Terraform state in OCI Object Storage
-terraform {
-  backend "s3" {
-    bucket   = "terraform-state"
-    key      = "prod/terraform.tfstate"
-    region   = "us-phoenix-1"
-    endpoint = "https://namespace.compat.objectstorage.us-phoenix-1.oraclecloud.com"
-    skip_region_validation = true
-  }
+# RIGHT - query AD names dynamically
+data "oci_identity_availability_domains" "ads" {
+  compartment_id = var.tenancy_ocid
 }
 
-Best Practices:
-✓ Use modules for reusability
-✓ Separate state files per environment
-✓ Implement proper variable management
-✓ Use Resource Manager for team collaboration
-✓ Tag all resources consistently
+resource "oci_core_instance" "web" {
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
+}
 ```
 
-### Tagging Strategy
+**Why**: OCI generates unique AD prefixes per tenant for security isolation
+
+❌ **NEVER enable Cloud Guard auto-remediation without testing**
+```
+Cloud Guard = OCI threat detection + auto-response
+
+# DANGER - auto-remediation can break production
+Detector: "Public bucket detected"
+Auto-remediation: Make bucket private → breaks public website!
+
+Detector: "Security list allows 0.0.0.0/0"
+Auto-remediation: Remove rule → breaks internet access!
+
+# SAFER approach:
+1. Enable detectors (read-only mode first)
+2. Review findings for 1-2 weeks
+3. Tune responders to avoid false positives
+4. Enable auto-remediation for trusted patterns only
+```
+
+**Gotcha**: Cloud Guard enabled by default in some tenancies, can auto-break things
+
+❌ **NEVER assume you need Oracle Linux (common misconception)**
+```
+OCI supports:
+✓ Oracle Linux (free, optimized)
+✓ Ubuntu, CentOS, Rocky Linux (free)
+✓ Windows Server (BYOL or license-included)
+✓ Custom images (import your own)
+
+# WRONG assumption: "OCI = must use Oracle Linux"
+Reality: Any Linux works, Ubuntu has larger community
+
+# Cost: Oracle Linux is FREE (no license cost)
+# But if team knows Ubuntu → use Ubuntu
+```
+
+**Marketing confusion**: Oracle pushes Oracle Linux, but it's not required
+
+## OCI Always-Free Tier (Exact Limits)
+
+**Generous permanent free tier** (no credit card trial, no expiration):
+
+### Compute
+- **2 AMD VMs**: VM.Standard.E2.1.Micro (1/8 OCPU, 1 GB RAM each)
+- **4 Arm OCPUs**: VM.Standard.A1.Flex (allocate as 1×4 OCPU or 4×1 OCPU)
+  - Up to 24 GB total RAM (6 GB per OCPU)
+  - **Example**: Run 4× 1OCPU/6GB Arm instances free forever
+
+### Database
+- **2 Autonomous Databases**: 1 OCPU each, 20 GB storage per ADB
+  - Can be ATP or ADW
+  - **Limit**: 2 total per tenancy across all regions
+
+### Storage
+- **Block volumes**: 200 GB total (2× 100 GB boot volumes + custom)
+- **Object storage**: 10 GB Standard tier
+- **Archive storage**: 10 GB Archive tier
+- **Block volume backups**: 10 GB
+
+### Networking
+- **Load balancer**: 1 flexible LB, 10 Mbps bandwidth
+- **VCN**: 2 VCNs per region (free, no OCID cost)
+- **Public IPv4**: 1 reserved public IP free per region
+
+### Observability
+- **Monitoring**: 1 billion data points ingested
+- **Logging**: 10 GB ingested per month
+- **Notifications**: 1 million emails per month
+
+### Always-Free Gotchas
+
+**CRITICAL limits often missed**:
+```
+# Gotcha 1: 2 ADB limit is TENANCY-wide, not per region
+Can have: 1 ATP in Phoenix + 1 ADW in Ashburn = 2 (limit reached)
+Cannot: Add 3rd ADB in any region
+
+# Gotcha 2: Arm instances must be VM.Standard.A1.Flex only
+Cannot: Use newer A2 shapes (paid only)
+
+# Gotcha 3: Free tier != trial credits
+Free tier: Permanent, no expiration
+Trial: $300 credit for 30 days (separate)
+
+# Gotcha 4: Stopped ADB counts toward 2 ADB limit
+To free slot: Must DELETE ADB, not just STOP
+```
+
+## OCI Terminology vs AWS/Azure
+
+Migrating from AWS/Azure? **Terminology traps**:
+
+| OCI Term | AWS Equivalent | Azure Equivalent |
+|----------|---------------|------------------|
+| **VCN** | VPC | Virtual Network |
+| **Subnet** | Subnet | Subnet |
+| **Security List** | VPC Security Group | NSG (network-level) |
+| **NSG** | Security Group | Application Security Group |
+| **DRG** | Virtual Private Gateway | VPN Gateway |
+| **Compartment** | Resource Group / OU | Resource Group |
+| **Tenancy** | Account | Subscription |
+| **Region** | Region | Region |
+| **AD (Availability Domain)** | Availability Zone | Availability Zone |
+| **Fault Domain** | (within AZ) | Availability Set |
+| **Dynamic Group** | IAM Role (for instances) | Managed Identity |
+| **Instance Principal** | EC2 Instance Profile | Managed Identity |
+| **OCIR** | ECR | Container Registry |
+| **OKE** | EKS | AKS |
+
+**Critical difference**: OCI has **both** Security Lists (subnet) **and** NSGs (resource). AWS only has Security Groups (resource-level).
+
+## Multi-AD Architecture Patterns
+
+**OCI multi-AD specifics**:
+
+### AD Distribution Strategy
+
+```
+OCI Regions with 3 ADs (most regions):
+- US: Phoenix, Ashburn
+- UK: London
+- DE: Frankfurt
+- AU: Sydney, Melbourne
+
+Pattern: Distribute instances across all 3 ADs
+
+AD-1: Web tier (2 instances) + DB primary
+AD-2: Web tier (2 instances) + DB standby
+AD-3: Web tier (2 instances) + DB standby
+
+Load Balancer: Automatically spans ADs
+```
+
+**Gotcha**: Some shapes only available in specific ADs (check first)
+
 ```bash
-# Comprehensive tagging
-oci compute instance update \
-  --instance-id <instance-ocid> \
-  --defined-tags '{
-    "Operations":{
-      "Environment":"Production",
-      "CostCenter":"ENG-001",
-      "Owner":"platform-team",
-      "Application":"web-app",
-      "BackupPolicy":"daily",
-      "Compliance":"PCI-DSS"
-    }
-  }'
-
-Use tags for:
-- Cost allocation and reporting
-- Automated backup policies
-- Resource grouping
-- Compliance tracking
+# Check shape availability by AD
+oci compute shape list \
+  --compartment-id <ocid> \
+  --availability-domain "fMgC:US-ASHBURN-AD-1"
 ```
 
-### Monitoring and Alarms
-```bash
-# Critical alarm (page immediately)
-oci monitoring alarm create \
-  --compartment-id <compartment-ocid> \
-  --display-name "Database Critical CPU" \
-  --namespace "oci_autonomous_database" \
-  --query-text 'CpuUtilization[1m].mean() > 90' \
-  --severity "CRITICAL" \
-  --destinations '["<pager-topic-ocid>"]' \
-  --pending-duration "PT5M" \
-  --repeat-notification-duration "PT5M"
+### Fault Domain Additional Layer
 
-Monitoring Stack:
-- Service logs → OCI Logging
-- Application logs → Logging Analytics
-- Metrics → OCI Monitoring
-- APM → Application Performance Monitoring
+Within each AD, OCI has **Fault Domains** (FD):
+- 3 FDs per AD
+- Separate power, cooling, network
+- <1ms latency within AD
+
+```
+Best practice: Spread instances across ADs AND FDs
+
+AD-1:
+  FD-1: Web instance 1
+  FD-2: Web instance 2
+  FD-3: Web instance 3
+
+AD-2:
+  FD-1: Web instance 4
+  (repeat pattern)
+
+Protection:
+- AD failure: 2 ADs survive (66% capacity)
+- FD failure: Only 1 instance affected (16% capacity)
 ```
 
-### CI/CD Pipeline
+**When to use FDs**: Only for extra-critical apps (adds complexity)
+
+## Compartment Strategy Best Practices
+
+**Compartment hierarchy** (OCI-specific IAM boundary):
+
 ```
-DevSecOps Stages:
-1. Code commit → Git webhook
-2. Build → Compile and package
-3. Security scan → SAST, dependency check
-4. Unit tests → Code coverage
-5. Container build → Docker image
-6. Push to OCIR → Registry
-7. Deploy to dev → Automated
-8. Integration tests → Automated
-9. Deploy to prod → Manual approval
-
-Security Checkpoints:
-✓ Static analysis
-✓ Dependency scanning
-✓ Container image scanning
-✓ IAM policy validation
-✓ Secrets detection
-```
-
-## Reliability and High Availability
-
-### Multi-AD Architecture
-```
-Highly Available Pattern:
-
-Region: us-phoenix-1
-
-AD-1:                  AD-2:                  AD-3:
-- Load Balancer       - Load Balancer        - Load Balancer
-- Web tier (2)        - Web tier (2)         - Web tier (2)
-- App tier (2)        - App tier (2)         - App tier (2)
-- Database (primary)  - Database (standby)   - Database (standby)
-
-Benefits:
-✓ 99.99% availability SLA
-✓ Automatic failover
-✓ No single point of failure
-✓ Performance optimization
+Root Compartment (tenancy)
+│
+├─ SharedServices (networking, security)
+│  ├─ Network (VCNs, DRGs)
+│  └─ Security (Vault, KMS, Cloud Guard)
+│
+├─ Production
+│  ├─ App1
+│  │  ├─ Compute
+│  │  ├─ Database
+│  │  └─ Storage
+│  └─ App2
+│
+├─ NonProduction
+│  ├─ Development
+│  ├─ Testing
+│  └─ Staging
+│
+└─ Sandbox (developers, auto-cleanup)
 ```
 
-### Database High Availability
-```bash
-# Autonomous Database (built-in HA)
-✓ Automatic 3-way replication across ADs
-✓ RPO ~0, RTO <2 minutes
-✓ Automated backups with 60-day retention
-✓ Point-in-time recovery
+**Key principles**:
+1. **Billing separation**: Compartment tags enable cost reporting by environment
+2. **IAM boundaries**: Policies scoped to compartments (least privilege)
+3. **Quota isolation**: Separate limits per compartment
+4. **Lifecycle**: Delete entire compartment = deletes all resources inside
 
-# Cross-region DR with Data Guard
-oci db autonomous-database create-autonomous-database-dataguard-association \
-  --autonomous-database-id <primary-adb-ocid> \
-  --creation-type NEW \
-  --peer-region <dr-region>
+**Anti-pattern**: Flat structure with no hierarchy (AWS account-per-env habit)
 
-# DB System with RAC (2-node cluster)
-oci db system launch \
-  --shape "VM.Standard2.2" \
-  --node-count 2 \
-  --cluster-name "proddb" \
-  --cpu-core-count 4
+## Cost Optimization OCI-Specific
+
+### Flex Shape Savings (Unique to OCI)
+
+```
+Fixed shapes (legacy):
+VM.Standard2.4: 4 OCPUs, 60 GB RAM, $218/month
+
+Flex shapes (right-size RAM independently):
+VM.Standard.E4.Flex: 4 OCPUs, 16 GB RAM, $109/month (50% savings)
+
+Flex advantage: Pay only for RAM you need
+- 1 OCPU = 1-64 GB RAM configurable
+- Most apps don't need 15GB per OCPU (fixed ratio)
 ```
 
-### Backup Strategy (3-2-1 Rule)
+**Migration**: Replace fixed shapes with Flex for 30-50% savings
+
+### Arm Instance Savings (Generous Free Tier)
+
 ```
-3 copies of data
-2 different storage types
-1 offsite (different region)
+AMD instance: VM.Standard.E4.Flex (1 OCPU) = $0.03/hr
+Arm instance: VM.Standard.A1.Flex (1 OCPU) = $0.01/hr (67% cheaper)
 
-OCI Implementation:
-✓ Primary: Production data (region A)
-✓ Secondary: Boot volume backups (region A)
-✓ Tertiary: Object storage replication (region B)
+Always-Free Arm: 4 OCPUs free forever!
 
-Retention Policy:
-Daily:    7 days
-Weekly:   4 weeks
-Monthly:  12 months
-Yearly:   7 years (compliance)
+Use case: Web servers, CI/CD runners, dev environments
+Limitation: ARM64 only (not all apps compatible)
 ```
 
-### Disaster Recovery
+**Gotcha**: Free tier is A1 shapes only, newer A2 shapes are paid
+
+### Storage Tiering (Exact Prices)
+
+| Tier | Cost/GB/Month | Use Case | Retrieval |
+|------|--------------|----------|-----------|
+| **Standard** | $0.0255 | Active data, frequent access | Instant, free |
+| **Infrequent Access** | $0.0125 (51% off) | Backups, logs (accessed monthly) | Instant, $0.01/GB |
+| **Archive** | $0.0024 (91% off) | Compliance, long-term retention | 1 hour, $0.01/GB |
+
+**Lifecycle policy example**:
 ```
-RTO/RPO by Business Tier:
+Day 0-30: Standard ($0.0255/GB/mo)
+Day 31-90: Infrequent ($0.0125/GB/mo)
+Day 91+: Archive ($0.0024/GB/mo)
 
-Tier | RTO      | RPO      | Strategy
-1    | <1 hour  | <15 min  | Active-active + Data Guard
-2    | <4 hours | <1 hour  | Hot standby
-3    | <24 hrs  | <4 hours | Warm standby
-4    | <72 hrs  | <24 hrs  | Backup/restore
-
-Implementation:
-Tier 1: Multi-region, automatic failover
-Tier 2: Standby region, manual failover
-Tier 3: Regular backups, restore to new region
-Tier 4: Archive storage, restore on demand
-```
-
-## Service-Specific Best Practices
-
-### Generative AI on OCI
-```
-Model Selection:
-✓ Cohere Command R+: Chat applications
-✓ Cohere Command: Content generation
-✓ CodeLlama: Code generation
-✓ Cohere Embed v3: Semantic search
-
-RAG (Retrieval Augmented Generation):
-1. Generate embeddings from user query
-2. Vector search in knowledge base
-3. Retrieve relevant context
-4. Augment prompt with context
-5. Generate response with LLM
-
-Benefits: Up-to-date info, reduced hallucinations
-
-Cost Optimization:
-✓ On-demand for development
-✓ Dedicated endpoints for production
-✓ Cache responses where appropriate
-✓ Implement rate limiting
+1 TB data for 1 year:
+Without tiering: $0.0255 × 1000 × 12 = $306/year
+With tiering: $0.0255 × 1000 × 1 + $0.0125 × 1000 × 2 + $0.0024 × 1000 × 9 = $72/year
+Savings: $234/year (76%)
 ```
 
-### Containers on OCI (OKE)
-```bash
-# Production cluster
-oci ce cluster create \
-  --compartment-id <compartment-ocid> \
-  --name "prod-cluster" \
-  --kubernetes-version "v1.28.2" \
-  --service-lb-subnet-ids '["<lb-subnet-ocid>"]' \
-  --is-kubernetes-dashboard-enabled false
+## Security Zones (OCI-Unique)
 
-Best Practices:
-✓ Private subnets for worker nodes
-✓ Public subnet for load balancers only
-✓ Enable pod security policies
-✓ Use Kubernetes secrets + OCI Vault
-✓ Implement network policies
-✓ Enable cluster autoscaling
-✓ Separate node pools by workload type
+**OCI Security Zones** = Infrastructure-level policy enforcement:
+
+```
+Security Zone enforces:
+✓ All storage encrypted
+✓ No public buckets
+✓ No internet gateways in VCN
+✓ All databases private endpoint only
+✓ Cloud Guard enabled
+
+Enforcement: API rejects violating requests (preventive, not detective)
+
+Example:
+oci os bucket create --public-access-type ObjectRead
+→ FAILS if compartment is in Security Zone
+
+Use case: Production, PCI-DSS, healthcare (mandatory controls)
 ```
 
-### E-Business Suite on OCI
-```
-Migration Approach:
-✓ Use EBS Cloud Manager for automation
-✓ Lift-and-shift initially, optimize later
-✓ Private subnets for app and database tiers
-✓ Enable SSO with OCI IAM Identity Domains
-✓ Implement DR with OCI native services
-
-HA Architecture:
-- Application: Multiple instances across ADs
-- Database: RAC or Data Guard
-- Load balancer: Traffic distribution
-- File storage: FSS with replication
-- Backups: Automated OCI services
-```
-
-## Well-Architected Framework Checklist
-
-### Security
-- [ ] IAM policies follow least privilege
-- [ ] MFA enabled for all privileged users
-- [ ] Zero trust principles implemented
-- [ ] Cloud Guard enabled and monitored
-- [ ] All data encrypted at rest
-- [ ] TLS 1.2+ for data in transit
-- [ ] Regular vulnerability scanning
-- [ ] Security zones for critical workloads
-
-### Cost Optimization
-- [ ] Resources right-sized based on metrics
-- [ ] Budget alerts configured
-- [ ] Cost tracking tags applied
-- [ ] Unused resources identified and removed
-- [ ] Storage tiering policies in place
-- [ ] Reserved capacity for predictable workloads
-- [ ] Free tier utilized for dev/test
-
-### Performance
-- [ ] Appropriate shapes selected
-- [ ] Caching implemented where beneficial
-- [ ] Database auto-scaling enabled
-- [ ] Network optimized (FastConnect if needed)
-- [ ] Performance testing completed
-- [ ] Bottlenecks identified and resolved
-
-### Operational Excellence
-- [ ] Infrastructure as code (Terraform)
-- [ ] CI/CD pipeline implemented
-- [ ] Comprehensive monitoring and alarms
-- [ ] Logging and log analytics enabled
-- [ ] Automated backups configured
-- [ ] Runbooks documented
-- [ ] Disaster recovery tested
-
-### Reliability
-- [ ] Multi-AD deployment for critical workloads
-- [ ] Database HA (RAC or Data Guard)
-- [ ] Load balancers with health checks
-- [ ] Backup and restore tested
-- [ ] DR plan documented and tested
-- [ ] Chaos engineering practiced
-- [ ] SLAs defined and monitored
-
-## Reference Architectures
-
-Based on https://docs.oracle.com/solutions/:
-
-### Three-Tier Web Application
-```
-Internet → WAF → Load Balancer (public subnet)
-           ↓
-    Web Tier (private subnet, multi-AD)
-           ↓
-    App Tier (private subnet, multi-AD)
-           ↓
-    Database (private subnet, Data Guard)
-```
-
-### Hybrid Cloud with FastConnect
-```
-On-Premises Data Center
-         ↓ (FastConnect)
-    DRG (Dynamic Routing Gateway)
-         ↓
-    OCI VCN (hub-spoke topology)
-    - Shared services VCN
-    - Production VCN
-    - Development VCN
-```
-
-### AI/ML Platform
-```
-Data Sources → Data Integration
-               ↓
-        Object Storage (raw data)
-               ↓
-        Data Science notebooks
-               ↓
-        Model training (GPU instances)
-               ↓
-        Model catalog → Inference endpoints
-```
+**Gotcha**: Security Zones can break existing automation (test in dev first)
 
 ## When to Use This Skill
 
-Activate when user asks about:
-- Architecture design and recommendations
-- Best practices for any OCI service
-- Security hardening or compliance
-- Cost optimization strategies
-- Performance tuning
-- High availability and disaster recovery
-- Operational excellence
-- Well-architected framework
-- CIS benchmarks
-- Service-specific guidance (GenAI, OKE, EBS)
+- Architecture design: Multi-AD patterns, compartment strategy, VCN sizing
+- Migration from AWS/Azure: Terminology mapping, anti-pattern avoidance
+- Cost optimization: Free tier planning, Flex shapes, storage tiering
+- Security: Cloud Guard tuning, Security Zones, NSG vs Security Lists
+- Production readiness: SLA requirements, HA patterns, fault tolerance
 
-## Example Interactions
-
-**User**: "What are OCI security best practices?"
-**Response**: Cover zero trust, IAM, Cloud Guard, encryption, CIS compliance with specific implementation examples.
-
-**User**: "How do I optimize my OCI costs?"
-**Response**: Explain right-sizing, reserved capacity, storage tiering, free tier, with CLI commands and cost comparisons.
-
-**User**: "Design a highly available application"
-**Response**: Multi-AD architecture with load balancer, compute distribution, database HA, and DR strategy.
-
-**User**: "Best practices for GenAI on OCI?"
-**Response**: Model selection, RAG implementation, cost optimization, dedicated vs on-demand endpoints.
-
-## Official Resources
-
-- OCI Best Practices Guide: https://www.oracle.com/cloud/oci-best-practices-guide/
-- Oracle Solutions: https://docs.oracle.com/solutions/
-- Architecture Center: https://www.oracle.com/cloud/architecture-center/
-- CIS OCI Benchmark: https://www.cisecurity.org/benchmark/oracle_cloud
