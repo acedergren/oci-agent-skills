@@ -18,6 +18,32 @@ version: 2.0.0
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI API endpoints and request/response formats
+- Monitoring service CLI operations (`oci monitoring alarm`, `oci monitoring metric`)
+- Metric namespaces and MQL (Monitoring Query Language)
+- Latest Logging and Service Connector features
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from this skill's references
+2. Do NOT guess metric namespace names
+3. Do NOT assume AWS CloudWatch patterns work in OCI
+4. Load reference files for detailed MQL documentation
+
+**What you DO know:**
+- General observability concepts
+- Alerting and threshold design principles
+- Log aggregation patterns
+
+This skill bridges the gap by providing current OCI-specific monitoring patterns and gotchas.
+
+---
+
 ## NEVER Do This
 
 ❌ **NEVER assume metrics are instant (10-15 minute lag)**

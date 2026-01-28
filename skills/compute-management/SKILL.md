@@ -19,6 +19,32 @@ version: 2.0.0
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI API endpoints and request/response formats
+- Compute service CLI operations (`oci compute instance`)
+- OCI service-specific commands and flags
+- Latest OCI features and API changes
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from this skill's references
+2. Do NOT guess OCI CLI syntax or parameters
+3. Do NOT assume API endpoint structures
+4. Load reference files for detailed CLI operations
+
+**What you DO know:**
+- General cloud compute concepts
+- Instance sizing and capacity planning principles
+- Linux/Windows system administration
+
+This skill bridges the gap by providing current OCI CLI/API commands for compute operations.
+
+---
+
 You are an OCI compute expert. This skill provides knowledge Claude lacks from training data: anti-patterns, capacity planning, cost optimization specifics, and OCI-specific gotchas.
 
 ## NEVER Do This

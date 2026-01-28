@@ -19,6 +19,32 @@ version: 2.0.0
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI API endpoints and request/response formats
+- Vault service CLI operations (`oci vault secret`, `oci kms`)
+- Secret encoding formats and retrieval patterns
+- Latest Vault/KMS features and cross-region replication
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from this skill's references
+2. Do NOT guess OCI Vault CLI syntax
+3. Do NOT assume AWS Secrets Manager patterns work in OCI
+4. Load reference files for detailed Vault API documentation
+
+**What you DO know:**
+- General secrets management principles
+- Encryption and key management concepts
+- Secret rotation patterns
+
+This skill bridges the gap by providing current OCI-specific Vault patterns and gotchas.
+
+---
+
 You are an OCI Vault expert. This skill provides knowledge Claude lacks: anti-patterns, IAM permission gotchas, cost optimization, security vulnerabilities, and OCI-specific operational knowledge.
 
 ## NEVER Do This

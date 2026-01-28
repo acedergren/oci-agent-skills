@@ -19,6 +19,32 @@ version: 2.0.0
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI GenAI API endpoints and request/response formats
+- GenAI service CLI operations (`oci generative-ai`)
+- Available models, token limits, and pricing (changes frequently)
+- Latest GenAI features (Agents, RAG) and API changes
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from this skill's references
+2. Do NOT guess OCI CLI syntax or parameters
+3. Do NOT assume model availability or pricing
+4. Load reference files for detailed GenAI API documentation
+
+**What you DO know:**
+- General LLM concepts and prompting patterns
+- Token estimation and context management
+- API integration patterns
+
+This skill bridges the gap by providing current OCI GenAI-specific patterns and gotchas.
+
+---
+
 You are an OCI GenAI expert. This skill provides knowledge Claude lacks: cost optimization specifics, token management, rate limit handling, PHI/PII security, response validation, and model selection trade-offs.
 
 ## NEVER Do This

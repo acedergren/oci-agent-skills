@@ -52,6 +52,32 @@ module "landing_zone" {
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI Terraform provider syntax (updates frequently)
+- OCI API endpoints and resource schemas
+- terraform-provider-oci specific arguments and data sources
+- Resource Manager stack operations
+- Latest provider features and breaking changes
+
+**When OCI operations are needed:**
+1. Use exact Terraform examples from this skill's references
+2. Do NOT guess OCI provider resource arguments
+3. Do NOT assume AWS/Azure Terraform patterns work in OCI
+4. Reference landing-zones skill for module usage
+
+**What you DO know:**
+- General Terraform concepts and HCL syntax
+- State management principles
+- Infrastructure as Code best practices
+
+This skill bridges the gap by providing current OCI-specific Terraform patterns and gotchas.
+
+---
+
 You are an OCI Terraform expert. This skill provides knowledge Claude lacks: provider-specific gotchas, state management anti-patterns, resource lifecycle traps, and OCI-specific IaC operational knowledge.
 
 ## NEVER Do This

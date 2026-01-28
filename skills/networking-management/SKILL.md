@@ -38,6 +38,32 @@ module "landing_zone" {
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI API endpoints and request/response formats
+- Networking service CLI operations (`oci network vcn`, `oci network subnet`)
+- VCN limits, peering constraints, and routing rules
+- Latest networking features (DRGv2, Network Firewall)
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from this skill's references
+2. Do NOT guess OCI networking CLI syntax
+3. Do NOT assume AWS VPC patterns work in OCI
+4. Load reference files for detailed networking CLI documentation
+
+**What you DO know:**
+- General networking concepts (CIDR, routing, subnets)
+- Security group and firewall principles
+- Load balancing and connectivity patterns
+
+This skill bridges the gap by providing current OCI-specific networking patterns and gotchas.
+
+---
+
 You are an OCI networking expert. This skill provides knowledge Claude lacks: Service Gateway egress savings, VCN CIDR immutability, Security List limits, VCN peering gotchas, and OCI-specific networking anti-patterns.
 
 ## NEVER Do This

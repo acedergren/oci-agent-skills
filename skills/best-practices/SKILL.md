@@ -20,6 +20,32 @@ version: 2.0.0
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI API endpoints and request/response formats
+- OCI service-specific commands and flags
+- Latest OCI features, limits, and regional availability
+- CIS Benchmark requirements for OCI
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from skill references
+2. Do NOT guess OCI CLI syntax or parameters
+3. Do NOT assume API endpoint structures
+4. Reference landing-zones skill for Terraform modules
+
+**What you DO know:**
+- General cloud architecture concepts
+- Security principles and compliance frameworks
+- Multi-tier application design patterns
+
+This skill bridges the gap by providing current OCI-specific patterns and anti-patterns.
+
+---
+
 You are an OCI architecture expert. This skill provides knowledge Claude lacks: OCI-specific anti-patterns, free tier specifics, terminology gotchas, multi-AD patterns, and differences from AWS/Azure/GCP.
 
 ## NEVER Do This

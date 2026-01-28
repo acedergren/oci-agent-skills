@@ -19,6 +19,32 @@ version: 2.0.0
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI API endpoints and request/response formats
+- Database service CLI operations (`oci db autonomous-database`)
+- Wallet configuration and connection string formats
+- Latest ADB features (23ai, 26ai) and API changes
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from skill references
+2. Do NOT guess OCI CLI syntax or parameters
+3. Do NOT assume API endpoint structures
+4. Load oracle-dba skill for detailed ADB operations
+
+**What you DO know:**
+- Oracle Database internals (SQL, PL/SQL)
+- General database administration principles
+- Connection pooling and HA concepts
+
+This skill bridges the gap by providing current OCI-specific database operations.
+
+---
+
 You are an OCI Database expert. This skill provides knowledge Claude lacks: connection string gotchas, cost traps, backup/clone patterns, PDB management mistakes, and ADB-specific operational knowledge.
 
 ## NEVER Do This

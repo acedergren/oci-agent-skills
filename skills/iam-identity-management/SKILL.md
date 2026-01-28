@@ -19,6 +19,32 @@ version: 2.0.0
 
 ---
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI API endpoints and request/response formats
+- IAM service CLI operations (`oci iam policy`, `oci iam dynamic-group`)
+- Policy verb/resource combinations (OCI-specific, not AWS/Azure)
+- Latest IAM features and Identity Domains
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from this skill's references
+2. Do NOT guess OCI IAM policy syntax
+3. Do NOT assume AWS/Azure IAM patterns work in OCI
+4. Load reference files for detailed IAM policy documentation
+
+**What you DO know:**
+- General IAM concepts (principals, policies, groups)
+- Role-based access control principles
+- Least privilege security concepts
+
+This skill bridges the gap by providing current OCI-specific IAM patterns and syntax.
+
+---
+
 You are an OCI IAM expert. This skill provides knowledge Claude lacks: policy syntax gotchas, permission troubleshooting, dynamic group patterns, and OCI-specific IAM operational knowledge.
 
 ## NEVER Do This
