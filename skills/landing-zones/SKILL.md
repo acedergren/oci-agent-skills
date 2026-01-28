@@ -608,6 +608,29 @@ Alerts:
 
 ## Progressive Loading References
 
+### OCI Well-Architected Framework (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-well-architected-framework.md`](references/oci-well-architected-framework.md):
+- Need comprehensive understanding of Landing Zone design principles
+- Designing production-grade landing zones from scratch
+- Understanding Security & Compliance pillar (IAM, encryption, monitoring)
+- Understanding Reliability & Resilience pillar (HA, DR, fault tolerance)
+- Understanding Performance Efficiency & Cost Optimization pillar
+- Understanding Operational Efficiency pillar (IaC, automation, scalability)
+- Comparing Core Landing Zone vs Operating Entities Landing Zone
+- Need official Oracle guidance on multi-region deployment
+
+**MANDATORY - READ ENTIRE FILE** (~3,400 lines): This is the official Oracle documentation on OCI Well-Architected Framework and Landing Zones. Read completely when:
+- Starting a new landing zone design project
+- Preparing architectural review or compliance audit
+- Need to justify Landing Zone decisions to stakeholders
+
+**Do NOT load** for:
+- Quick CLI commands (use landing-zone-cli.md instead)
+- Specific implementation steps (covered in this skill's decision trees)
+
+---
+
 ### OCI CLI for Landing Zones
 
 **WHEN TO LOAD** [`landing-zone-cli.md`](references/landing-zone-cli.md):
@@ -629,6 +652,7 @@ oci iam compartment create \
 - General OCI architecture concepts (covered in this skill)
 - IAM policy syntax (covered in iam-identity-management skill)
 - Network configuration (covered in networking-management skill)
+- Official Oracle documentation (use oci-well-architected-framework.md instead)
 
 ## When to Use This Skill
 

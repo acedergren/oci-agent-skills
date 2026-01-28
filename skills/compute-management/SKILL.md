@@ -152,6 +152,25 @@ Benefits: No credential rotation, no secrets to manage, automatic token refresh.
 
 Example: 2 OCPU, 16GB = (2×$0.03 + 16×$0.0015) × 730 = **$61.32/month**
 
+## Progressive Loading References
+
+### OCI Compute Shapes Reference (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-compute-shapes-reference.md`](references/oci-compute-shapes-reference.md):
+- Need detailed specifications for specific shapes (memory limits, OCPU counts, network bandwidth)
+- Comparing flexible shapes (VM.Standard3.Flex vs E4.Flex vs E5.Flex vs E6.Flex vs A1/A2/A4.Flex)
+- Understanding extended memory VM instances
+- Researching bare metal shapes (BM.Standard3, BM.Standard.E4/E5/E6, BM.Standard.A1/A4)
+- Checking GPU shapes, Dense I/O shapes, or HPC-optimized shapes
+- Need official Oracle specifications for shape families
+
+**Do NOT load** for:
+- Quick cost comparisons (use Quick Cost Reference table in this skill)
+- "Out of capacity" troubleshooting (decision tree in this skill covers it)
+- Shape selection guidance (anti-patterns and recommendations in this skill)
+
+---
+
 ## When to Use This Skill
 
 - Launching instances: shape selection, capacity planning
