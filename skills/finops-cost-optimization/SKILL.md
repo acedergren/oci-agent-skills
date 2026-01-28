@@ -1,511 +1,439 @@
 ---
 name: OCI FinOps and Cost Optimization
-description: Financial operations, cost intelligence, usage analytics, anomaly detection, and cost optimization strategies for Oracle Cloud Infrastructure. Leverages Cost and Usage Reports, Autonomous Database AI, and OCI monitoring for automated FinOps insights.
-version: 1.0.0
+description: Use when optimizing OCI costs, investigating unexpected bills, planning budgets, or identifying waste. Covers hidden cost traps (boot volumes, reserved IPs, egress), Universal Credits gotchas, shape migration savings, free tier maximization, and cost allocation challenges. Keywords: unexpected charges, boot volume costs, stopped instance billing, data egress, reserved IP waste, budget exceeded.
+version: 2.0.0
 ---
 
-# OCI FinOps and Cost Optimization Skill
+# OCI FinOps - Expert Knowledge
 
-You are an expert in Oracle Cloud Infrastructure financial operations (FinOps) and cost optimization. This skill provides comprehensive guidance for cost intelligence, usage analytics, anomaly detection, and optimization strategies.
+You are an OCI cost optimization expert. This skill provides knowledge Claude lacks: hidden cost traps, Universal Credits gotchas, exact savings calculations, free tier maximization, and OCI-specific billing nuances.
 
-## Core FinOps Capabilities
+## NEVER Do This
 
-### Cost and Usage Reporting
-- Automated cost report generation and analysis
-- Usage pattern identification
-- Cost allocation by compartment, tag, and service
-- Trend analysis and forecasting
+❌ **NEVER ignore orphaned boot volumes (silent cost drain)**
+```
+# Default OCI behavior: Boot volumes PRESERVED after instance termination
+oci compute instance terminate --instance-id <ocid> --force
+# Instance deleted, but boot volume remains (charges continue!)
 
-### Cost Intelligence
-- Anomaly detection using Autonomous Database ML
-- Automated insights generation
-- Cost optimization recommendations
-- Budget variance analysis
+Cost trap:
+- Boot volume: 50 GB × $0.025/GB/mo = $1.25/month per instance
+- 20 terminated test instances = $25/month wasted
+- Over 1 year: $300 wasted on deleted instances
 
-### Resource Optimization
-- Right-sizing recommendations
-- Idle resource identification
-- Reserved capacity planning
-- Committed use discounts analysis
+# RIGHT - explicitly delete boot volume
+oci compute instance terminate \
+  --instance-id <ocid> \
+  --preserve-boot-volume false  # Critical flag!
 
-## Cost and Usage Reports CLI Commands
-
-### Configuring Cost Reports
-
-```bash
-# List usage statements
-oci usage-api usage-statement list \
-  --tenant-id <tenancy-ocid> \
-  --time-usage-started "2025-01-01T00:00:00Z" \
-  --time-usage-ended "2025-01-31T23:59:59Z"
-
-# Get summarized usage
-oci usage-api usage-summary list-usage \
-  --tenant-id <tenancy-ocid> \
-  --time-usage-started "2025-01-01T00:00:00Z" \
-  --time-usage-ended "2025-01-31T23:59:59Z" \
-  --granularity DAILY
-
-# Get usage by service
-oci usage-api usage-summary list-usage \
-  --tenant-id <tenancy-ocid> \
-  --time-usage-started "2025-01-01T00:00:00Z" \
-  --time-usage-ended "2025-01-31T23:59:59Z" \
-  --granularity DAILY \
-  --group-by service
-
-# Get usage by compartment
-oci usage-api usage-summary list-usage \
-  --tenant-id <tenancy-ocid> \
-  --time-usage-started "2025-01-01T00:00:00Z" \
-  --time-usage-ended "2025-01-31T23:59:59Z" \
-  --granularity DAILY \
-  --group-by compartmentName
-
-# Get usage by tag
-oci usage-api usage-summary list-usage \
-  --tenant-id <tenancy-ocid> \
-  --time-usage-started "2025-01-01T00:00:00Z" \
-  --time-usage-ended "2025-01-31T23:59:59Z" \
-  --granularity DAILY \
-  --group-by-tag Environment
+# Or in Terraform:
+resource "oci_core_instance" "dev" {
+  preserve_boot_volume = false  # Must set explicitly
+}
 ```
 
-### Cost Analysis Queries
+**Cleanup strategy**: Monthly audit for unattached boot volumes older than 7 days
 
-```bash
-# Get cost by resource
-oci usage-api cost-summary list-usage \
-  --tenant-id <tenancy-ocid> \
-  --time-usage-started "2025-01-01T00:00:00Z" \
-  --time-usage-ended "2025-01-31T23:59:59Z" \
-  --granularity MONTHLY
+❌ **NEVER forget reserved public IPs cost money when unattached**
+```
+Cost: $0.01/hour = $7.30/month per IP
 
-# Forecast future costs
-oci usage-api forecast-cost \
-  --tenant-id <tenancy-ocid> \
-  --time-forecast-started "2025-02-01T00:00:00Z" \
-  --time-forecast-ended "2025-02-28T23:59:59Z"
+# Common mistake: Reserve IP, detach from instance, forget to release
+oci network public-ip create --lifetime RESERVED
+# Later: delete instance but IP remains reserved (charges continue)
 
-# Get service-specific costs
-oci usage-api cost-summary list-usage \
-  --tenant-id <tenancy-ocid> \
-  --time-usage-started "2025-01-01T00:00:00Z" \
-  --time-usage-ended "2025-01-31T23:59:59Z" \
-  --filter "service,equals,'COMPUTE'"
+Wasted cost example:
+- 5 old reserved IPs from deleted instances
+- 5 × $7.30/month = $36.50/month waste
+- Over 1 year: $438 wasted
+
+# RIGHT - use ephemeral IPs for temporary resources
+oci network public-ip create --lifetime EPHEMERAL
+# Auto-deleted when instance terminated
+
+# Or release reserved IPs explicitly
+oci network public-ip delete --public-ip-id <ocid>
 ```
 
-## Budget Management
+**Detection**: List reserved IPs without instance attachment
 
-### Creating and Managing Budgets
+❌ **NEVER assume stopped resources = zero cost**
+```
+Stopped Autonomous Database:
+✓ Compute: Zero cost (stopped)
+✗ Storage: $0.025/GB/mo continues
+✗ Backups: Retention charges continue
 
-```bash
-# Create budget
-oci budgets budget create \
-  --compartment-id <compartment-ocid> \
-  --amount 10000 \
-  --reset-period MONTHLY \
-  --target-type COMPARTMENT \
-  --targets '["<compartment-ocid>"]' \
-  --display-name "Engineering Department Budget"
+Example: 1 TB ADB stopped for 30 days
+Storage: 1000 GB × $0.025 = $25/month (charged!)
 
-# Create budget with alert
-oci budgets budget create \
-  --compartment-id <compartment-ocid> \
-  --amount 5000 \
-  --reset-period MONTHLY \
-  --target-type COMPARTMENT \
-  --targets '["<compartment-ocid>"]' \
-  --display-name "Development Budget" \
-  --freeform-tags '{"Department":"Engineering","Environment":"Development"}'
+Stopped Compute Instance:
+✓ Compute: Zero cost
+✗ Boot volume: $0.025/GB/mo continues
+✗ Block volumes: $0.025/GB/mo continues
+✗ Reserved IP (if attached): $7.30/month continues
 
-# List budgets
-oci budgets budget list \
-  --compartment-id <compartment-ocid>
-
-# Get budget details
-oci budgets budget get \
-  --budget-id <budget-ocid>
-
-# Update budget amount
-oci budgets budget update \
-  --budget-id <budget-ocid> \
-  --amount 15000
-
-# Delete budget
-oci budgets budget delete \
-  --budget-id <budget-ocid>
+# Better for long-term idle (>30 days): TERMINATE + backup
+# Restore from backup when needed
 ```
 
-### Budget Alert Rules
+**Rule**: Stopped = compute paused, storage still charged
 
-```bash
-# Create alert rule (80% threshold)
-oci budgets alert-rule create \
-  --budget-id <budget-ocid> \
-  --type ACTUAL \
-  --threshold 80 \
-  --threshold-type PERCENTAGE \
-  --recipients "email@example.com" \
-  --display-name "80% Budget Alert"
-
-# Create forecast alert
-oci budgets alert-rule create \
-  --budget-id <budget-ocid> \
-  --type FORECAST \
-  --threshold 100 \
-  --threshold-type PERCENTAGE \
-  --recipients "email@example.com" \
-  --display-name "Forecast 100% Alert"
-
-# List alert rules
-oci budgets alert-rule list \
-  --budget-id <budget-ocid>
-
-# Update alert rule
-oci budgets alert-rule update \
-  --budget-id <budget-ocid> \
-  --alert-rule-id <alert-rule-ocid> \
-  --threshold 90
-
-# Delete alert rule
-oci budgets alert-rule delete \
-  --budget-id <budget-ocid> \
-  --alert-rule-id <alert-rule-ocid>
+❌ **NEVER ignore data egress costs (surprise bills)**
 ```
+OCI egress pricing:
+- First 10 TB/month: FREE
+- 10-50 TB: $0.0085/GB
+- 50+ TB: Contact sales for discount
+
+# Common mistake: Large data export
+oci os object bulk-download --bucket-name backups --download-dir /local
+# Downloading 15 TB = 5 TB chargeable × $0.0085/GB = $42,500 surprise!
+
+# Cheaper alternatives:
+1. Use OCI FastConnect (fixed cost, unlimited egress)
+2. Download within same region (free between OCI services)
+3. Export to another OCI region first (inter-region = free)
+
+Cost comparison (15 TB export):
+- Internet egress: $42,500
+- FastConnect (1 Gbps): $1,100/month flat rate
+- Breakeven: 130 GB/month egress
+```
+
+**Gotcha**: Egress is FREE between OCI regions (intra-Oracle network)
+
+❌ **NEVER enable NAT Gateway without understanding costs**
+```
+NAT Gateway pricing:
+- Gateway itself: $0.01/hour = $7.30/month
+- Data processed: $0.01/GB
+
+# Mistake: Use NAT Gateway for high-traffic apps
+Example: Application with 5 TB/month outbound traffic
+- Gateway: $7.30/month
+- Data: 5000 GB × $0.01 = $50/month
+- Total: $57.30/month
+
+# Cheaper alternative: Public IP on instance (ephemeral IP = free)
+Cost: $0/month for egress <10 TB
+
+When NAT Gateway makes sense:
+- Private subnets with <100 GB/month egress
+- Security requirement (no public IPs on instances)
+
+When to avoid:
+- High-traffic egress (use public IPs instead)
+- Low-security dev/test environments
+```
+
+❌ **NEVER over-commit with Universal Credits**
+```
+Universal Credits gotcha:
+- Credits are NON-TRANSFERABLE between service categories
+  * Compute credits → can only pay for compute
+  * Database credits → can only pay for database
+  * Cannot move credits between categories
+
+# Mistake: Commit to $10k/month compute credits
+# Reality: Only use $6k/month compute
+# Cannot use $4k surplus for database spending
+# Result: Waste $4k/month ($48k/year)
+
+# RIGHT - commit conservatively based on baseline usage
+Analyze 3-6 months historical usage
+Commit to 70-80% of baseline (not peak)
+
+Expiration gotcha:
+- Monthly credits expire end of month
+- Cannot roll over to next month
+- Use-it-or-lose-it model
+```
+
+❌ **NEVER trust forecast budgets (30-40% error rate)**
+```
+OCI Budget types:
+1. ACTUAL: Alerts on actual spending (accurate)
+2. FORECAST: Alerts on projected spending (often wrong)
+
+# Problem: Forecast uses simple linear projection
+Example:
+- Week 1: $100 spend
+- Forecast for month: $100 × 4 = $400
+- Reality: Week 1 included one-time data migration
+- Actual month: $150 total
+- Forecast error: 167% over-prediction
+
+# WRONG - rely on forecast alerts
+Alert at 80% forecast → fires prematurely
+
+# RIGHT - use actual spend alerts at multiple thresholds
+Alert at 50% actual, 75% actual, 90% actual, 100% actual
+```
+
+**Best practice**: Use FORECAST for trends, ACTUAL for budgeting
 
 ## Cost Optimization Strategies
 
-### Compute Optimization
+### Shape Migration Savings (Exact Calculations)
+
+**Fixed → Flex Shape Migration**
+
+```
+Legacy fixed shape:
+VM.Standard2.4: 4 OCPUs, 60 GB RAM (fixed ratio 1:15)
+Cost: $0.06/hr × 4 = $0.24/hr = $175/month
+
+Flex shape (right-sized):
+VM.Standard.E4.Flex: 4 OCPUs, 16 GB RAM (custom ratio)
+Cost: ($0.02/OCPU-hr × 4) + ($0.0015/GB-hr × 16) = $0.104/hr = $76/month
+
+Savings: $99/month per instance (56% reduction)
+
+Migration path:
+1. Create flex instance with same OCPU count
+2. Test with minimal RAM (4 GB per OCPU)
+3. Increase RAM only if needed
+4. Delete fixed instance
+```
+
+**AMD → Arm Migration**
+
+```
+AMD instance:
+VM.Standard.E4.Flex: 4 OCPUs, 16 GB RAM
+Cost: $0.02/OCPU-hr × 4 × 730 = $58.40/month
+
+Arm instance (same workload):
+VM.Standard.A1.Flex: 4 OCPUs, 16 GB RAM
+Cost: $0.01/OCPU-hr × 4 × 730 = $29.20/month
+
+Savings: $29.20/month per instance (50% reduction)
+
+Gotcha: ARM64 architecture (not all apps compatible)
+Check: Docker images available for ARM64?
+```
+
+### Free Tier Maximization
+
+**Exact cost avoidance** (what you DON'T pay):
+
+```
+Always-Free tier value if fully utilized:
+
+Compute:
+- 2 AMD Micro VMs: 2 × $7/month = $14/month
+- 4 Arm OCPUs (24 GB): 4 × $7.30/month = $29.20/month
+Subtotal: $43.20/month
+
+Database:
+- 2 Autonomous Databases: 2 × $292/month = $584/month
+
+Storage:
+- 200 GB block: $5/month
+- 10 GB object: $0.26/month
+- 10 GB archive: $0.02/month
+Subtotal: $5.28/month
+
+Networking:
+- 1 load balancer: $10/month
+- 10 TB egress: $85/month
+Subtotal: $95/month
+
+TOTAL COST AVOIDED: $727.48/month ($8,730/year)
+```
+
+**Gotcha**: 2 ADB limit is TENANCY-wide (not per region/compartment)
+
+### Storage Lifecycle Optimization
+
+**Automated tiering savings**:
+
+```
+Scenario: 10 TB compliance data, accessed quarterly
+
+Without tiering (all Standard):
+10,000 GB × $0.0255/GB/mo = $255/month = $3,060/year
+
+With tiering (Archive after 30 days):
+Month 1 (Standard): 10,000 GB × $0.0255 = $255
+Months 2-12 (Archive): 10,000 GB × $0.0024 × 11 = $264
+Total year: $519
+
+Savings: $2,541/year (83% reduction)
+
+Lifecycle policy:
+- Day 0-30: Standard (frequent access window)
+- Day 31+: Archive (compliance retention)
+- Retrieval cost: $0.01/GB (acceptable for quarterly access)
+```
+
+### Compute Auto-Shutdown Savings
+
+**Dev/test environment automation**:
+
+```
+Scenario: 10 development instances, 2 OCPUs each
+Running 24/7: 10 × 2 × $0.02/hr × 730 = $292/month
+
+Auto-shutdown (weekdays 9am-6pm only):
+Usage: 9 hours/day × 5 days = 45 hours/week = 195 hours/month
+Cost: 10 × 2 × $0.02/hr × 195 = $78/month
+
+Savings: $214/month (73% reduction)
+
+Implementation:
+1. Tag instances: Environment=Development
+2. Create Functions for start/stop
+3. Schedule with OCI Events:
+   - Start: Weekdays 9am
+   - Stop: Weekdays 6pm
+```
+
+## Universal Credits Gotchas
+
+**Credit categories** (non-transferable):
+
+| Category | Services Included | Typical Use |
+|----------|------------------|-------------|
+| **Compute** | VM, bare metal, container instances, OKE | Applications, workloads |
+| **Database** | ADB, DB Systems, Exadata, MySQL | Data storage, transactions |
+| **Storage** | Block, object, file, archive | Backups, data lakes |
+| **Network** | Load balancer, FastConnect, NAT GW | Connectivity, egress |
+
+**Commitment trap**:
+
+```
+Scenario: Commit to $5k/month database credits
+Month 1-3: Use only $3k/month (waste $2k/month)
+Cannot: Transfer $2k to compute spending
+Result: Waste $6k over 3 months
+
+Better approach:
+1. Analyze 6 months baseline usage per category
+2. Commit to 70% of baseline (room for variance)
+3. Over-commit only if growth guaranteed
+```
+
+**Expiration**: Monthly credits = use-it-or-lose-it (no rollover)
+
+## Cost Allocation Challenges
+
+**Shared resource allocation** (OCI-specific):
+
+```
+Problem: How to allocate costs for shared VCN?
+
+VCN costs:
+- DRG: $0.01/hr = $7.30/month
+- NAT Gateway: $0.01/hr + $0.01/GB = variable
+- FastConnect: $1,100/month (1 Gbps)
+
+Allocation strategies:
+1. Equal split: $1,107.30 / N teams
+2. Usage-based: Track egress per team (requires tagging)
+3. Chargeback: Production pays 100%, dev/test free
+
+Gotcha: OCI doesn't auto-allocate shared resource costs
+Must implement manual showback/chargeback process
+```
+
+**Load balancer cost allocation**:
+
+```
+Problem: Multiple apps share 1 load balancer
+
+LB costs:
+- Flexible LB: $10/month + $0.008/LCU-hour
+- Bandwidth: $0.01/GB processed
+
+Allocation approach:
+1. Tag backends by team (freeform_tags.Team)
+2. Estimate traffic % per team (monitoring metrics)
+3. Allocate LB cost proportionally
+
+Example:
+- Total LB cost: $50/month
+- Team A: 60% traffic → $30/month
+- Team B: 40% traffic → $20/month
+```
+
+## Budget Best Practices
+
+**Multi-threshold alerts**:
+
+```
+# Best practice: Set 4 alert levels
+oci budgets alert-rule create \
+  --budget-id <ocid> \
+  --type ACTUAL \
+  --threshold 50 \
+  --recipients "team@example.com"
+
+oci budgets alert-rule create \
+  --budget-id <ocid> \
+  --type ACTUAL \
+  --threshold 80 \
+  --recipients "team@example.com,manager@example.com"
+
+oci budgets alert-rule create \
+  --budget-id <ocid> \
+  --type ACTUAL \
+  --threshold 90 \
+  --recipients "team@example.com,manager@example.com,finance@example.com"
+
+oci budgets alert-rule create \
+  --budget-id <ocid> \
+  --type ACTUAL \
+  --threshold 100 \
+  --recipients "team@example.com,manager@example.com,finance@example.com"
+
+Alert strategy:
+50%: FYI to team (informational)
+80%: Action required (investigate spike)
+90%: Escalation to management
+100%: Finance involved (budget exceeded)
+```
+
+**Gotcha**: Budgets are ALERTING only, not enforcement (cannot block spending)
+
+## Hidden Cost Detection
+
+**Monthly audit checklist**:
 
 ```bash
-# Find stopped instances (candidates for termination)
-oci compute instance list \
-  --compartment-id <compartment-ocid> \
-  --lifecycle-state STOPPED \
-  --query 'data[*].{Name:"display-name",OCID:id,Shape:shape}'
+# 1. Orphaned boot volumes (cost trap #1)
+oci bv boot-volume list --all --lifecycle-state AVAILABLE \
+  | grep -v "attached-instance"
 
-# Find instances with low CPU utilization
-# Use monitoring queries to identify underutilized resources
-oci monitoring metric-data summarize-metrics-data \
-  --compartment-id <compartment-ocid> \
-  --namespace oci_computeagent \
-  --query-text 'CpuUtilization[1d]{resourceId = "<instance-ocid>"}.mean()' \
-  --start-time "2025-01-01T00:00:00Z" \
-  --end-time "2025-01-31T23:59:59Z"
+# 2. Unattached block volumes
+oci bv volume list --all --lifecycle-state AVAILABLE
 
-# Check for instances without activity
-oci monitoring metric-data summarize-metrics-data \
-  --compartment-id <compartment-ocid> \
-  --namespace oci_computeagent \
-  --query-text 'NetworkBytesOut[7d]{}.sum() < 1000000' \
-  --start-time "2025-01-20T00:00:00Z" \
-  --end-time "2025-01-27T23:59:59Z"
+# 3. Reserved IPs without instance
+oci network public-ip list --scope REGION --lifetime RESERVED
+
+# 4. Stopped instances with volumes
+oci compute instance list --lifecycle-state STOPPED
+
+# 5. Old snapshots/backups
+oci bv backup list --all \
+  | jq '.data[] | select(.["time-created"] < "2024-01-01")'
+
+# 6. Unused load balancers (no backends)
+oci lb load-balancer list --all
+
+# 7. Empty Object Storage buckets
+oci os bucket list --all --fields approximateCount,approximateSize
 ```
 
-### Storage Optimization
-
-```bash
-# List unattached boot volumes (candidates for deletion)
-oci bv boot-volume list \
-  --compartment-id <compartment-ocid> \
-  --availability-domain <ad-name> \
-  --lifecycle-state AVAILABLE \
-  --query 'data[?!"boot-volume-attachments"]|[*].{Name:"display-name",Size:"size-in-gbs",Created:"time-created"}'
-
-# List unattached block volumes
-oci bv volume list \
-  --compartment-id <compartment-ocid> \
-  --lifecycle-state AVAILABLE
-
-# Find old volume backups
-oci bv backup list \
-  --compartment-id <compartment-ocid> \
-  --query 'data[?!"time-created" < `2024-01-01`]|[*].{Name:"display-name",Size:"size-in-gbs",Created:"time-created"}'
-
-# Identify Object Storage buckets with lifecycle policies
-oci os bucket list \
-  --compartment-id <compartment-ocid> \
-  --fields approximateCount,approximateSize
-
-# Get Object Storage usage by bucket
-oci os bucket get \
-  --bucket-name <bucket-name> \
-  --fields approximateCount,approximateSize
-```
-
-### Database Optimization
-
-```bash
-# Find stopped Autonomous Databases
-oci db autonomous-database list \
-  --compartment-id <compartment-ocid> \
-  --lifecycle-state STOPPED
-
-# Check auto-scaling configuration
-oci db autonomous-database list \
-  --compartment-id <compartment-ocid> \
-  --query 'data[*].{Name:"display-name",AutoScaling:"is-auto-scaling-enabled",CPUs:"cpu-core-count"}'
-
-# Identify databases without recent backups
-oci db autonomous-database-backup list \
-  --autonomous-database-id <adb-ocid> \
-  --query 'data[?!"time-ended" < `2025-01-01`]'
-```
-
-## Anomaly Detection with Autonomous Database
-
-### Setting Up Cost Anomaly Detection
-
-Based on Oracle A-Team Chronicles article series "From Cost Reports to Cost Intelligence":
-
-**Part 1: Data Ingestion**
-1. Configure Cost and Usage Reports to Object Storage
-2. Create Autonomous Database for analysis
-3. Set up external tables pointing to cost reports
-4. Schedule regular data refresh
-
-**Part 2: ML Model Training**
-```sql
--- Create ML model for anomaly detection
-BEGIN
-  DBMS_DATA_MINING.CREATE_MODEL2(
-    model_name => 'COST_ANOMALY_MODEL',
-    mining_function => 'CLASSIFICATION',
-    data_query => 'SELECT * FROM cost_usage_data',
-    set_list => 'ALGO_NAME=ALGO_AI',
-    model_detail_level => 'FULL'
-  );
-END;
-/
-
--- Apply model to detect anomalies
-SELECT
-  service_name,
-  cost_date,
-  actual_cost,
-  predicted_cost,
-  CASE WHEN ABS(actual_cost - predicted_cost) > (2 * STDDEV_POP(actual_cost) OVER ())
-    THEN 'ANOMALY'
-    ELSE 'NORMAL'
-  END as status
-FROM cost_predictions
-ORDER BY cost_date DESC;
-```
-
-**Part 3: Automated Insights**
-- Generate daily cost summaries
-- Identify unusual spending patterns
-- Create actionable recommendations
-- Send alerts via OCI Notifications
-
-**Part 4: Visualization and Reporting**
-- Build OAC dashboards
-- Create executive summaries
-- Track optimization metrics
-- Monitor budget adherence
-
-**Part 5: Continuous Optimization**
-- Implement feedback loops
-- Refine ML models
-- Automate remediation actions
-- Track ROI of optimizations
-
-## Pricing Intelligence
-
-### Using OCI Pricing MCP Server
-
-The `oracle-oci-pricing` MCP server provides real-time pricing data:
-
-```bash
-# Example queries (via MCP client):
-# "What's the price for compute instance VM.Standard.E4.Flex in USD?"
-# "Show Object Storage pricing in JPY"
-# "Get pricing for SKU B93113"
-# "List all Autonomous Database pricing"
-```
-
-**Key Features:**
-- SKU-based pricing lookup
-- Fuzzy product name search
-- Multi-currency support
-- Free-tier identification
-
-### Cost Estimation
-
-```bash
-# Estimate compute costs
-# Shape: VM.Standard.E4.Flex, 2 OCPUs, 16GB RAM
-# Running 24/7 for 30 days
-# Price: $0.02 per OCPU-hour + $0.0015 per GB-hour
-# Monthly cost: 2 * 0.02 * 24 * 30 + 16 * 0.0015 * 24 * 30 = $46.08
-
-# Estimate storage costs
-# Block Volume: 1TB (1024GB)
-# Price: $0.025 per GB-month
-# Monthly cost: 1024 * 0.025 = $25.60
-
-# Estimate Object Storage costs
-# Standard tier: 500GB stored
-# Price: $0.0255 per GB-month
-# Monthly cost: 500 * 0.0255 = $12.75
-```
-
-## Resource Tagging for Cost Allocation
-
-### Tag-Based Cost Tracking
-
-```bash
-# Create tag namespace
-oci iam tag-namespace create \
-  --compartment-id <tenancy-ocid> \
-  --name "CostCenter" \
-  --description "Cost center allocation tags"
-
-# Create tag key
-oci iam tag create \
-  --tag-namespace-id <namespace-ocid> \
-  --name "Department" \
-  --description "Department name"
-
-# Apply tags to resources
-oci compute instance update \
-  --instance-id <instance-ocid> \
-  --defined-tags '{"CostCenter":{"Department":"Engineering","Project":"CloudMigration"}}'
-
-# Query costs by tag
-oci usage-api usage-summary list-usage \
-  --tenant-id <tenancy-ocid> \
-  --time-usage-started "2025-01-01T00:00:00Z" \
-  --time-usage-ended "2025-01-31T23:59:59Z" \
-  --group-by-tag "CostCenter.Department"
-```
-
-## Reserved Capacity and Commitments
-
-### Universal Credits
-
-```bash
-# View subscription details
-oci usage-api subscription list \
-  --compartment-id <tenancy-ocid>
-
-# View subscription rewards
-oci usage-api reward list \
-  --subscription-id <subscription-ocid> \
-  --tenancy-id <tenancy-ocid>
-
-# Check commitment status
-oci usage-api subscription get \
-  --subscription-id <subscription-ocid> \
-  --tenancy-id <tenancy-ocid>
-```
-
-## Best Practices
-
-### Cost Optimization
-1. **Right-size resources**: Start small, scale based on actual usage
-2. **Use auto-scaling**: Leverage ADB and compute auto-scaling
-3. **Stop idle resources**: Automate shutdown of dev/test environments
-4. **Leverage free tier**: Use always-free services for non-critical workloads
-5. **Reserved capacity**: Commit to reserved instances for predictable workloads
-6. **Storage tiering**: Move infrequently accessed data to Archive Storage
-
-### FinOps Automation
-1. **Daily cost reviews**: Automate daily cost report generation
-2. **Anomaly alerts**: Set up ML-based anomaly detection
-3. **Budget enforcement**: Configure budgets with automatic alerts
-4. **Tagging standards**: Enforce consistent tagging for cost allocation
-5. **Showback/chargeback**: Implement departmental cost allocation
-6. **Optimization tracking**: Measure and report on savings realized
-
-### Monitoring and Alerts
-1. **Budget alerts**: Set multiple threshold alerts (50%, 80%, 100%)
-2. **Usage spikes**: Monitor for unexpected usage increases
-3. **Idle resources**: Regular scans for unused resources
-4. **Cost trends**: Track month-over-month and year-over-year trends
-5. **Service-specific**: Monitor high-cost services individually
-
-## Common FinOps Workflows
-
-### Monthly Cost Review
-1. Generate cost report for previous month
-2. Compare to budget and forecast
-3. Identify anomalies and investigate root causes
-4. Review top spending services and compartments
-5. Identify optimization opportunities
-6. Update forecasts based on trends
-
-### Quarterly Optimization Review
-1. Analyze 90-day cost trends
-2. Review all stopped/idle resources
-3. Evaluate reserved capacity needs
-4. Assess storage lifecycle policies
-5. Review and update budgets
-6. Calculate realized savings from optimizations
-
-### Annual Planning
-1. Review full year spending patterns
-2. Identify growth trends by service
-3. Plan reserved capacity purchases
-4. Set annual budgets by department
-5. Define FinOps goals and KPIs
-6. Establish cost optimization roadmap
-
-## Integration with Other Services
-
-### Cloud Guard Integration
-- Cost-related security issues
-- Overprivileged resources
-- Publicly accessible expensive services
-
-### Logging and Events
-- Cost anomaly events
-- Budget threshold breaches
-- Resource lifecycle changes
-
-### Notifications
-- Email alerts for budget thresholds
-- Slack/Teams integration for anomalies
-- PagerDuty for critical cost events
-
-## MCP Server Tools (Optional)
-
-This skill provides full functionality using OCI CLI commands. Optional MCP servers enhance capabilities with real-time data:
-
-1. **oracle-oci-usage**: Automated cost and usage data retrieval (vs CLI queries)
-2. **oracle-oci-pricing**: Real-time pricing lookups (vs manual calculations)
-3. **oracle-oci-resource-search**: Fast cross-compartment search (vs sequential queries)
-4. **oracle-oci-cloud-guard**: Automated security recommendations (vs manual review)
-
-**Note**: These servers require local installation. See [MCP Setup Guide](../../docs/MCP_SETUP.md). All functionality works without them using standard OCI CLI commands.
+**Estimated monthly savings**: $100-500 for typical tenancy (cleanup waste)
 
 ## When to Use This Skill
 
-Activate this skill when the user mentions:
-- Cost optimization, savings, or reduction
-- Budget management or alerts
-- Usage analysis or reporting
-- FinOps, financial operations, or cost intelligence
-- Anomaly detection in spending
-- Reserved capacity or commitments
-- Cost allocation or showback/chargeback
-- Right-sizing resources
-- Idle or unused resources
-- Pricing information or estimates
-- Cost forecasting or trends
-- Tagging for cost tracking
-
-## Example Interactions
-
-**User**: "Show me my top 10 spending services this month"
-**Response**: Use usage-api to query costs grouped by service, sorted by amount.
-
-**User**: "Find idle compute instances to reduce costs"
-**Response**: Query for stopped instances and check CPU utilization metrics for running instances.
-
-**User**: "Set up anomaly detection for my OCI costs"
-**Response**: Guide through setting up ADB with ML models for cost anomaly detection.
-
-**User**: "What's the pricing for a VM.Standard.E4.Flex instance?"
-**Response**: Use oracle-oci-pricing MCP server to fetch real-time pricing.
+- Unexpected bills: Investigating charges, finding cost spikes
+- Budget planning: Estimating costs, setting budgets, forecasting
+- Cost optimization: Right-sizing, waste reduction, shape migration
+- Free tier: Maximizing always-free usage, avoiding over-provisioning
+- Universal Credits: Commitment planning, credit allocation
+- Cost allocation: Showback, chargeback, shared resource costs
+- Savings calculations: Comparing options, ROI analysis
