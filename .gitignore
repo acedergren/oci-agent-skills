@@ -64,3 +64,6 @@ Thumbs.db
 *.temp
 *.bak
 *.backup
+
+# Firecrawl cache (may contain API tokens)
+.firecrawl/
