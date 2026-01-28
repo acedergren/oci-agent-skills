@@ -1,6 +1,6 @@
 {
   "name": "oci-agent-skills",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "OCI Agent Skills for Claude Code - Expert-level Oracle Cloud Infrastructure automation",
   "private": true,
   "repository": {
