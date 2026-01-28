@@ -163,7 +163,7 @@ Successfully refactored all 11 OCI Agent Skills using TDD methodology, achieving
 
 ---
 
-## Post-Release Enhancement: SQLcl Integration
+## Post-Release Enhancement: Direct CLI Integration
 
 **Date:** 2026-01-28 (post v2.0.0 release)
 
@@ -172,23 +172,44 @@ Initial oracle-dba skill referenced Oracle MCP servers which:
 - Required complex setup (download 26ai docs, build index, run MCP server)
 - Added token overhead (MCP tool invocation)
 - Created external dependencies
+- Obscured what commands were actually being run
 
-### Solution
-**Direct SQLcl Integration** - eliminated MCP middleware by:
-1. Created `sqlcl-workflows.md` reference (251 lines)
-2. Shows how to use SQLcl directly via Bash tool
-3. Progressive loading - only loaded when executing database operations
+### Solution: Eliminate ALL MCP Middleware
+
+#### 1. Direct SQLcl Integration
+Replaced Oracle DB Documentation MCP server with:
+- Created `sqlcl-workflows.md` reference (251 lines)
+- Shows how to use SQLcl directly via Bash tool
+- 15 practical patterns (top SQL, execution plans, wait events, exports)
+
+#### 2. Direct OCI CLI Integration
+Replaced OCI API/Database MCP servers with:
+- Created `oci-cli-adb.md` reference (471 lines)
+- Complete ADB management operations via `oci db` commands
+- Provision, scale, backup, clone, wallet management
+- Cost formulas embedded in commands
+
+#### 3. Knowledge Gap Disclaimer
+Added prominent section at top:
+```markdown
+## ⚠️ OCI CLI/API Knowledge Gap
+**You don't know OCI CLI commands or OCI API structure.**
+```
+Prevents Claude from guessing outdated OCI syntax.
 
 ### Value
-- **No setup**: SQLcl ships with Oracle, already available
-- **Token efficient**: Uses existing Bash tool, no MCP overhead
-- **Practical workflows**: 15 common patterns (top SQL, execution plans, wait events, exports)
+- **No setup**: Tools already available (SQLcl, OCI CLI)
+- **Token efficient**: Uses Bash tool, no MCP overhead
+- **Transparency**: User sees exact commands being run
 - **Self-contained**: No external dependencies
+- **Current**: Reference docs updated as OCI CLI changes
 
 ### Updated Metrics
-- **Lines**: 259 → 385 (main) + 251 (reference) = 636 total
-- **Progressive loading**: Only ~385 lines loaded initially
+- **Lines**: 259 → 445 (main) + 471 (oci-cli) + 251 (sqlcl) = 1,167 total
+- **Progressive loading**: Only ~445 lines loaded initially
+- **References**: Loaded on-demand based on operation type
 - **Coverage**: 95% expert knowledge maintained
+- **MCP elimination**: 100% - zero MCP server dependencies
 
 ---
 

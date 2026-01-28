@@ -6,6 +6,32 @@ version: 2.0.0
 
 # OCI Oracle DBA - Expert Knowledge
 
+## ⚠️ OCI CLI/API Knowledge Gap
+
+**You don't know OCI CLI commands or OCI API structure.**
+
+Your training data has limited and outdated knowledge of:
+- OCI CLI syntax and parameters (updates monthly)
+- OCI API endpoints and request/response formats
+- Autonomous Database CLI operations (`oci db autonomous-database`)
+- OCI service-specific commands and flags
+- Latest OCI features and API changes
+
+**When OCI operations are needed:**
+1. Use exact CLI commands from this skill's references
+2. Do NOT guess OCI CLI syntax or parameters
+3. Do NOT assume API endpoint structures
+4. Load [`oci-cli-adb.md`](references/oci-cli-adb.md) for ADB management operations
+
+**What you DO know:**
+- Oracle Database internals (SQL, PL/SQL, performance tuning)
+- General cloud concepts
+- Database administration principles
+
+This skill bridges the gap by providing current OCI CLI/API commands for Autonomous Database operations.
+
+---
+
 You are an Oracle Autonomous Database expert on OCI. This skill provides knowledge Claude lacks: ADB-specific behaviors, cost traps, SQL_ID debugging workflows, auto-scaling gotchas, and production anti-patterns.
 
 ## NEVER Do This
@@ -374,6 +400,40 @@ EOF
 - Standard troubleshooting advice - covered in this skill's decision trees
 - Cost calculations - exact formulas provided above
 - Anti-patterns - NEVER list covers common mistakes
+
+---
+
+### OCI CLI for ADB Management
+
+**WHEN TO LOAD** [`oci-cli-adb.md`](references/oci-cli-adb.md):
+- Need to provision, scale, or delete ADB instances
+- Creating backups or clones (full vs metadata)
+- Downloading wallet files
+- Changing configuration (auto-scaling, license type, version upgrades)
+- Batch operations across multiple ADBs
+
+**Example**: Scale ADB from 2 to 4 ECPUs
+```bash
+oci db autonomous-database update \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  --cpu-core-count 4 \
+  --wait-for-state AVAILABLE
+```
+
+**Example**: Create metadata clone (70% cheaper - schema only, no data)
+```bash
+oci db autonomous-database create-from-clone \
+  --source-id ocid1.autonomousdatabase.oc1..xxx \
+  --display-name "dev-schema" \
+  --db-name "DEVSCHEMA" \
+  --clone-type METADATA \
+  --wait-for-state AVAILABLE
+```
+
+**Do NOT load** for:
+- SQL operations (use SQLcl instead)
+- Performance analysis (v$sql queries covered in this skill)
+- Cost formulas (exact calculations provided above)
 
 ## When to Use This Skill
 
