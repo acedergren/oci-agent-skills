@@ -125,11 +125,23 @@ oci db autonomous-database update \
   --cpu-core-count 4 \
   --wait-for-state AVAILABLE
 
-# Enable auto-scaling (1-3x base)
+# Enable auto-scaling (1-3x base ECPU, cannot configure max via CLI)
 oci db autonomous-database update \
   --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
   --is-auto-scaling-enabled true \
   --wait-for-state AVAILABLE
+
+# IMPORTANT: Auto-scaling limits are FIXED (cannot change via CLI):
+# - Min: 1x base ECPU
+# - Max: 3x base ECPU (hard limit)
+# - Scaling trigger: CPU > 80% for 5+ minutes
+# - Scale-down: CPU < 60% for 10+ minutes
+#
+# Cost impact example (Base 2 ECPU):
+# - Without auto-scaling: 2 × $0.36 × 730 = $526/month (fixed)
+# - With auto-scaling peak: 6 × $0.36 × 730 = $1,578/month (if sustained)
+#
+# To limit costs: Start with higher base ECPU, disable auto-scaling
 ```
 
 ### Scale Storage
@@ -332,6 +344,134 @@ oci db autonomous-database update \
   --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
   --is-database-management-enabled true \
   --wait-for-state AVAILABLE
+```
+
+## High Availability and Disaster Recovery
+
+### Create Autonomous Data Guard (Standby Database)
+```bash
+# Enable Autonomous Data Guard (creates standby in different region)
+oci db autonomous-database create-autonomous-database-dataguard-association \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  --protection-mode MAXIMUM_PERFORMANCE \
+  --wait-for-state AVAILABLE
+
+# Check Data Guard status
+oci db autonomous-database-dataguard-association list \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  --output table
+```
+
+### Failover (Disaster Recovery)
+```bash
+# Failover to standby (makes standby the new primary)
+# Use when primary is unavailable
+oci db autonomous-database failover \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  --wait-for-state AVAILABLE
+
+# CRITICAL: This is a disaster recovery operation
+# Primary must be unavailable or you'll get an error
+```
+
+### Switchover (Planned Maintenance)
+```bash
+# Switchover to standby (makes standby the new primary)
+# Use for planned maintenance
+oci db autonomous-database switchover \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  --wait-for-state AVAILABLE
+
+# After switchover:
+# - Old primary becomes new standby
+# - Old standby becomes new primary
+# - Zero data loss
+```
+
+### Reinstate Failed Primary
+```bash
+# After failover, reinstate old primary as new standby
+oci db autonomous-database reinstate-autonomous-database-dataguard-association \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  --wait-for-state AVAILABLE
+```
+
+## Version-Specific Features
+
+### Check Available Versions
+```bash
+# List all available DB versions
+oci db autonomous-db-version list \
+  --compartment-id ocid1.compartment.oc1..xxx \
+  --db-workload OLTP \
+  --output table
+
+# Check features available in specific version
+oci db autonomous-database get \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  | jq '.data["db-version"]'
+```
+
+### Version-Specific Feature Matrix
+```
+Version-specific features (enabled by upgrading to version):
+
+19c:
+- Standard Oracle Database features
+- Basic JSON support
+
+21c:
+- Property Graphs (CREATE PROPERTY GRAPH)
+- Blockchain Tables (CREATE BLOCKCHAIN TABLE)
+- Enhanced JSON (JSON_VALUE, JSON_QUERY)
+
+23ai:
+- JSON Relational Duality Views
+- AI Vector Search (VECTOR data type, VECTOR_DISTANCE)
+- SELECT AI (natural language queries)
+- SQL Domains (domain data types)
+- Annotations (metadata tags)
+
+26ai:
+- JavaScript Stored Procedures
+- True Cache (application-consistent read cache)
+- Enhanced vector search (hybrid search)
+- All 23ai features
+
+IMPORTANT: Features are enabled by database version, not OCI CLI flags.
+To use 23ai features, upgrade database to version "23ai".
+```
+
+### Upgrade Path Example
+```bash
+# Check current version
+oci db autonomous-database get \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  | jq -r '.data["db-version"]'
+
+# 1. Create clone for testing
+oci db autonomous-database create-from-clone \
+  --source-id ocid1.autonomousdatabase.oc1..xxx \
+  --display-name "test-23ai-upgrade" \
+  --db-name "TEST23AI" \
+  --clone-type FULL \
+  --wait-for-state AVAILABLE
+
+# 2. Upgrade clone to 23ai
+oci db autonomous-database update \
+  --autonomous-database-id <clone-id> \
+  --db-version "23ai" \
+  --wait-for-state AVAILABLE
+
+# 3. Test application with 23ai features
+
+# 4. If successful, upgrade production
+oci db autonomous-database update \
+  --autonomous-database-id ocid1.autonomousdatabase.oc1..xxx \
+  --db-version "23ai" \
+  --wait-for-state AVAILABLE
+
+# CRITICAL: Cannot downgrade! Always test in clone first.
 ```
 
 ## Troubleshooting
