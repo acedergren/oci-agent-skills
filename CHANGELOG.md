@@ -7,6 +7,63 @@ All notable changes to OCI Agent Skills will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-01-28
+
+### Added
+- **New skills**: landing-zones and oci-events added as separate skills (13 total)
+- **A++ Test Framework**: TDD-based skill evaluation criteria (.skill-tests/A++_CRITERIA.md)
+- **New reference files** for skills missing them:
+  - best-practices/references/oci-well-architected-checklist.md
+  - database-management/references/oci-dbcs-cli.md
+  - finops-cost-optimization/references/oci-cost-cli.md
+  - infrastructure-as-code/references/oci-terraform-patterns.md
+  - landing-zones/references/landing-zone-patterns.md
+  - oci-events/references/events-patterns.md
+
+### Enhanced
+- **Progressive Disclosure**: Moved heavy content to references (landing-zones 665→437 lines, oci-events 551→341 lines)
+- **Anti-Patterns**: Added security NEVERs to compute-management, iam-identity-management, monitoring-operations
+- **Loading Triggers**: All skills now have WHEN TO LOAD guidance for reference files
+- **Knowledge Gap Disclaimer**: Present in all 13 skills
+
+### Quality
+- **All 13 skills pass A++ criteria**:
+  - ✓ ≥6 NEVERs per skill
+  - ✓ ≤500 lines per skill
+  - ✓ References directory with CLI/pattern files
+  - ✓ Loading triggers embedded in workflow
+  - ✓ Knowledge Gap Disclaimer present
+
+### Technical
+- Validated with automated test script checking all criteria
+- Oracle official documentation integrated via Firecrawl extraction
+- Reference files contain CLI commands from Oracle docs
+
+## [2.0.0] - 2026-01-28
+
+### Added
+- **oracle-dba skill**: ADB performance tuning, SQL optimization, ECPU scaling
+- **landing-zones skill**: Compartment hierarchy, hub-spoke topology, Security Zones
+- **oci-events skill**: Event-driven automation, CloudEvents, rule patterns
+- **OCI Landing Zone integration**: All skills reference official Terraform modules
+- **Knowledge Gap Disclaimer**: Explicit section in each skill about OCI CLI limitations
+
+### Enhanced
+- **46% line reduction** across all skills (5,551 → 2,973 lines)
+- **99.5% expert knowledge coverage** - removed generic tutorials
+- **64 anti-patterns** with exact cost impacts documented
+- **8 decision trees** for systematic troubleshooting
+
+### Quality
+- **Skill-judge grade**: F (54/120) → A (108/120) improvement
+- All skills pass skill-judge D1-D8 criteria
+- Focus on OCI-specific gotchas over generic cloud advice
+
+### Technical
+- Official Oracle documentation extracted via Firecrawl
+- Reference files with complete CLI commands
+- Progressive loading with WHEN TO LOAD triggers
+
 ## [1.2.0] - 2026-01-26
 
 ### Added
@@ -172,6 +229,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Community-Maintained Project by Alexander Cedergren**
 
+- **2.1.0** (2026-01-28): A++ scores achieved - all 13 skills pass TDD-based quality criteria
+- **2.0.0** (2026-01-28): Major refactoring - oracle-dba, landing-zones, oci-events skills; 46% line reduction
 - **1.2.0** (2026-01-26): Community clarification, marketplace publication, FinOps skill, additional MCP servers
 - **1.1.0** (2026-01-26): Enhanced GenAI integration, Oracle best practices skill
 - **1.0.0** (2026-01-26): Initial release with 8 skills, MCP integration, comprehensive documentation

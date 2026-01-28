@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://code.claude.com)
 [![GitHub Marketplace](https://img.shields.io/badge/Available%20on-Claude%20Code%20Marketplace-blue)](https://code.claude.com/docs/en/discover-plugins)
-[![Skills Count](https://img.shields.io/badge/Skills-11%2B1%20Agent-brightgreen)](#skills-reference)
+[![Skills Count](https://img.shields.io/badge/Skills-13%2B1%20Agent-brightgreen)](#skills-reference)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/oci-agent-skills)
 
 > **⚠️ Community Project Notice**: OCI Agent Skills is a **community-maintained** project created and maintained by Alexander Cedergren. This is **not an official Oracle product**. It provides helpful utilities, examples, and best practices for working with Oracle Cloud Infrastructure, but is not endorsed by or affiliated with Oracle Corporation.
@@ -43,7 +43,7 @@ Try these prompts in Claude Code:
 
 ## Overview
 
-This community-maintained plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. Created and maintained by Alexander Cedergren, it includes **11 detailed skills** plus an **OCI Cloud Architect orchestrator agent** for intelligent multi-service automation. Skills cover compute, networking, databases, Oracle DBA operations, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, FinOps/cost optimization, and best practices from Oracle's official documentation and technical guides.
+This community-maintained plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. Created and maintained by Alexander Cedergren, it includes **13 detailed skills** plus an **OCI Cloud Architect orchestrator agent** for intelligent multi-service automation. Skills cover compute, networking, databases, Oracle DBA operations, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, FinOps/cost optimization, Landing Zones architecture, OCI Events automation, and best practices from Oracle's official documentation and technical guides.
 
 **This is a community project and is not an official Oracle product or endorsement.**
 
@@ -51,9 +51,9 @@ This community-maintained plugin provides expert-level guidance and complete CLI
 
 ### 🎯 Comprehensive Skills Coverage
 
-**11 Specialized Skills:**
+**13 Specialized Skills:**
 - **Compute Management**: Launch, manage, and troubleshoot compute instances
-- **Networking**: VCN, subnet, security group, and gateway configuration
+- **Networking Management**: VCN, subnet, security group, and gateway configuration
 - **Database Management**: Autonomous Database, DB Systems, Exadata, and PDBs
 - **Oracle DBA**: Performance tuning, SQL optimization, cost analysis, and ADB-specific operations
 - **Monitoring & Observability**: Metrics, alarms, logs, and events
@@ -62,6 +62,8 @@ This community-maintained plugin provides expert-level guidance and complete CLI
 - **IAM & Identity**: Users, groups, policies, dynamic groups, and IDCS integration
 - **Infrastructure as Code**: Terraform, Resource Manager, and Landing Zones
 - **FinOps & Cost Optimization**: Usage analytics, anomaly detection, budgets, and cost intelligence
+- **Landing Zones**: Compartment hierarchies, hub-spoke topology, Security Zones, CIS compliance
+- **OCI Events**: Event-driven automation, CloudEvents, Functions/Streaming integration
 - **Best Practices**: Official Oracle guidance, Well-Architected Framework, CIS compliance
 
 **🤖 Intelligent Orchestrator Agent:**
@@ -157,29 +159,46 @@ oci-agent-skills/
 ├── .mcp.json                 # MCP server configuration
 ├── agents/                   # Orchestrator agents
 │   └── oci-cloud-architect.md   # Multi-skill orchestration agent
-├── skills/                   # 11 Auto-activating specialist skills
+├── skills/                   # 13 Auto-activating specialist skills
+│   ├── best-practices/
+│   │   ├── SKILL.md
+│   │   └── references/
 │   ├── compute-management/
-│   │   └── SKILL.md
-│   ├── networking-management/
-│   │   └── SKILL.md
+│   │   ├── SKILL.md
+│   │   └── references/
 │   ├── database-management/
-│   │   └── SKILL.md
-│   ├── oracle-dba/
-│   │   └── SKILL.md
-│   ├── monitoring-operations/
-│   │   └── SKILL.md
-│   ├── secrets-management/
-│   │   └── SKILL.md
-│   ├── genai-services/
-│   │   └── SKILL.md
-│   ├── iam-identity-management/
-│   │   └── SKILL.md
-│   ├── infrastructure-as-code/
-│   │   └── SKILL.md
+│   │   ├── SKILL.md
+│   │   └── references/
 │   ├── finops-cost-optimization/
-│   │   └── SKILL.md
-│   └── best-practices/
-│       └── SKILL.md
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── genai-services/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── iam-identity-management/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── infrastructure-as-code/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── landing-zones/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── monitoring-operations/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── networking-management/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── oci-events/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── oracle-dba/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   └── secrets-management/
+│       ├── SKILL.md
+│       └── references/
 └── README.md
 ```
 
@@ -271,6 +290,27 @@ Activate when working with:
 - Pricing lookups and estimates
 
 **Example**: "Show my top spending services and identify idle resources"
+
+### Landing Zones Architecture
+Activate when working with:
+- Compartment hierarchies and governance
+- Hub-spoke network topology
+- Security Zones and Cloud Guard
+- CIS OCI Foundations Benchmark
+- Multi-tenant and multi-environment setup
+- Tagging strategy and cost allocation
+
+**Example**: "Design a Landing Zone for my production environment"
+
+### OCI Events Service
+Activate when working with:
+- Event-driven automation
+- CloudEvents rules and filters
+- Functions and Streaming integration
+- Dead letter queue configuration
+- Event patterns for compliance
+
+**Example**: "Set up an event rule to notify when instances are terminated"
 
 ## Orchestrator Agent
 
@@ -694,16 +734,24 @@ OCI Agent Skills is built by the community, for the community. This project aims
 
 This is a community-maintained project. All releases are managed by Alexander Cedergren.
 
+### 2.1.0 (2026-01-28) - A++ Quality Release
+- **All 13 skills pass A++ criteria** - TDD-based quality validation
+- **New reference files** for skills missing them (best-practices, database-management, finops-cost-optimization, infrastructure-as-code)
+- **Progressive disclosure** - moved heavy content to references (landing-zones 665→437 lines, oci-events 551→341 lines)
+- **Anti-patterns enhanced** - added security NEVERs to compute, IAM, monitoring skills
+- **Loading triggers** - all skills have WHEN TO LOAD guidance
+- **Test framework** - .skill-tests/A++_CRITERIA.md for validation
+
 ### 2.0.0 (2026-01-28) - Major Refactoring Release
 - **Complete TDD refactoring** of all skills using Test-Driven Development methodology
 - **46% line reduction** (5,551 → 2,973 lines) with 99.5% expert knowledge coverage
-- **Added oracle-dba skill** (11th skill) - ADB performance tuning and cost optimization
+- **Added oracle-dba skill** - ADB performance tuning and cost optimization
+- **Added landing-zones skill** - Compartment hierarchies, hub-spoke, Security Zones
+- **Added oci-events skill** - Event-driven automation, CloudEvents patterns
 - **64 anti-patterns documented** with exact cost impacts across all skills
 - **8 decision trees** for systematic troubleshooting workflows
-- **$243,000-280,000/year** documented cost savings potential identified
 - **Skill-judge grade**: F (54/120) → A (108/120) - 100% improvement
 - **Expert knowledge focus**: Deleted CLI tutorials/generic advice, added OCI-specific gotchas
-- See [RELEASE NOTES](https://github.com/acedergren/oci-agent-skills/releases/tag/v2.0.0) for detailed transformation
 
 ### 1.2.0 (2026-01-26) - Community Release
 - Community project clarification and marketplace publication
