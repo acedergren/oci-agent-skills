@@ -522,6 +522,24 @@ oci events rule create \
 - Notification topic setup (covered in monitoring-operations skill)
 - Streaming configuration (covered in streaming skill when available)
 
+---
+
+### OCI Events Reference (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-events-reference.md`](references/oci-events-reference.md):
+- Need comprehensive list of all OCI service event types
+- Understanding CloudEvents 1.0 specification in OCI
+- Implementing complex event patterns and filtering
+- Need official Oracle guidance on Events service architecture
+- Troubleshooting event delivery and action failures
+
+**Do NOT load** for:
+- Quick event rule creation (CLI examples above)
+- Common event patterns (architecture patterns in this skill)
+- Events vs Alarms decision (decision tree above)
+
+---
+
 ## When to Use This Skill
 
 - Implementing event-driven automation and workflows

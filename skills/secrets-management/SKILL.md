@@ -271,6 +271,24 @@ encoded = secret_bundle.data.secret_bundle_content.content
 decoded = base64.b64decode(encoded).decode('utf-8')  # Don't forget decode()
 ```
 
+## Progressive Loading References
+
+### OCI Vault Reference (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-vault-reference.md`](references/oci-vault-reference.md):
+- Need comprehensive Vault and KMS API documentation
+- Understanding key management and encryption options
+- Implementing HSM-backed key protection
+- Need official Oracle guidance on Vault architecture
+- Setting up cross-region secret replication
+
+**Do NOT load** for:
+- Quick secret retrieval examples (covered in this skill)
+- Permission debugging (decision trees above)
+- Secret rotation patterns (covered above)
+
+---
+
 ## When to Use This Skill
 
 - Storing credentials in Vault: secret organization, IAM setup

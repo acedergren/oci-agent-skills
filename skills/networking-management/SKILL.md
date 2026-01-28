@@ -399,6 +399,24 @@ Assign:
 - DB instances: DB NSG + Monitor NSG
 ```
 
+## Progressive Loading References
+
+### OCI Networking Reference (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-networking-reference.md`](references/oci-networking-reference.md):
+- Need comprehensive VCN and subnet configuration details
+- Understanding Security Lists vs NSGs in depth
+- Implementing DRG, FastConnect, or VPN configurations
+- Troubleshooting complex routing issues
+- Need official Oracle networking best practices
+
+**Do NOT load** for:
+- Quick CIDR allocation (tables in this skill)
+- Basic NSG vs Security List choice (decision tree above)
+- Service Gateway cost savings (covered in this skill)
+
+---
+
 ## When to Use This Skill
 
 - Network design: VCN planning, subnet sizing, CIDR allocation

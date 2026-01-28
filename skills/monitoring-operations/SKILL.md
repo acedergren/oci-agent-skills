@@ -113,6 +113,24 @@ CPUUtilization[1m]{resourceId='<instance-ocid>'}.mean()
 
 **Cost**: Queries free, but rate limited (1000 req/min)
 
+## Progressive Loading References
+
+### OCI Monitoring Reference (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-monitoring-reference.md`](references/oci-monitoring-reference.md):
+- Need comprehensive list of all OCI service metrics
+- Understanding MQL (Monitoring Query Language) in depth
+- Implementing complex alarm conditions and composites
+- Need official Oracle guidance on Logging and Service Connector
+- Setting up Log Analytics and APM integration
+
+**Do NOT load** for:
+- Quick alarm setup (examples in this skill)
+- Common metric patterns (tables above)
+- Troubleshooting decision trees (covered above)
+
+---
+
 ## When to Use This Skill
 
 - Alarms: threshold configuration, missing data handling, trigger delay

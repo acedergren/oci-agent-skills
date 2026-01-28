@@ -250,6 +250,24 @@ Tenancy
 - "Invalid credentials" → IDCS federation not configured in OCI tenancy
 - Group membership doesn't sync → OCI group name doesn't match IDCS group name
 
+## Progressive Loading References
+
+### OCI IAM Policies Reference (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-iam-policies-reference.md`](references/oci-iam-policies-reference.md):
+- Need comprehensive IAM policy syntax and examples
+- Writing complex policies with conditions
+- Understanding service-specific verbs and permissions
+- Implementing least privilege access patterns
+- Troubleshooting policy evaluation order
+
+**Do NOT load** for:
+- Quick policy syntax examples (covered in this skill)
+- Common permission patterns (decision trees above)
+- Dynamic group rules (covered in this skill)
+
+---
+
 ## When to Use This Skill
 
 - Writing IAM policies: syntax, verb selection, conditions

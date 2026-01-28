@@ -448,6 +448,24 @@ oci db autonomous-database create-from-clone \
 - Performance analysis (v$sql queries covered in this skill)
 - Cost formulas (exact calculations provided above)
 
+---
+
+### OCI Autonomous Database Best Practices (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-adb-best-practices.md`](references/oci-adb-best-practices.md):
+- Need comprehensive ADB architecture and design patterns
+- Understanding ADB workload types (ATP, ADW, APEX, JSON)
+- Implementing production-grade ADB deployments
+- Need official Oracle guidance on ADB features and limitations
+- Planning migrations to ADB from on-premises Oracle
+
+**Do NOT load** for:
+- Quick SQL_ID debugging (workflow in this skill)
+- Cost calculations (exact formulas above)
+- Common gotchas (NEVER list covers them)
+
+---
+
 ## When to Use This Skill
 
 - Performance issues: Slow queries, high CPU, scaling decisions

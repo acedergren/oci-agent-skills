@@ -326,6 +326,24 @@ genai_response = genai_client.chat(prompt=f"Summarize: {redacted_note}")
 # Store phi_mapping securely, use to re-identify if needed
 ```
 
+## Progressive Loading References
+
+### OCI Generative AI Reference (Official Oracle Documentation)
+
+**WHEN TO LOAD** [`oci-genai-reference.md`](references/oci-genai-reference.md):
+- Need comprehensive GenAI API documentation
+- Understanding all available models and capabilities
+- Implementing RAG (Retrieval-Augmented Generation) with OCI
+- Need official Oracle guidance on GenAI Agents
+- Understanding fine-tuning and custom model deployment
+
+**Do NOT load** for:
+- Quick API usage examples (covered in this skill)
+- Model selection guidance (decision tree above)
+- Cost calculations (formulas above)
+
+---
+
 ## When to Use This Skill
 
 - GenAI API implementation: model selection, cost estimation, SDK usage
