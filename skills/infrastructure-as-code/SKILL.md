@@ -1,879 +1,346 @@
 ---
 name: OCI Infrastructure as Code
-description: Expert in Terraform for OCI, Resource Manager, OCI Landing Zones, and infrastructure automation. Complete reference for terraform-provider-oci with examples.
-version: 1.0.0
+description: Use when writing Terraform for OCI, troubleshooting provider errors, managing state files, or implementing Resource Manager stacks. Covers terraform-provider-oci gotchas, resource lifecycle anti-patterns, state management mistakes, authentication issues, and OCI Landing Zones. Keywords: terraform state, provider authentication, resource already exists, destroy failed, instance principal terraform.
+version: 2.0.0
 ---
 
-# OCI Infrastructure as Code Skill
+# OCI Infrastructure as Code - Expert Knowledge
 
-You are an expert in infrastructure as code for Oracle Cloud Infrastructure using Terraform, OCI Resource Manager, and OCI Landing Zones. This skill provides comprehensive guidance to compensate for Claude's limited OCI training data.
+You are an OCI Terraform expert. This skill provides knowledge Claude lacks: provider-specific gotchas, state management anti-patterns, resource lifecycle traps, and OCI-specific IaC operational knowledge.
 
-## Core Concepts
+## NEVER Do This
 
-### Terraform Provider for OCI
-- Official HashiCorp provider: `terraform-provider-oci`
-- Comprehensive resource coverage for all OCI services
-- Data sources for querying existing resources
-- Authentication via OCI CLI config or instance principals
-
-### OCI Resource Manager
-- Managed Terraform service within OCI
-- Stack-based infrastructure management
-- Built-in state management
-- Plan, apply, and destroy operations via console or API
-
-### OCI Landing Zones
-- Pre-built Terraform templates for enterprise patterns
-- Security-hardened configurations
-- Multi-environment support
-- Compliance-ready architectures
-
-## Terraform Provider Setup
-
-### Provider Configuration
+❌ **NEVER hardcode OCIDs in Terraform (breaks portability)**
 ```hcl
-# Configure the OCI Provider
-terraform {
-  required_providers {
-    oci = {
-      source  = "oracle/oci"
-      version = "~> 5.0"
-    }
-  }
+# WRONG - breaks when moving between regions/compartments
+resource "oci_core_instance" "web" {
+  compartment_id = "ocid1.compartment.oc1..aaaaaa..."  # Hardcoded!
+  subnet_id      = "ocid1.subnet.oc1.phx.bbbbbb..."     # Hardcoded!
 }
 
-provider "oci" {
-  # Authentication via OCI CLI config (default)
-  # Reads from ~/.oci/config
-  region = "us-phoenix-1"
-}
-
-# Alternative: Explicit authentication
-provider "oci" {
-  tenancy_ocid     = var.tenancy_ocid
-  user_ocid        = var.user_ocid
-  fingerprint      = var.fingerprint
-  private_key_path = var.private_key_path
-  region           = var.region
-}
-
-# Instance Principal authentication (for compute instances)
-provider "oci" {
-  auth                = "InstancePrincipal"
-  region              = "us-phoenix-1"
+# RIGHT - use variables or data sources
+resource "oci_core_instance" "web" {
+  compartment_id = var.compartment_ocid
+  subnet_id      = data.oci_core_subnet.existing.id
 }
 ```
 
-### Variables Configuration
+❌ **NEVER use `preserve_boot_volume = true` in dev/test (cost trap)**
 ```hcl
-# variables.tf
-variable "tenancy_ocid" {
-  description = "OCI Tenancy OCID"
-  type        = string
+# WRONG - orphans boot volumes when instance destroyed ($50+/month per instance)
+resource "oci_core_instance" "dev" {
+  preserve_boot_volume = true  # Default behavior!
 }
 
-variable "compartment_ocid" {
-  description = "Target compartment OCID"
-  type        = string
-}
-
-variable "region" {
-  description = "OCI Region"
-  type        = string
-  default     = "us-phoenix-1"
-}
-
-variable "ssh_public_key" {
-  description = "SSH public key for instance access"
-  type        = string
+# RIGHT - explicit cleanup in dev/test
+resource "oci_core_instance" "dev" {
+  preserve_boot_volume = false
 }
 ```
 
-## Common Resource Examples
+**Cost impact**: Dev team with 10 test instances × $5/volume/month = $50/month wasted on orphaned volumes
 
-### Compartment
+❌ **NEVER forget `lifecycle` blocks for critical resources**
 ```hcl
-resource "oci_identity_compartment" "app_compartment" {
-  compartment_id = var.tenancy_ocid
-  description    = "Application compartment"
-  name           = "ApplicationCompartment"
+# WRONG - accidental destroy can delete production database
+resource "oci_database_autonomous_database" "prod" {
+  # No protection!
+}
 
-  freeform_tags = {
-    "Environment" = "Production"
-    "CostCenter"  = "Engineering"
+# RIGHT - prevent accidental destruction
+resource "oci_database_autonomous_database" "prod" {
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [defined_tags]  # Ignore tag changes from console
   }
 }
 ```
 
-### VCN (Virtual Cloud Network)
+❌ **NEVER mix regional and AD-specific resources (portability trap)**
 ```hcl
-resource "oci_core_vcn" "app_vcn" {
-  compartment_id = var.compartment_ocid
-  cidr_blocks    = ["10.0.0.0/16"]
-  display_name   = "ApplicationVCN"
-  dns_label      = "appvcn"
-
-  freeform_tags = {
-    "Environment" = "Production"
-  }
+# WRONG - hardcoded AD breaks multi-region deployment
+resource "oci_core_instance" "web" {
+  availability_domain = "fMgC:US-ASHBURN-AD-1"  # Tenant-specific!
 }
 
-# Internet Gateway
-resource "oci_core_internet_gateway" "app_igw" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "InternetGateway"
-  enabled        = true
-}
-
-# NAT Gateway
-resource "oci_core_nat_gateway" "app_nat" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "NATGateway"
-}
-
-# Service Gateway
-resource "oci_core_service_gateway" "app_sgw" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "ServiceGateway"
-
-  services {
-    service_id = data.oci_core_services.all_services.services[0].id
-  }
-}
-
-# Data source for OCI services
-data "oci_core_services" "all_services" {
-  filter {
-    name   = "name"
-    values = ["All .* Services In Oracle Services Network"]
-    regex  = true
-  }
-}
-```
-
-### Subnet with Security List
-```hcl
-# Public Subnet
-resource "oci_core_subnet" "public_subnet" {
-  compartment_id      = var.compartment_ocid
-  vcn_id              = oci_core_vcn.app_vcn.id
-  cidr_block          = "10.0.1.0/24"
-  display_name        = "PublicSubnet"
-  dns_label           = "public"
-  route_table_id      = oci_core_route_table.public_rt.id
-  security_list_ids   = [oci_core_security_list.public_sl.id]
-  prohibit_public_ip_on_vnic = false
-}
-
-# Private Subnet
-resource "oci_core_subnet" "private_subnet" {
-  compartment_id      = var.compartment_ocid
-  vcn_id              = oci_core_vcn.app_vcn.id
-  cidr_block          = "10.0.2.0/24"
-  display_name        = "PrivateSubnet"
-  dns_label           = "private"
-  route_table_id      = oci_core_route_table.private_rt.id
-  security_list_ids   = [oci_core_security_list.private_sl.id]
-  prohibit_public_ip_on_vnic = true
-}
-
-# Route Table for Public Subnet
-resource "oci_core_route_table" "public_rt" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "PublicRouteTable"
-
-  route_rules {
-    network_entity_id = oci_core_internet_gateway.app_igw.id
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-  }
-}
-
-# Route Table for Private Subnet
-resource "oci_core_route_table" "private_rt" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "PrivateRouteTable"
-
-  route_rules {
-    network_entity_id = oci_core_nat_gateway.app_nat.id
-    destination       = "0.0.0.0/0"
-    destination_type  = "CIDR_BLOCK"
-  }
-
-  route_rules {
-    network_entity_id = oci_core_service_gateway.app_sgw.id
-    destination       = data.oci_core_services.all_services.services[0].cidr_block
-    destination_type  = "SERVICE_CIDR_BLOCK"
-  }
-}
-
-# Security List for Public Subnet
-resource "oci_core_security_list" "public_sl" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "PublicSecurityList"
-
-  egress_security_rules {
-    destination = "0.0.0.0/0"
-    protocol    = "all"
-  }
-
-  ingress_security_rules {
-    protocol = "6" # TCP
-    source   = "0.0.0.0/0"
-    tcp_options {
-      min = 80
-      max = 80
-    }
-  }
-
-  ingress_security_rules {
-    protocol = "6" # TCP
-    source   = "0.0.0.0/0"
-    tcp_options {
-      min = 443
-      max = 443
-    }
-  }
-
-  ingress_security_rules {
-    protocol = "6" # TCP
-    source   = "0.0.0.0/0"
-    tcp_options {
-      min = 22
-      max = 22
-    }
-  }
-}
-
-# Security List for Private Subnet
-resource "oci_core_security_list" "private_sl" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "PrivateSecurityList"
-
-  egress_security_rules {
-    destination = "0.0.0.0/0"
-    protocol    = "all"
-  }
-
-  ingress_security_rules {
-    protocol = "6" # TCP
-    source   = "10.0.0.0/16"
-    tcp_options {
-      min = 1521
-      max = 1521
-    }
-  }
-}
-```
-
-### Network Security Group (NSG)
-```hcl
-resource "oci_core_network_security_group" "app_nsg" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "ApplicationNSG"
-}
-
-# NSG Rule - Allow HTTP from internet
-resource "oci_core_network_security_group_security_rule" "app_nsg_http" {
-  network_security_group_id = oci_core_network_security_group.app_nsg.id
-  direction                 = "INGRESS"
-  protocol                  = "6"
-  source                    = "0.0.0.0/0"
-  source_type               = "CIDR_BLOCK"
-
-  tcp_options {
-    destination_port_range {
-      min = 80
-      max = 80
-    }
-  }
-}
-
-# NSG Rule - Allow HTTPS
-resource "oci_core_network_security_group_security_rule" "app_nsg_https" {
-  network_security_group_id = oci_core_network_security_group.app_nsg.id
-  direction                 = "INGRESS"
-  protocol                  = "6"
-  source                    = "0.0.0.0/0"
-  source_type               = "CIDR_BLOCK"
-
-  tcp_options {
-    destination_port_range {
-      min = 443
-      max = 443
-    }
-  }
-}
-```
-
-### Compute Instance
-```hcl
-# Get latest Oracle Linux image
-data "oci_core_images" "ol8_images" {
-  compartment_id           = var.compartment_ocid
-  operating_system         = "Oracle Linux"
-  operating_system_version = "8"
-  shape                    = "VM.Standard.E4.Flex"
-  sort_by                  = "TIMECREATED"
-  sort_order               = "DESC"
-}
-
-resource "oci_core_instance" "app_instance" {
-  compartment_id      = var.compartment_ocid
-  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
-  shape               = "VM.Standard.E4.Flex"
-
-  shape_config {
-    ocpus         = 1
-    memory_in_gbs = 16
-  }
-
-  display_name = "ApplicationServer"
-
-  create_vnic_details {
-    subnet_id        = oci_core_subnet.public_subnet.id
-    assign_public_ip = true
-    display_name     = "PrimaryVNIC"
-    nsg_ids          = [oci_core_network_security_group.app_nsg.id]
-  }
-
-  source_details {
-    source_type = "image"
-    source_id   = data.oci_core_images.ol8_images.images[0].id
-  }
-
-  metadata = {
-    ssh_authorized_keys = var.ssh_public_key
-    user_data = base64encode(templatefile("${path.module}/cloud-init.yaml", {
-      hostname = "app-server"
-    }))
-  }
-
-  freeform_tags = {
-    "Environment" = "Production"
-    "Application" = "WebApp"
-  }
-}
-
-# Availability Domains data source
+# RIGHT - query AD dynamically
 data "oci_identity_availability_domains" "ads" {
-  compartment_id = var.compartment_ocid
+  compartment_id = var.tenancy_ocid
+}
+
+resource "oci_core_instance" "web" {
+  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
 }
 ```
 
-### Autonomous Database
+❌ **NEVER store state file in local filesystem for teams**
 ```hcl
-resource "oci_database_autonomous_database" "app_adb" {
-  compartment_id           = var.compartment_ocid
-  db_name                  = "APPADB"
-  display_name             = "Application Database"
-  admin_password           = var.adb_admin_password
-  cpu_core_count           = 1
-  data_storage_size_in_tbs = 1
-  db_workload              = "OLTP"
-
-  # Always Free configuration
-  is_free_tier             = true
-
-  # Or production configuration
-  # is_auto_scaling_enabled  = true
-  # license_model            = "LICENSE_INCLUDED"
-
-  # Private endpoint (recommended)
-  subnet_id                = oci_core_subnet.private_subnet.id
-  nsg_ids                  = [oci_core_network_security_group.db_nsg.id]
-
-  freeform_tags = {
-    "Environment" = "Production"
-  }
-}
-
-# Output connection strings
-output "adb_connection_strings" {
-  value     = oci_database_autonomous_database.app_adb.connection_strings
-  sensitive = true
-}
-```
-
-### Object Storage Bucket
-```hcl
-resource "oci_objectstorage_bucket" "app_bucket" {
-  compartment_id = var.compartment_ocid
-  namespace      = data.oci_objectstorage_namespace.ns.namespace
-  name           = "application-data"
-  access_type    = "NoPublicAccess"
-
-  versioning = "Enabled"
-
-  freeform_tags = {
-    "Environment" = "Production"
-  }
-}
-
-data "oci_objectstorage_namespace" "ns" {
-  compartment_id = var.compartment_ocid
-}
-```
-
-### Vault and Secret
-```hcl
-resource "oci_kms_vault" "app_vault" {
-  compartment_id = var.compartment_ocid
-  display_name   = "ApplicationVault"
-  vault_type     = "DEFAULT"
-}
-
-resource "oci_kms_key" "encryption_key" {
-  compartment_id = var.compartment_ocid
-  display_name   = "ApplicationKey"
-
-  key_shape {
-    algorithm = "AES"
-    length    = 32
-  }
-
-  management_endpoint = oci_kms_vault.app_vault.management_endpoint
-}
-
-resource "oci_vault_secret" "db_password" {
-  compartment_id = var.compartment_ocid
-  vault_id       = oci_kms_vault.app_vault.id
-  key_id         = oci_kms_key.encryption_key.id
-  secret_name    = "database-password"
-
-  secret_content {
-    content_type = "BASE64"
-    content      = base64encode(var.db_password)
-  }
-}
-```
-
-### Load Balancer
-```hcl
-resource "oci_load_balancer_load_balancer" "app_lb" {
-  compartment_id = var.compartment_ocid
-  display_name   = "ApplicationLB"
-  shape          = "flexible"
-
-  shape_details {
-    minimum_bandwidth_in_mbps = 10
-    maximum_bandwidth_in_mbps = 100
-  }
-
-  subnet_ids = [
-    oci_core_subnet.public_subnet.id
-  ]
-
-  is_private = false
-}
-
-# Backend Set
-resource "oci_load_balancer_backend_set" "app_backend_set" {
-  load_balancer_id = oci_load_balancer_load_balancer.app_lb.id
-  name             = "ApplicationBackendSet"
-  policy           = "ROUND_ROBIN"
-
-  health_checker {
-    protocol          = "HTTP"
-    port              = 80
-    url_path          = "/health"
-    interval_ms       = 10000
-    timeout_in_millis = 3000
-    retries           = 3
-  }
-}
-
-# Backend (instance)
-resource "oci_load_balancer_backend" "app_backend" {
-  load_balancer_id = oci_load_balancer_load_balancer.app_lb.id
-  backendset_name  = oci_load_balancer_backend_set.app_backend_set.name
-  ip_address       = oci_core_instance.app_instance.private_ip
-  port             = 80
-  backup           = false
-  drain            = false
-  offline          = false
-  weight           = 1
-}
-
-# Listener
-resource "oci_load_balancer_listener" "app_listener" {
-  load_balancer_id         = oci_load_balancer_load_balancer.app_lb.id
-  name                     = "HTTP"
-  default_backend_set_name = oci_load_balancer_backend_set.app_backend_set.name
-  port                     = 80
-  protocol                 = "HTTP"
-}
-```
-
-## OCI Resource Manager
-
-### Creating a Stack via CLI
-```bash
-# Create configuration ZIP
-zip -r stack.zip *.tf
-
-# Create stack in Resource Manager
-oci resource-manager stack create \
-  --compartment-id <compartment-ocid> \
-  --config-source stack.zip \
-  --display-name "ApplicationStack" \
-  --description "Application infrastructure"
-
-# Plan the stack
-oci resource-manager job create-plan-job \
-  --stack-id <stack-ocid> \
-  --display-name "InitialPlan"
-
-# Apply the stack
-oci resource-manager job create-apply-job \
-  --stack-id <stack-ocid> \
-  --display-name "InitialApply" \
-  --execution-plan-strategy AUTO_APPROVED
-
-# Destroy resources
-oci resource-manager job create-destroy-job \
-  --stack-id <stack-ocid> \
-  --display-name "Cleanup" \
-  --execution-plan-strategy AUTO_APPROVED
-```
-
-### Stack Configuration with Remote State
-```hcl
-# backend.tf
+# WRONG - no locking, no collaboration
 terraform {
-  backend "http" {
-    address       = "https://objectstorage.us-phoenix-1.oraclecloud.com/n/${var.namespace}/b/${var.bucket}/o/terraform.tfstate"
-    update_method = "PUT"
-  }
+  backend "local" {}
 }
 
-# Alternative: OCI Object Storage backend
+# RIGHT - use OCI Object Storage with locking
 terraform {
   backend "s3" {
-    bucket                      = "terraform-state"
-    key                         = "prod/terraform.tfstate"
-    region                      = "us-phoenix-1"
-    endpoint                    = "https://${var.namespace}.compat.objectstorage.us-phoenix-1.oraclecloud.com"
+    bucket   = "terraform-state"
+    key      = "prod/terraform.tfstate"
+    region   = "us-phoenix-1"
+    endpoint = "https://namespace.compat.objectstorage.us-phoenix-1.oraclecloud.com"
+
     skip_region_validation      = true
     skip_credentials_validation = true
     skip_metadata_api_check     = true
-    force_path_style            = true
+    use_path_style              = true
+  }
+}
+```
+
+❌ **NEVER use `count` for resources that shouldn't be replaced on reorder**
+```hcl
+# WRONG - reordering list recreates ALL resources
+resource "oci_core_instance" "web" {
+  count = length(var.instance_names)
+  display_name = var.instance_names[count.index]
+}
+
+# If instance_names changes from ["web1", "web2", "web3"] to ["web0", "web1", "web2", "web3"]
+# Terraform RECREATES all instances!
+
+# RIGHT - use for_each with stable keys
+resource "oci_core_instance" "web" {
+  for_each = toset(var.instance_names)
+  display_name = each.value
+}
+```
+
+## OCI Provider Gotchas
+
+### Authentication Hierarchy (Often Confusing)
+
+Provider authentication precedence:
+1. Explicit provider block credentials
+2. `TF_VAR_*` environment variables
+3. `~/.oci/config` file (DEFAULT profile)
+4. Instance Principal (if `auth = "InstancePrincipal"`)
+
+**Common mistake**: Setting environment variables but provider block overrides them silently.
+
+### Instance Principal for Terraform on OCI Compute
+
+```hcl
+# In provider.tf
+provider "oci" {
+  auth   = "InstancePrincipal"
+  region = var.region
+}
+
+# Dynamic group matching rule:
+# "ALL {instance.compartment.id = '<compartment-ocid>'}"
+
+# IAM policy:
+# "Allow dynamic-group terraform-instances to manage all-resources in tenancy"
+```
+
+**Critical**: Instance must be in dynamic group BEFORE Terraform runs, or authentication fails with cryptic error: "authorization failed or requested resource not found"
+
+### Resource Already Exists Errors
+
+```
+Error: 409-Conflict, Resource already exists
+```
+
+**Cause**: Resource exists in OCI but not in state file.
+
+**Solution**:
+```bash
+# Import existing resource into state
+terraform import oci_core_vcn.main ocid1.vcn.oc1.phx.xxxxx
+
+# Then run plan/apply as normal
+terraform plan
+```
+
+**Prevention**: Always use `terraform import` for existing infrastructure before managing with Terraform.
+
+## State Management Anti-Patterns
+
+### Problem: State Drift
+
+**Symptoms**: Terraform wants to change/destroy resources that were modified outside Terraform (console, API, CLI).
+
+**Detection**:
+```bash
+terraform plan  # Shows unexpected changes
+terraform show  # Compare state to actual infrastructure
+```
+
+**Solutions**:
+
+**Option 1**: Refresh state (safe)
+```bash
+terraform refresh  # Updates state to match reality
+```
+
+**Option 2**: Import changes (if new resources)
+```bash
+terraform import <resource_type>.<name> <ocid>
+```
+
+**Option 3**: Ignore changes in lifecycle
+```hcl
+lifecycle {
+  ignore_changes = [defined_tags, freeform_tags]  # Ignore console tag edits
+}
+```
+
+### Problem: State File Corruption
+
+**Symptoms**: `terraform plan` fails with "state file corrupted" or "version mismatch"
+
+**Recovery**:
+```bash
+# 1. Make backup
+cp terraform.tfstate terraform.tfstate.backup
+
+# 2. Try state repair
+terraform state pull > recovered.tfstate
+mv recovered.tfstate terraform.tfstate
+
+# 3. If that fails, restore from Object Storage versioning
+# Or reconstruct with imports (last resort)
+```
+
+**Prevention**: Use Object Storage backend with versioning enabled
+
+## Resource Lifecycle Traps
+
+### Destroy Failures (Common with Dependencies)
+
+```
+Error: Resource still in use
+```
+
+**Example**: Can't destroy VCN because subnet still exists, can't destroy subnet because instances still attached.
+
+**Solution**:
+```bash
+# 1. Visualize dependencies
+terraform graph | dot -Tpng > graph.png
+
+# 2. Destroy in reverse order
+terraform destroy -target=oci_core_instance.web
+terraform destroy -target=oci_core_subnet.private
+terraform destroy -target=oci_core_vcn.main
+
+# Or use depends_on explicitly:
+resource "oci_core_vcn" "main" {
+  # ...
+}
+
+resource "oci_core_subnet" "private" {
+  vcn_id = oci_core_vcn.main.id
+  # depends_on is implicit via vcn_id reference
+}
+```
+
+### Timeouts for Long-Running Resources
+
+```hcl
+# Database provisioning takes 15-30 minutes
+resource "oci_database_autonomous_database" "prod" {
+  # ... configuration ...
+
+  timeouts {
+    create = "60m"  # Default 20m often not enough
+    update = "60m"
+    delete = "30m"
+  }
+}
+
+# Compute instance usually fast, but can timeout on capacity issues
+resource "oci_core_instance" "web" {
+  # ... configuration ...
+
+  timeouts {
+    create = "30m"  # Allow retries on "out of capacity"
   }
 }
 ```
 
 ## OCI Landing Zones
 
-### Using Landing Zone Modules
+**What**: Pre-built Terraform templates for enterprise OCI architectures
+
+**Repository**: `github.com/oracle-quickstart/oci-landing-zones`
+
+**Use when**:
+- Starting new OCI tenancy (greenfield)
+- Need CIS OCI Foundations Benchmark compliance
+- Want security-hardened baseline
+- Multi-environment (dev/test/prod) setup
+
+**DON'T use when**:
+- Brownfield (existing infrastructure) - too opinionated
+- Simple single-app deployment - overkill
+
+**Key patterns**:
+- Hub-and-spoke networking
+- Centralized logging/monitoring
+- Security zones and bastion hosts
+- IAM baseline with groups/policies
+
+## Cost Optimization for IaC
+
+### Use Flex Shapes (50% savings)
+
 ```hcl
-# Example: CIS Landing Zone
-module "cis_landing_zone" {
-  source = "github.com/oracle-quickstart/oci-cis-landingzone-quickstart"
-
-  tenancy_ocid         = var.tenancy_ocid
-  region               = var.region
-  service_label        = "prod"
-  cis_level            = "1"
-
-  # Network configuration
-  vcn_cidr             = "10.0.0.0/16"
-  public_subnet_cidr   = "10.0.1.0/24"
-  private_subnet_cidr  = "10.0.2.0/24"
-
-  # Security configuration
-  create_iam_resources = true
-  create_budget        = true
-  budget_amount        = "1000"
-}
-```
-
-### Enterprise Landing Zone Pattern
-```hcl
-# Multi-environment landing zone structure
-module "landing_zone" {
-  source = "oracle-terraform-modules/landing-zone/oci"
-
-  # Core settings
-  tenancy_ocid = var.tenancy_ocid
-  region       = var.region
-
-  # Compartment structure
-  compartments = {
-    production = {
-      description = "Production environment"
-      enable_delete = false
-    }
-    development = {
-      description = "Development environment"
-      enable_delete = true
-    }
-    shared = {
-      description = "Shared services"
-      enable_delete = false
-    }
-  }
-
-  # Networking
-  vcns = {
-    prod_vcn = {
-      compartment_key = "production"
-      cidr_blocks     = ["10.0.0.0/16"]
-    }
-    dev_vcn = {
-      compartment_key = "development"
-      cidr_blocks     = ["10.1.0.0/16"]
-    }
-  }
-
-  # IAM configuration
-  groups = {
-    prod_admins = {
-      description = "Production administrators"
-    }
-    dev_users = {
-      description = "Development users"
-    }
-  }
-
-  policies = {
-    prod_admin_policy = {
-      compartment_key = "production"
-      statements = [
-        "Allow group prod_admins to manage all-resources in compartment production"
-      ]
-    }
-  }
-}
-```
-
-## Advanced Patterns
-
-### Multi-Region Deployment
-```hcl
-# providers.tf
-provider "oci" {
-  alias  = "phoenix"
-  region = "us-phoenix-1"
+# EXPENSIVE - fixed shape
+resource "oci_core_instance" "web" {
+  shape = "VM.Standard2.4"  # 4 OCPUs, 60GB RAM, $218/month
 }
 
-provider "oci" {
-  alias  = "ashburn"
-  region = "us-ashburn-1"
-}
-
-# Deploy in Phoenix
-resource "oci_core_vcn" "phoenix_vcn" {
-  provider       = oci.phoenix
-  compartment_id = var.compartment_ocid
-  cidr_blocks    = ["10.0.0.0/16"]
-  display_name   = "Phoenix VCN"
-}
-
-# Deploy in Ashburn
-resource "oci_core_vcn" "ashburn_vcn" {
-  provider       = oci.ashburn
-  compartment_id = var.compartment_ocid
-  cidr_blocks    = ["10.1.0.0/16"]
-  display_name   = "Ashburn VCN"
-}
-```
-
-### Using Modules
-```hcl
-# modules/compute-instance/main.tf
-variable "compartment_id" {}
-variable "subnet_id" {}
-variable "display_name" {}
-variable "ssh_public_key" {}
-
-resource "oci_core_instance" "this" {
-  compartment_id      = var.compartment_id
-  availability_domain = data.oci_identity_availability_domains.ads.availability_domains[0].name
-  shape               = "VM.Standard.E4.Flex"
-
+# CHEAPER - flexible shape
+resource "oci_core_instance" "web" {
+  shape = "VM.Standard.E4.Flex"
   shape_config {
-    ocpus = 1
-    memory_in_gbs = 16
+    ocpus         = 4
+    memory_in_gbs = 60
   }
-
-  display_name = var.display_name
-
-  create_vnic_details {
-    subnet_id = var.subnet_id
-    assign_public_ip = true
-  }
-
-  source_details {
-    source_type = "image"
-    source_id   = data.oci_core_images.ol8_images.images[0].id
-  }
-
-  metadata = {
-    ssh_authorized_keys = var.ssh_public_key
-  }
-}
-
-output "instance_id" {
-  value = oci_core_instance.this.id
-}
-
-output "public_ip" {
-  value = oci_core_instance.this.public_ip
-}
-
-# main.tf - Using the module
-module "web_server" {
-  source = "./modules/compute-instance"
-
-  compartment_id  = var.compartment_ocid
-  subnet_id       = oci_core_subnet.public_subnet.id
-  display_name    = "WebServer"
-  ssh_public_key  = var.ssh_public_key
-}
-
-module "app_server" {
-  source = "./modules/compute-instance"
-
-  compartment_id  = var.compartment_ocid
-  subnet_id       = oci_core_subnet.private_subnet.id
-  display_name    = "AppServer"
-  ssh_public_key  = var.ssh_public_key
+  # Cost: (4 × $0.03 + 60 × $0.0015) × 730 = $153/month (30% savings)
 }
 ```
 
-### Dynamic Blocks
+### Tag Everything for Cost Tracking
+
 ```hcl
-variable "ingress_rules" {
-  type = list(object({
-    protocol    = string
-    source      = string
-    description = string
-    tcp_options = object({
-      min = number
-      max = number
-    })
-  }))
-}
-
-resource "oci_core_security_list" "dynamic_sl" {
-  compartment_id = var.compartment_ocid
-  vcn_id         = oci_core_vcn.app_vcn.id
-  display_name   = "DynamicSecurityList"
-
-  dynamic "ingress_security_rules" {
-    for_each = var.ingress_rules
-    content {
-      protocol    = ingress_security_rules.value.protocol
-      source      = ingress_security_rules.value.source
-      description = ingress_security_rules.value.description
-
-      tcp_options {
-        min = ingress_security_rules.value.tcp_options.min
-        max = ingress_security_rules.value.tcp_options.max
-      }
-    }
+# Define locals for consistent tagging
+locals {
+  common_tags = {
+    "CostCenter"  = "Engineering"
+    "Environment" = var.environment
+    "ManagedBy"   = "Terraform"
+    "Project"     = var.project_name
   }
 }
+
+resource "oci_core_instance" "web" {
+  freeform_tags = merge(
+    local.common_tags,
+    {
+      "Component" = "WebServer"
+    }
+  )
+}
 ```
 
-## Best Practices
-
-### State Management
-1. **Remote state**: Use OCI Object Storage or Resource Manager
-2. **State locking**: Enable locking for team environments
-3. **Separate states**: Use different state files for different environments
-4. **Backup state**: Regular backups of state files
-
-### Code Organization
-1. **Modules**: Create reusable modules for common patterns
-2. **Environments**: Separate directories or workspaces per environment
-3. **Variables**: Use terraform.tfvars for environment-specific values
-4. **Outputs**: Define outputs for values needed by other stacks
-
-### Security
-1. **Sensitive variables**: Mark sensitive data appropriately
-2. **Secrets**: Never commit secrets to version control
-3. **IAM policies**: Use least privilege principle
-4. **Network security**: Default to private, explicitly allow public
-
-### Testing
-1. **Terraform validate**: Check syntax before apply
-2. **Terraform plan**: Always review plan before apply
-3. **Test environments**: Test in non-production first
-4. **Terratest**: Use Go tests for complex modules
-
-## Common Workflows
-
-### Initial Setup
-```bash
-# Initialize Terraform
-terraform init
-
-# Validate configuration
-terraform validate
-
-# Format code
-terraform fmt -recursive
-
-# Plan deployment
-terraform plan -out=tfplan
-
-# Apply changes
-terraform apply tfplan
-```
-
-### Making Changes
-```bash
-# See what would change
-terraform plan
-
-# Apply specific resource
-terraform apply -target=oci_core_instance.app_instance
-
-# Taint resource for recreation
-terraform taint oci_core_instance.app_instance
-
-# Import existing resource
-terraform import oci_core_vcn.app_vcn <vcn-ocid>
-```
-
-### Cleanup
-```bash
-# Destroy all resources
-terraform destroy
-
-# Destroy specific resource
-terraform destroy -target=oci_core_instance.app_instance
-```
+**Benefit**: Cost reporting by CostCenter, Environment, Project in OCI Console
 
 ## When to Use This Skill
 
-Activate this skill when the user mentions:
-- Terraform, infrastructure as code, or IaC
-- OCI Resource Manager or stacks
-- OCI Landing Zones
-- Terraform modules or providers
-- Automated infrastructure deployment
-- Multi-environment management
-- Infrastructure templating
-- GitOps or CI/CD for infrastructure
-- terraform-provider-oci
-
-## Example Interactions
-
-**User**: "Create Terraform code for a three-tier application"
-**Response**: Provide complete Terraform configuration with VCN, subnets, compute, database, and load balancer.
-
-**User**: "How do I use OCI Resource Manager?"
-**Response**: Show stack creation, planning, and apply workflows with CLI examples.
-
-**User**: "I need a production-ready landing zone"
-**Response**: Reference OCI Landing Zone modules with security best practices and multi-compartment structure.
+- Writing Terraform: provider configuration, resource dependencies, lifecycle
+- State management: drift, corruption, import/export
+- Troubleshooting: authentication failures, "resource already exists", destroy failures
+- OCI Landing Zones: when to use, how to customize
+- Cost optimization: Flex shapes, tagging strategies
+- Production: prevent_destroy, ignore_changes, timeouts
