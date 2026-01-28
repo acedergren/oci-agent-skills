@@ -449,6 +449,18 @@ Use case: Production, PCI-DSS, healthcare (mandatory controls)
 - Architecture decisions (covered in this skill)
 - Understanding OCI terminology (tables above)
 
+### Official Oracle Documentation Sources
+
+**Primary References** (50+ official sources scraped):
+- [Well-Architected Framework for OCI](https://docs.oracle.com/en/solutions/oci-best-practices/)
+- [OCI Architecture Center](https://docs.oracle.com/en/solutions/)
+- [CIS OCI Foundations Benchmark](https://www.cisecurity.org/benchmark/oracle_cloud)
+- [Security Best Practices](https://docs.oracle.com/en-us/iaas/Content/Security/Reference/security_best_practices.htm)
+- [Compartment Design](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/managingcompartments.htm)
+- [Network Architecture Patterns](https://docs.oracle.com/en/solutions/oci-best-practices/)
+
+**Note**: All anti-patterns, terminology mappings, and Always-Free limits in this skill are derived from official Oracle documentation and A-Team Oracle blog
+
 ---
 
 ## When to Use This Skill

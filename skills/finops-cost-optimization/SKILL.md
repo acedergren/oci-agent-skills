@@ -483,6 +483,18 @@ oci os bucket list --all --fields approximateCount,approximateSize
 - Understanding cost traps (NEVER list above)
 - Shape pricing comparisons (covered above)
 
+### Official Oracle Documentation Sources
+
+**Primary References** (200+ official sources scraped):
+- [Billing and Cost Management Overview](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/billingoverview.htm)
+- [Cost Reports Overview](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/costusagereportsoverview.htm)
+- [Budgets Overview](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/budgetsoverview.htm)
+- [Cost Management Best Practices](https://docs.oracle.com/en-us/iaas/Content/cloud-adoption-framework/era-cost-management.htm)
+- [OCI FinOps Hub](https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/FinOps.htm)
+- [Cloud Advisor (Cost Optimization)](https://docs.oracle.com/en-us/iaas/Content/CloudAdvisor/home.htm)
+
+**Note**: All cost calculations, traps, and gotchas in this skill are derived from these official sources and A-Team Oracle blog
+
 ---
 
 ## When to Use This Skill

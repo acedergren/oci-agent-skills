@@ -353,6 +353,16 @@ oci db pluggable-database unplug --pdb-id <ocid>
 - Connection troubleshooting (decision tree above)
 - Cost calculations (tables above)
 
+### Official Oracle Documentation Sources
+
+**Primary References** (30+ official sources scraped):
+- [Autonomous Database Serverless](https://docs.oracle.com/en/cloud/paas/autonomous-database/serverless/)
+- [Database Cloud Service](https://docs.oracle.com/en-us/iaas/Content/Database/home.htm)
+- [Exadata Database Service](https://docs.oracle.com/en-us/iaas/exadata/index.html)
+- [Data Guard Configuration](https://docs.oracle.com/en/database/oracle/oracle-database/19/sbydb/)
+
+**Note**: Connection gotchas, password rules, and cost traps in this skill are derived from official Oracle docs
+
 ---
 
 ## When to Use This Skill
