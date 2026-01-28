@@ -15,10 +15,10 @@
 ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝       ╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚══════╝
 ```
 
-**Expert Oracle Cloud Infrastructure automation for Claude Code**
+**Expert Oracle Cloud Infrastructure automation for AI coding agents**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://claude.ai/code)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Compatible-blueviolet)](https://skills.sh)
 [![Skills.sh](https://img.shields.io/badge/Skills.sh-Install-C74634)](https://skills.sh/acedergren/oci-agent-skills)
 [![Skills Count](https://img.shields.io/badge/Skills-13%2B1%20Agent-brightgreen)](#skills-reference)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/oci-agent-skills)
@@ -27,33 +27,19 @@
 
 > **⚠️ Community Project Notice**: OCI Agent Skills is a **community-maintained** project created and maintained by Alexander Cedergren. This is **not an official Oracle product**. It provides helpful utilities, examples, and best practices for working with Oracle Cloud Infrastructure, but is not endorsed by or affiliated with Oracle Corporation.
 
-Comprehensive Oracle Cloud Infrastructure (OCI) agent skills plugin for Claude Code - intelligent automation for managing cloud resources across compute, networking, databases, monitoring, and more.
+Comprehensive Oracle Cloud Infrastructure (OCI) agent skills for AI coding agents - intelligent automation for managing cloud resources across compute, networking, databases, monitoring, and more.
 
 ## ⚡ Quick Start
-
-### Quickest: Using OpenSkills CLI
 
 ```bash
 npx skills add acedergren/oci-agent-skills
 ```
 
-That's it! The OCI skills are now available.
-
-### Alternative: Claude Code Marketplace
-
-```bash
-# Add the marketplace (one-time)
-/plugin marketplace add acedergren/oci-agent-skills
-
-# Install the plugin
-/plugin install oci-agent-skills
-```
-
-Both methods install the same plugin - choose whichever is more convenient for your workflow.
+That's it! The OCI skills are now available in any coding agent that supports the [Agent Skills](https://skills.sh) standard.
 
 ### First Steps
 
-Try these prompts in Claude Code:
+Try these prompts:
 
 1. **Compute**: "Help me launch an OCI compute instance for a web server"
 2. **Networking**: "I need to create a VCN with public and private subnets"
