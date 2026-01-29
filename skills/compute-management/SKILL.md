@@ -1,5 +1,5 @@
 ---
-name: OCI Compute Management
+name: compute-management
 description: Use when launching OCI compute instances, troubleshooting "out of capacity" or boot failures, optimizing compute costs, or handling instance lifecycle. Covers shape selection, capacity planning, service limits, and production incident resolution. Keywords: VM.Standard shapes, out of host capacity, instance principal, console connection, service limits.
 version: 2.0.0
 license: MIT

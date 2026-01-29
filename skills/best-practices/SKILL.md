@@ -1,5 +1,5 @@
 ---
-name: OCI Best Practices and Architecture
+name: best-practices
 description: Use when architecting OCI solutions, migrating from AWS/Azure, designing multi-AD deployments, or avoiding common OCI anti-patterns. Covers VCN sizing mistakes, Cloud Guard gotchas, free tier specifics, OCI terminology confusion, and multi-AD patterns. Keywords: VCN CIDR too small, compartment strategy, security list vs NSG, regional subnet, always-free limits.
 version: 2.0.0
 license: MIT
