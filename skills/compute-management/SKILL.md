@@ -1,6 +1,6 @@
 ---
 name: compute-management
-description: Use when launching OCI compute instances, troubleshooting "out of capacity" or boot failures, optimizing compute costs, or handling instance lifecycle. Covers shape selection, capacity planning, service limits, and production incident resolution. Keywords: VM.Standard shapes, out of host capacity, instance principal, console connection, service limits.
+description: Use when launching OCI compute instances, troubleshooting out-of-capacity or boot failures, optimizing compute costs, or handling instance lifecycle. Covers shape selection, capacity planning, service limits, and production incident resolution.
 license: MIT
 metadata:
   author: alexander-cedergren
