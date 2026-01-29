@@ -1,6 +1,6 @@
 ---
 name: networking-management
-description: Use when designing OCI networks, troubleshooting connectivity, optimizing egress costs, or configuring VCN security. Covers Service Gateway cost savings, VCN CIDR immutability, Security List vs NSG tradeoffs, VCN peering limitations, and Load Balancer subnet requirements. Keywords: egress costs service gateway, VCN CIDR cannot change, security list limit 5, local peering same region, LB subnet too small.
+description: Use when designing OCI networks, troubleshooting connectivity, optimizing egress costs, or configuring VCN security. Covers Service Gateway cost savings, VCN CIDR immutability, Security List vs NSG tradeoffs, VCN peering limitations, and Load Balancer subnet requirements.
 license: MIT
 metadata:
   author: alexander-cedergren

@@ -1,6 +1,6 @@
 ---
 name: genai-services
-description: Use when implementing OCI GenAI inference APIs, troubleshooting rate limits or token errors, optimizing GenAI costs, or handling sensitive data (PHI/PII) in prompts. Covers model selection, cost calculations, token management, response validation, and healthcare/compliance considerations. Keywords: cohere command, token limit exceeded, rate limit 429, PHI in prompts, hallucination, embedding costs.
+description: Use when implementing OCI GenAI inference APIs, troubleshooting rate limits or token errors, optimizing GenAI costs, or handling sensitive data (PHI/PII) in prompts. Covers model selection, cost calculations, token management, response validation, and healthcare/compliance considerations.
 license: MIT
 metadata:
   author: alexander-cedergren

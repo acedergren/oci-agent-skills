@@ -1,6 +1,6 @@
 ---
 name: iam-identity-management
-description: Use when writing IAM policies, troubleshooting permission denied errors, setting up dynamic groups, or implementing IDCS integration. Covers policy syntax gotchas, principal types confusion, compartment inheritance, and common authorization failures. Keywords: authorization failed, policy syntax, dynamic group, instance principal, 404 not found, IDCS federation.
+description: Use when writing IAM policies, troubleshooting permission denied errors, setting up dynamic groups, or implementing IDCS integration. Covers policy syntax gotchas, principal types confusion, compartment inheritance, and common authorization failures.
 license: MIT
 metadata:
   author: alexander-cedergren

@@ -1,6 +1,6 @@
 ---
 name: landing-zones
-description: Use when designing multi-tenant OCI environments, setting up production landing zones, implementing compartment hierarchies, or establishing governance foundations. Covers Landing Zone reference architectures, compartment strategy, network topology patterns (hub-spoke vs multi-VCN), IAM structure, tagging standards, and cost segregation. Keywords: landing zone, compartment hierarchy, hub-spoke topology, security zones, CIS benchmark, multi-tenant, environment isolation, governance, budgets per environment.
+description: Use when designing multi-tenant OCI environments, setting up production landing zones, implementing compartment hierarchies, or establishing governance foundations. Covers Landing Zone reference architectures, compartment strategy, network topology patterns (hub-spoke vs multi-VCN), IAM structure, tagging standards, and cost segregation.
 license: MIT
 metadata:
   author: alexander-cedergren
