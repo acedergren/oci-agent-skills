@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI networking including VCN design, subnet planning, security lists vs NSGs, route tables, gateways, and network troubleshooting patterns.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/overview.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/Network/Concepts/securityrules.htm",
+    "https://github.com/oracle-terraform-modules/terraform-oci-landing-zones"
+  ]
+}

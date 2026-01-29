@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI Landing Zones including compartment hierarchy design, hub-spoke network topology, Security Zones integration, and enterprise-scale architecture patterns.",
+  "references": [
+    "https://github.com/oracle-terraform-modules/terraform-oci-landing-zones",
+    "https://docs.oracle.com/en-us/iaas/Content/cloud-adoption-framework/landing-zone.htm"
+  ]
+}

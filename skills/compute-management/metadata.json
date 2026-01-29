@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI compute instance management including shape selection, capacity planning, troubleshooting boot failures and out-of-capacity errors, instance principal configuration, and production incident resolution.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Compute/home.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/Compute/References/computeshapes.htm",
+    "https://github.com/oracle-terraform-modules/terraform-oci-landing-zones"
+  ]
+}

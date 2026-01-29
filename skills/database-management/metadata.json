@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI database services including Autonomous Database (ATP/ADW) operations, DB Systems, backup strategies, Data Guard configuration, and PDB management.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Database/home.htm",
+    "https://docs.oracle.com/en-us/iaas/autonomous-database/index.html",
+    "https://github.com/oracle-terraform-modules/terraform-oci-landing-zones"
+  ]
+}

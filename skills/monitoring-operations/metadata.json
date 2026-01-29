@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI monitoring and observability including metrics queries, alarm configuration, log collection and search, and event-driven automation patterns.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Monitoring/home.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/Logging/home.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/cloudguard/home.htm"
+  ]
+}

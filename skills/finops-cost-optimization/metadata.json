@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI FinOps including cost analysis, budget management, usage reports, tagging for cost allocation, and optimization recommendations.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Billing/home.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/Billing/Concepts/costanalysisoverview.htm"
+  ]
+}

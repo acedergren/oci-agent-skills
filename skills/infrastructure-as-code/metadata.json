@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI Infrastructure as Code including Terraform provider patterns, Resource Manager stacks, Landing Zone modules, and multi-region deployment strategies.",
+  "references": [
+    "https://registry.terraform.io/providers/oracle/oci/latest/docs",
+    "https://docs.oracle.com/en-us/iaas/Content/ResourceManager/home.htm",
+    "https://github.com/oracle-terraform-modules/terraform-oci-landing-zones"
+  ]
+}

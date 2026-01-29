@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI best practices including Well-Architected Framework pillars, CIS OCI Foundations Benchmark compliance, and security hardening patterns.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/cloud-adoption-framework/home.htm",
+    "https://www.cisecurity.org/benchmark/oracle_cloud"
+  ]
+}

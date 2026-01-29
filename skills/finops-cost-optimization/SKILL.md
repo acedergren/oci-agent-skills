@@ -2,6 +2,7 @@
 name: OCI FinOps and Cost Optimization
 description: Use when optimizing OCI costs, investigating unexpected bills, planning budgets, or identifying waste. Covers hidden cost traps (boot volumes, reserved IPs, egress), Universal Credits gotchas, shape migration savings, free tier maximization, and cost allocation challenges. Keywords: unexpected charges, boot volume costs, stopped instance billing, data egress, reserved IP waste, budget exceeded.
 version: 2.0.0
+license: MIT
 ---
 
 # OCI FinOps - Expert Knowledge

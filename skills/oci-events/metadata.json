@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI Events service including event-driven automation patterns, CloudEvents format, rule configuration, and integration with Functions and Notifications.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Events/home.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/Events/Concepts/eventsoverview.htm"
+  ]
+}

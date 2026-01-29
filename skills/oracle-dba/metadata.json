@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert DBA knowledge for OCI Autonomous Database including performance tuning, SQL optimization, ECPU scaling decisions, AWR analysis, and production incident resolution.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/autonomous-database/doc/monitor-performance.html",
+    "https://docs.oracle.com/en-us/iaas/autonomous-database/doc/autonomous-database-performance-hub.html"
+  ]
+}

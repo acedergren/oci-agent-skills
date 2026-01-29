@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI Generative AI services including foundation model access, text generation, embeddings, RAG patterns, and multi-provider agent building with LangChain and LlamaIndex.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/generative-ai/home.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/generative-ai/use-playground-chat.htm"
+  ]
+}

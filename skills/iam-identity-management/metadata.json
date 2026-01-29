@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "January 2026",
+  "abstract": "Expert knowledge for OCI IAM including policy syntax, dynamic groups for instance principals, compartment hierarchy, and access troubleshooting patterns.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Identity/home.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/Identity/policysyntax/policysyntax.htm",
+    "https://docs.oracle.com/en-us/iaas/Content/Identity/dynamicgroups/To_create_a_dynamic_group.htm"
+  ]
+}
