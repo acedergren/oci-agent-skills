@@ -32,6 +32,8 @@ Result: ✅ Perfect for LLM context + Context7 on-demand
 
 | Service | File | Size | Status |
 |---------|------|------|--------|
+| **OCI CLI** | `oci-cli-reference.md` | 15K | ✅ Complete |
+| **CLI Quick Ref** | `oci-cli-quickref.md` | 5K | ✅ Complete |
 | Compute | `oci-compute-reference.md` | 4.6K | ✅ Complete |
 | Network | `oci-network-reference.md` | - | 🚧 TODO |
 | Database | `oci-database-reference.md` | - | 🚧 TODO |

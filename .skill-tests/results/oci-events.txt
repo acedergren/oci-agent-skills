@@ -1,0 +1,14 @@
+=== Testing: oci-events ===
+D1: Knowledge Delta
+  ✓ PASS: No tutorials
+D2: Mindset + Procedures
+  ✓ PASS: Has Knowledge Gap Disclaimer
+D3: Anti-Patterns
+  ✓ PASS: Has 8 NEVERs (≥6)
+D4: Specification
+  ✓ PASS: Description has keywords/triggers
+D5: Progressive Disclosure
+  ❌ FAIL:      551 lines (>500)
+  ✓ PASS: Has 2 reference files
+  ✓ PASS: Has loading triggers
+

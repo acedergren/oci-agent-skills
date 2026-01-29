@@ -1,0 +1,14 @@
+=== Testing: database-management ===
+D1: Knowledge Delta
+  ✓ PASS: No tutorials
+D2: Mindset + Procedures
+  ✓ PASS: Has Knowledge Gap Disclaimer
+D3: Anti-Patterns
+  ✓ PASS: Has 7 NEVERs (≥6)
+D4: Specification
+  ✓ PASS: Description has keywords/triggers
+D5: Progressive Disclosure
+  ✓ PASS:      347 lines (≤500)
+  ❌ FAIL: No reference files
+  ⚠️ WARN: Missing loading triggers
+
