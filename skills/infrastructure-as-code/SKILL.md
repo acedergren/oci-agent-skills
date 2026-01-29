@@ -1,8 +1,10 @@
 ---
 name: infrastructure-as-code
 description: Use when writing Terraform for OCI, troubleshooting provider errors, managing state files, or implementing Resource Manager stacks. Covers terraform-provider-oci gotchas, resource lifecycle anti-patterns, state management mistakes, authentication issues, and OCI Landing Zones. Keywords: terraform state, provider authentication, resource already exists, destroy failed, instance principal terraform.
-version: 2.0.0
 license: MIT
+metadata:
+  author: alexander-cedergren
+  version: "2.0.0"
 ---
 
 # OCI Infrastructure as Code - Expert Knowledge

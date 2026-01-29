@@ -1,50 +1,34 @@
 {
-  "name": "oracle-oci-agent-skills",
+  "name": "oci-agent-skills",
   "owner": {
     "name": "Alexander Cedergren",
     "email": "alex@solutionsedge.io"
   },
-  "description": "Community-maintained Oracle Cloud Infrastructure agent skills for Claude Code - intelligent automation for cloud operations (not an official Oracle project)",
+  "metadata": {
+    "description": "Oracle Cloud Infrastructure agent skills for AI coding agents",
+    "version": "2.2.4"
+  },
   "plugins": [
     {
-      "name": "oci-agent-skills",
-      "description": "Community-maintained Oracle Cloud Infrastructure operations plugin featuring 10 specialized skills plus OCI Cloud Architect orchestrator agent for end-to-end cloud solutions. Includes 800+ CLI commands, Python SDK examples, multi-service architecture patterns, and best practices for compute, networking, databases, monitoring, secrets, GenAI services, IAM, cost optimization, and infrastructure as code. (Not an official Oracle project)",
-      "version": "1.2.0",
-      "author": {
-        "name": "Alexander Cedergren",
-        "email": "alex@solutionsedge.io"
-      },
-      "homepage": "https://github.com/acedergren/oci-agent-skills",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/acedergren/oci-agent-skills.git"
-      },
-      "license": "MIT",
-      "keywords": [
-        "oracle",
-        "oci",
-        "cloud",
-        "cloud-architecture",
-        "infrastructure",
-        "infrastructure-as-code",
-        "devops",
-        "orchestration",
-        "multi-service-coordination",
-        "compute",
-        "networking",
-        "database",
-        "autonomous-database",
-        "monitoring",
-        "vault",
-        "secrets",
-        "genai",
-        "ai",
-        "iam",
-        "terraform",
-        "finops",
-        "cost-optimization"
-      ],
-      "category": "cloud-operations"
+      "name": "oci-skills",
+      "description": "Complete OCI automation skills covering compute, networking, databases, monitoring, secrets, GenAI, IAM, IaC, FinOps, and best practices",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/compute-management",
+        "./skills/networking-management",
+        "./skills/database-management",
+        "./skills/oracle-dba",
+        "./skills/monitoring-operations",
+        "./skills/secrets-management",
+        "./skills/genai-services",
+        "./skills/iam-identity-management",
+        "./skills/infrastructure-as-code",
+        "./skills/finops-cost-optimization",
+        "./skills/best-practices",
+        "./skills/landing-zones",
+        "./skills/oci-events"
+      ]
     }
   ]
 }

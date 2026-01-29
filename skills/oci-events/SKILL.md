@@ -1,8 +1,10 @@
 ---
 name: oci-events
 description: Use when implementing event-driven automation, setting up CloudEvents rules, troubleshooting event delivery failures, or integrating with Functions/Streaming/Notifications. Covers event rule patterns, filter syntax, action types, dead letter queue configuration, and event-driven architecture anti-patterns. Keywords: event rule, CloudEvents, event filter, event action, function trigger, streaming integration, event not firing, DLQ.
-version: 2.0.0
 license: MIT
+metadata:
+  author: alexander-cedergren
+  version: "2.0.0"
 ---
 
 # OCI Events Service - Event-Driven Architecture

@@ -1,8 +1,10 @@
 ---
 name: monitoring-operations
 description: Use when setting up metrics, alarms, or troubleshooting missing data in OCI Monitoring. Covers metric namespace confusion, alarm threshold gotchas, log collection setup, and common monitoring gaps. Keywords: metrics not showing, alarm not firing, oci_* namespace, metric query, service connector.
-version: 2.0.0
 license: MIT
+metadata:
+  author: alexander-cedergren
+  version: "2.0.0"
 ---
 
 # OCI Monitoring and Observability - Expert Knowledge

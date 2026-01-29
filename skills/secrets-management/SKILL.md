@@ -1,8 +1,10 @@
 ---
 name: secrets-management
 description: Use when storing credentials in OCI Vault, troubleshooting secret retrieval failures, implementing secret rotation, or setting up application authentication to Vault. Covers vault hierarchy confusion, IAM permission gotchas, cost optimization, temp file security, and audit logging. Keywords: vault secret, 403 forbidden, secret retrieval, instance principal, base64 encoding, secret rotation.
-version: 2.0.0
 license: MIT
+metadata:
+  author: alexander-cedergren
+  version: "2.0.0"
 ---
 
 # OCI Vault and Secrets Management - Expert Knowledge

@@ -1,8 +1,10 @@
 ---
 name: database-management
 description: Use when creating Autonomous Databases, troubleshooting connection failures, managing PDBs, or optimizing database costs. Covers connection string confusion, password validation errors, stop/start cost traps, clone type selection, and backup retention gotchas. Keywords: wallet connection refused, service name HIGH MEDIUM LOW, password complexity, clone vs refreshable, storage charges when stopped.
-version: 2.0.0
 license: MIT
+metadata:
+  author: alexander-cedergren
+  version: "2.0.0"
 ---
 
 # OCI Database Management - Expert Knowledge

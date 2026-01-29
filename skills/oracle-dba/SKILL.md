@@ -1,8 +1,10 @@
 ---
 name: oracle-dba
 description: Use when managing Oracle Autonomous Database on OCI, troubleshooting performance issues, optimizing costs, or implementing HA/DR. Covers ADB-specific gotchas, cost traps, SQL_ID debugging workflows, auto-scaling behavior, and version differences (19c/21c/23ai/26ai). Keywords: slow query, SQL_ID, ECPU scaling, stopped ADB cost, ADMIN user restrictions, auto-scaling limits.
-version: 2.0.0
 license: MIT
+metadata:
+  author: alexander-cedergren
+  version: "2.0.0"
 ---
 
 # OCI Oracle DBA - Expert Knowledge
