@@ -11,7 +11,7 @@ metadata:
 
 ## 🏗️ Use OCI Landing Zone Terraform Modules
 
-**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for GenAI infrastructure.
+**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/orgs/oci-landing-zones/repositories) for GenAI infrastructure.
 
 **Landing Zone solves:**
 - ❌ Bad Practice #1: Generic compartments (Landing Zone creates AI/ML workload compartments)
