@@ -9,46 +9,11 @@ metadata:
 
 # OCI FinOps - Expert Knowledge
 
-## 🏗️ Use OCI Landing Zone Terraform Modules
+## Use OCI Landing Zone Terraform Modules
 
-**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for cost-optimized infrastructure.
+Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for cost-optimized infrastructure. Landing Zone auto-configures budget alerts, hub-spoke with centralized NAT/Firewall (saves $3k-5k/month egress), and usage notifications.
 
-**Landing Zone solves:**
-- ❌ Bad Practice #3: Internet breakout from spoke networks (Egress cost waste $3k-5k/month; Landing Zone uses hub-spoke with centralized NAT/Firewall)
-- ❌ Bad Practice #8: Creating your own Terraform modules (Maintenance cost; Landing Zone is Oracle-maintained, CIS-certified, no technical debt)
-- ❌ Bad Practice #10: No monitoring (Blind spending; Landing Zone auto-configures budget alerts, usage notifications, and cost tracking)
-
-**This skill provides**: Cost optimization strategies, hidden cost traps, and savings calculations for resources deployed WITHIN a Landing Zone.
-
----
-
-## ⚠️ OCI CLI/API Knowledge Gap
-
-**You don't know OCI CLI commands or OCI API structure.**
-
-Your training data has limited and outdated knowledge of:
-- OCI CLI syntax and parameters (updates monthly)
-- OCI API endpoints and request/response formats
-- Cost Management CLI operations (`oci usage-api`)
-- Current OCI pricing (changes frequently)
-- Universal Credits consumption rates and SKUs
-
-**When OCI operations are needed:**
-1. Use exact CLI commands from skill references
-2. Do NOT guess OCI CLI syntax or parameters
-3. Do NOT assume current pricing - always verify
-4. Reference official Oracle pricing calculator
-
-**What you DO know:**
-- General cloud cost optimization principles
-- FinOps frameworks and methodologies
-- Resource right-sizing concepts
-
-This skill bridges the gap by providing current OCI-specific cost traps and optimization patterns.
-
----
-
-You are an OCI cost optimization expert. This skill provides knowledge Claude lacks: hidden cost traps, Universal Credits gotchas, exact savings calculations, free tier maximization, and OCI-specific billing nuances.
+**OCI CLI/API gap**: Do NOT guess OCI CLI syntax or current pricing. Use exact commands from skill references and verify pricing via Oracle pricing calculator.
 
 ## NEVER Do This
 
@@ -234,9 +199,10 @@ Savings: $99/month per instance (56% reduction)
 
 Migration path:
 1. Create flex instance with same OCPU count
-2. Test with minimal RAM (4 GB per OCPU)
-3. Increase RAM only if needed
-4. Delete fixed instance
+2. Verify: oci compute instance get --instance-id <new-ocid> --query 'data."lifecycle-state"'
+3. Test with minimal RAM (4 GB per OCPU)
+4. Increase RAM only if needed
+5. Delete fixed instance
 ```
 
 **AMD → Arm Migration**
@@ -447,19 +413,23 @@ Alert strategy:
 # 1. Orphaned boot volumes (cost trap #1)
 oci bv boot-volume list --all --lifecycle-state AVAILABLE \
   | grep -v "attached-instance"
+# If found: oci bv boot-volume delete --boot-volume-id <ocid> --force
 
 # 2. Unattached block volumes
 oci bv volume list --all --lifecycle-state AVAILABLE
+# If found: oci bv volume delete --volume-id <ocid> --force
 
 # 3. Reserved IPs without instance
 oci network public-ip list --scope REGION --lifetime RESERVED
+# If found: oci network public-ip delete --public-ip-id <ocid>
 
-# 4. Stopped instances with volumes
+# 4. Stopped instances with volumes (>30 days idle → terminate + backup)
 oci compute instance list --lifecycle-state STOPPED
 
 # 5. Old snapshots/backups
 oci bv backup list --all \
   | jq '.data[] | select(.["time-created"] < "2024-01-01")'
+# If found: oci bv backup delete --volume-backup-id <ocid>
 
 # 6. Unused load balancers (no backends)
 oci lb load-balancer list --all

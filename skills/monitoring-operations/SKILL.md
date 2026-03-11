@@ -1,6 +1,6 @@
 ---
 name: monitoring-operations
-description: Use when setting up metrics, alarms, or troubleshooting missing data in OCI Monitoring. Covers metric namespace confusion, alarm threshold gotchas, log collection setup, and common monitoring gaps.
+description: Use when setting up metrics, alarms, or troubleshooting missing data in OCI Monitoring. Configures alarm thresholds with proper missing-data handling, diagnoses metric namespace errors, resolves log collection gaps via Service Connector, and optimizes MQL queries with dimension filtering.
 license: MIT
 metadata:
   author: alexander-cedergren
@@ -9,43 +9,11 @@ metadata:
 
 # OCI Monitoring and Observability - Expert Knowledge
 
-## 🏗️ Use OCI Landing Zone Terraform Modules
+## Use OCI Landing Zone Terraform Modules
 
-**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for observability stack.
+Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for the observability stack. Landing Zone deploys complete observability and integrates Cloud Guard, VSS, and OSMS.
 
-**Landing Zone solves:**
-- ❌ Bad Practice #10: No logging, monitoring, notifications (Landing Zone deploys complete observability)
-- ❌ Bad Practice #7: Limited security services (Landing Zone integrates Cloud Guard, VSS, OSMS)
-
-**This skill provides**: Metrics, alarms, and troubleshooting for monitoring deployed WITHIN a Landing Zone.
-
----
-
-## ⚠️ OCI CLI/API Knowledge Gap
-
-**You don't know OCI CLI commands or OCI API structure.**
-
-Your training data has limited and outdated knowledge of:
-- OCI CLI syntax and parameters (updates monthly)
-- OCI API endpoints and request/response formats
-- Monitoring service CLI operations (`oci monitoring alarm`, `oci monitoring metric`)
-- Metric namespaces and MQL (Monitoring Query Language)
-- Latest Logging and Service Connector features
-
-**When OCI operations are needed:**
-1. Use exact CLI commands from this skill's references
-2. Do NOT guess metric namespace names
-3. Do NOT assume AWS CloudWatch patterns work in OCI
-4. Load reference files for detailed MQL documentation
-
-**What you DO know:**
-- General observability concepts
-- Alerting and threshold design principles
-- Log aggregation patterns
-
-This skill bridges the gap by providing current OCI-specific monitoring patterns and gotchas.
-
----
+**OCI CLI/API gap**: Do NOT guess metric namespace names or assume AWS CloudWatch patterns work in OCI. Use exact commands from skill references.
 
 ## NEVER Do This
 
@@ -156,6 +124,19 @@ CPUUtilization[1m]{resourceId='<instance-ocid>'}.mean()
 ```
 
 **Cost**: Queries free, but rate limited (1000 req/min)
+
+## Alarm Setup Validation Workflow
+
+```
+1. Create alarm        → oci monitoring alarm create ...
+2. Verify alarm state  → oci monitoring alarm get --alarm-id <ocid> --query 'data."lifecycle-state"'
+3. Check notification  → oci ons subscription list --topic-id <topic-ocid>
+4. Test delivery       → Temporarily lower threshold to trigger alarm
+5. Confirm receipt     → Verify email/Slack/PagerDuty received alert
+6. Restore threshold   → Set production threshold value
+```
+
+Skipping step 4-5 is the #1 cause of "alarm never fired" in production incidents.
 
 ## Progressive Loading References
 

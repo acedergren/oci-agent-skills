@@ -1,6 +1,6 @@
 ---
 name: best-practices
-description: Use when architecting OCI solutions, migrating from AWS/Azure, designing multi-AD deployments, or avoiding common OCI anti-patterns. Covers VCN sizing mistakes, Cloud Guard gotchas, free tier specifics, OCI terminology confusion, and multi-AD patterns.
+description: Use when architecting OCI solutions, migrating from AWS/Azure, designing multi-AD deployments, or avoiding common OCI anti-patterns. Reviews VCN configurations for sizing mistakes, validates Cloud Guard auto-remediation settings, identifies free tier limit violations, resolves OCI terminology confusion for AWS/Azure migrants, and recommends multi-AD deployment patterns.
 license: MIT
 metadata:
   author: alexander-cedergren
@@ -9,7 +9,7 @@ metadata:
 
 # OCI Best Practices - Expert Knowledge
 
-## 🏗️ Use OCI Landing Zone Terraform Modules
+## Use OCI Landing Zone Terraform Modules
 
 **Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for OCI architecture.
 
@@ -23,33 +23,7 @@ metadata:
 
 ---
 
-## ⚠️ OCI CLI/API Knowledge Gap
-
-**You don't know OCI CLI commands or OCI API structure.**
-
-Your training data has limited and outdated knowledge of:
-- OCI CLI syntax and parameters (updates monthly)
-- OCI API endpoints and request/response formats
-- OCI service-specific commands and flags
-- Latest OCI features, limits, and regional availability
-- CIS Benchmark requirements for OCI
-
-**When OCI operations are needed:**
-1. Use exact CLI commands from skill references
-2. Do NOT guess OCI CLI syntax or parameters
-3. Do NOT assume API endpoint structures
-4. Reference landing-zones skill for Terraform modules
-
-**What you DO know:**
-- General cloud architecture concepts
-- Security principles and compliance frameworks
-- Multi-tier application design patterns
-
-This skill bridges the gap by providing current OCI-specific patterns and anti-patterns.
-
----
-
-You are an OCI architecture expert. This skill provides knowledge Claude lacks: OCI-specific anti-patterns, free tier specifics, terminology gotchas, multi-AD patterns, and differences from AWS/Azure/GCP.
+**OCI CLI/API gap**: Do NOT guess OCI CLI syntax or assume AWS/Azure patterns work in OCI. Use exact commands from skill references.
 
 ## NEVER Do This
 
@@ -162,20 +136,17 @@ resource "oci_core_instance" "web" {
 
 ❌ **NEVER enable Cloud Guard auto-remediation without testing**
 ```
-Cloud Guard = OCI threat detection + auto-response
-
 # DANGER - auto-remediation can break production
-Detector: "Public bucket detected"
-Auto-remediation: Make bucket private → breaks public website!
+Detector: "Public bucket detected" → Auto-remediation makes bucket private → breaks public website!
+Detector: "Security list allows 0.0.0.0/0" → Auto-remediation removes rule → breaks internet access!
 
-Detector: "Security list allows 0.0.0.0/0"
-Auto-remediation: Remove rule → breaks internet access!
-
-# SAFER approach:
-1. Enable detectors (read-only mode first)
+# SAFER approach with validation:
+1. Enable detectors in read-only mode
 2. Review findings for 1-2 weeks
-3. Tune responders to avoid false positives
-4. Enable auto-remediation for trusted patterns only
+3. Verify: oci cloud-guard detector-recipe list --compartment-id <ocid>
+4. Tune responders to avoid false positives
+5. Enable auto-remediation for trusted patterns only
+6. Verify: oci cloud-guard responder-recipe list --compartment-id <ocid>
 ```
 
 **Gotcha**: Cloud Guard enabled by default in some tenancies, can auto-break things

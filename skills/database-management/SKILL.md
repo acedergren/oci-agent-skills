@@ -1,6 +1,6 @@
 ---
 name: database-management
-description: Use when creating Autonomous Databases, troubleshooting connection failures, managing PDBs, or optimizing database costs. Covers connection string confusion, password validation errors, stop/start cost traps, clone type selection, and backup retention gotchas.
+description: Use when creating Autonomous Databases, troubleshooting connection failures, managing PDBs, or optimizing database costs. Resolves connection string issues, validates passwords against OCI complexity rules, manages stop/start scheduling to avoid cost traps, selects optimal clone types for dev/test, and configures backup retention policies.
 license: MIT
 metadata:
   author: alexander-cedergren
@@ -9,46 +9,11 @@ metadata:
 
 # OCI Database Management - Expert Knowledge
 
-## 🏗️ Use OCI Landing Zone Terraform Modules
+## Use OCI Landing Zone Terraform Modules
 
-**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for database infrastructure.
+Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for database infrastructure. Landing Zone isolates database tier, enforces private subnets via Security Zones, and auto-configures database alarms.
 
-**Landing Zone solves:**
-- ❌ Bad Practice #4: Poor network segmentation (Landing Zone isolates database tier)
-- ❌ Bad Practice #9: Public database endpoints (Security Zones enforce private subnets)
-- ❌ Bad Practice #10: No monitoring (Landing Zone auto-configures database alarms)
-
-**This skill provides**: ADB operations, troubleshooting, and cost optimization for databases deployed WITHIN a Landing Zone.
-
----
-
-## ⚠️ OCI CLI/API Knowledge Gap
-
-**You don't know OCI CLI commands or OCI API structure.**
-
-Your training data has limited and outdated knowledge of:
-- OCI CLI syntax and parameters (updates monthly)
-- OCI API endpoints and request/response formats
-- Database service CLI operations (`oci db autonomous-database`)
-- Wallet configuration and connection string formats
-- Latest ADB features (23ai, 26ai) and API changes
-
-**When OCI operations are needed:**
-1. Use exact CLI commands from skill references
-2. Do NOT guess OCI CLI syntax or parameters
-3. Do NOT assume API endpoint structures
-4. Load oracle-dba skill for detailed ADB operations
-
-**What you DO know:**
-- Oracle Database internals (SQL, PL/SQL)
-- General database administration principles
-- Connection pooling and HA concepts
-
-This skill bridges the gap by providing current OCI-specific database operations.
-
----
-
-You are an OCI Database expert. This skill provides knowledge Claude lacks: connection string gotchas, cost traps, backup/clone patterns, PDB management mistakes, and ADB-specific operational knowledge.
+**OCI CLI/API gap**: Do NOT guess OCI database CLI syntax or wallet configuration. Use exact commands from skill references. Load oracle-dba skill for detailed ADB operations.
 
 ## NEVER Do This
 

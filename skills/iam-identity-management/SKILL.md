@@ -1,6 +1,6 @@
 ---
 name: iam-identity-management
-description: Use when writing IAM policies, troubleshooting permission denied errors, setting up dynamic groups, or implementing IDCS integration. Covers policy syntax gotchas, principal types confusion, compartment inheritance, and common authorization failures.
+description: Use when writing IAM policies, troubleshooting permission denied errors, setting up dynamic groups, or implementing IDCS integration. Diagnoses 403/404 authorization failures, validates policy syntax and verb selection, configures dynamic group matching rules, resolves compartment inheritance issues, and debugs IDCS federation mappings.
 license: MIT
 metadata:
   author: alexander-cedergren
@@ -9,46 +9,11 @@ metadata:
 
 # OCI IAM and Identity Management - Expert Knowledge
 
-## 🏗️ Use OCI Landing Zone Terraform Modules
+## Use OCI Landing Zone Terraform Modules
 
-**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for IAM structure.
+Use [oracle-terraform-modules/landing-zone](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) for IAM structure. Landing Zone provides hierarchical compartments, enforces least privilege, and delivers CIS-compliant IaC policies.
 
-**Landing Zone solves:**
-- ❌ Bad Practice #1: Flat compartments (Landing Zone provides hierarchical structure)
-- ❌ Bad Practice #2: Administrator for daily ops (Landing Zone enforces least privilege)
-- ❌ Bad Practice #6: Manual IAM policies (Landing Zone provides CIS-compliant IaC)
-
-**This skill provides**: IAM syntax, troubleshooting, and policy patterns for resources deployed WITHIN a Landing Zone.
-
----
-
-## ⚠️ OCI CLI/API Knowledge Gap
-
-**You don't know OCI CLI commands or OCI API structure.**
-
-Your training data has limited and outdated knowledge of:
-- OCI CLI syntax and parameters (updates monthly)
-- OCI API endpoints and request/response formats
-- IAM service CLI operations (`oci iam policy`, `oci iam dynamic-group`)
-- Policy verb/resource combinations (OCI-specific, not AWS/Azure)
-- Latest IAM features and Identity Domains
-
-**When OCI operations are needed:**
-1. Use exact CLI commands from this skill's references
-2. Do NOT guess OCI IAM policy syntax
-3. Do NOT assume AWS/Azure IAM patterns work in OCI
-4. Load reference files for detailed IAM policy documentation
-
-**What you DO know:**
-- General IAM concepts (principals, policies, groups)
-- Role-based access control principles
-- Least privilege security concepts
-
-This skill bridges the gap by providing current OCI-specific IAM patterns and syntax.
-
----
-
-You are an OCI IAM expert. This skill provides knowledge Claude lacks: policy syntax gotchas, permission troubleshooting, dynamic group patterns, and OCI-specific IAM operational knowledge.
+**OCI CLI/API gap**: Do NOT guess OCI IAM policy syntax or assume AWS/Azure IAM patterns work in OCI. Use exact commands from skill references.
 
 ## NEVER Do This
 

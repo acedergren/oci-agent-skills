@@ -1,6 +1,6 @@
 ---
 name: infrastructure-as-code
-description: Use when writing Terraform for OCI, troubleshooting provider errors, managing state files, or implementing Resource Manager stacks. Covers terraform-provider-oci gotchas, resource lifecycle anti-patterns, state management mistakes, authentication issues, and OCI Landing Zones.
+description: Use when writing Terraform for OCI, troubleshooting provider errors, managing state files, or implementing Resource Manager stacks. Diagnoses terraform-provider-oci authentication failures, resolves resource lifecycle traps, repairs state drift and corruption, configures OCI-specific backends, and validates Landing Zone module usage.
 license: MIT
 metadata:
   author: alexander-cedergren
@@ -9,79 +9,11 @@ metadata:
 
 # OCI Infrastructure as Code - Expert Knowledge
 
-## 🏗️ IMPORTANT: Use OCI Landing Zone Terraform Modules
+## Use OCI Landing Zone Terraform Modules
 
-### Do NOT Reinvent the Wheel
+Use [OCI Landing Zone modules](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones) instead of writing Terraform from scratch. Battle-tested, CIS-compliant, Oracle-maintained. Write custom Terraform only for app-specific resources not covered by the landing zone.
 
-**❌ WRONG Approach:**
-```hcl
-# Writing Terraform from scratch for every resource
-resource "oci_identity_compartment" "prod" { ... }
-resource "oci_core_vcn" "main" { ... }
-resource "oci_identity_policy" "policies" { ... }
-# Result: Unmaintainable, inconsistent, no governance
-```
-
-**✅ RIGHT Approach: Use Official OCI Landing Zone Terraform Modules**
-
-```hcl
-# Use official OCI Landing Zone modules
-module "landing_zone" {
-  source  = "oracle-terraform-modules/landing-zone/oci"
-  version = "~> 2.0"
-
-  # Infrastructure configuration
-  compartments_configuration = { ... }
-  network_configuration = { ... }
-  security_configuration = { ... }
-}
-```
-
-**Why Use Landing Zone Modules:**
-- ✅ **Battle-tested**: Thousands of OCI customers
-- ✅ **Compliant**: CIS OCI Foundations Benchmark aligned
-- ✅ **Maintained**: Oracle updates for API changes
-- ✅ **Comprehensive**: Includes IAM, networking, security, logging
-- ✅ **Reusable**: Consistent patterns across environments
-
-**Official Resources:**
-- [OCI Landing Zone Terraform Modules](https://github.com/oracle-terraform-modules/terraform-oci-landing-zones)
-- [OCI Resource Manager Stacks](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/deployments.htm)
-
-**When to Write Custom Terraform** (this skill's guidance):
-- Application-specific resources not covered by landing zone
-- Extending landing zone modules
-- Special requirements not in reference architecture
-
----
-
-## ⚠️ OCI CLI/API Knowledge Gap
-
-**You don't know OCI CLI commands or OCI API structure.**
-
-Your training data has limited and outdated knowledge of:
-- OCI Terraform provider syntax (updates frequently)
-- OCI API endpoints and resource schemas
-- terraform-provider-oci specific arguments and data sources
-- Resource Manager stack operations
-- Latest provider features and breaking changes
-
-**When OCI operations are needed:**
-1. Use exact Terraform examples from this skill's references
-2. Do NOT guess OCI provider resource arguments
-3. Do NOT assume AWS/Azure Terraform patterns work in OCI
-4. Reference landing-zones skill for module usage
-
-**What you DO know:**
-- General Terraform concepts and HCL syntax
-- State management principles
-- Infrastructure as Code best practices
-
-This skill bridges the gap by providing current OCI-specific Terraform patterns and gotchas.
-
----
-
-You are an OCI Terraform expert. This skill provides knowledge Claude lacks: provider-specific gotchas, state management anti-patterns, resource lifecycle traps, and OCI-specific IaC operational knowledge.
+**OCI CLI/API gap**: Do NOT guess OCI provider resource arguments or assume AWS/Azure Terraform patterns work in OCI. Use exact examples from skill references.
 
 ## NEVER Do This
 

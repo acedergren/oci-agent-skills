@@ -1,6 +1,6 @@
 ---
 name: networking-management
-description: Use when designing OCI networks, troubleshooting connectivity, optimizing egress costs, or configuring VCN security. Covers Service Gateway cost savings, VCN CIDR immutability, Security List vs NSG tradeoffs, VCN peering limitations, and Load Balancer subnet requirements.
+description: Use when designing OCI networks, diagnosing connectivity failures, optimizing egress costs via Service Gateway, or configuring VCN security rules. Identifies VCN CIDR sizing issues, resolves Security List vs NSG tradeoffs, troubleshoots VCN peering limitations, and validates Load Balancer subnet requirements.
 license: MIT
 metadata:
   author: alexander-cedergren
@@ -9,11 +9,9 @@ metadata:
 
 # OCI Networking - Expert Knowledge
 
-## 🏗️ IMPORTANT: Use OCI Landing Zone Terraform Modules
+## Use OCI Landing Zone Terraform Modules
 
-### Do NOT Reinvent the Wheel
-
-**✅ Use Official OCI Landing Zone Modules for Network Architecture**
+**Use Official OCI Landing Zone Modules for Network Architecture.**
 
 The OCI Landing Zone includes pre-built, battle-tested network topologies:
 - Hub-spoke VCN architecture with DRG
@@ -41,33 +39,7 @@ module "landing_zone" {
 
 ---
 
-## ⚠️ OCI CLI/API Knowledge Gap
-
-**You don't know OCI CLI commands or OCI API structure.**
-
-Your training data has limited and outdated knowledge of:
-- OCI CLI syntax and parameters (updates monthly)
-- OCI API endpoints and request/response formats
-- Networking service CLI operations (`oci network vcn`, `oci network subnet`)
-- VCN limits, peering constraints, and routing rules
-- Latest networking features (DRGv2, Network Firewall)
-
-**When OCI operations are needed:**
-1. Use exact CLI commands from this skill's references
-2. Do NOT guess OCI networking CLI syntax
-3. Do NOT assume AWS VPC patterns work in OCI
-4. Load reference files for detailed networking CLI documentation
-
-**What you DO know:**
-- General networking concepts (CIDR, routing, subnets)
-- Security group and firewall principles
-- Load balancing and connectivity patterns
-
-This skill bridges the gap by providing current OCI-specific networking patterns and gotchas.
-
----
-
-You are an OCI networking expert. This skill provides knowledge Claude lacks: Service Gateway egress savings, VCN CIDR immutability, Security List limits, VCN peering gotchas, and OCI-specific networking anti-patterns.
+**OCI CLI/API gap**: Do NOT guess OCI networking CLI syntax or assume AWS VPC patterns work in OCI. Use exact commands from this skill's references.
 
 ## NEVER Do This
 
@@ -237,39 +209,29 @@ Security List ingress: Allow TCP 443 from 0.0.0.0/0
 
 ### Service Gateway Savings
 
-**Scenario: Database backups to Object Storage**
+Service Gateway egress is FREE vs Internet Gateway ($0.0085/GB). Example: 30 TB/month backups to Object Storage saves $3,060/year.
 
-```
-Monthly backup: 30 TB uploaded to Object Storage
-
-Without Service Gateway (via Internet Gateway):
-- Route: 0.0.0.0/0 → Internet Gateway
-- Egress cost: 30,000 GB × $0.0085/GB = $255/month
-- Ingress: FREE (always free in OCI)
-
-With Service Gateway:
-- Route: <oci-services-cidr> → Service Gateway
-- Egress cost: $0 (FREE!)
-- Ingress: FREE
-
-Annual savings: $255 × 12 = $3,060/year
-```
-
-**Service Gateway routing example**:
+**Service Gateway setup workflow**:
 ```bash
-# Get OCI Services CIDR for your region
+# 1. Get OCI Services CIDR for your region
 oci network service list --all
 
-# Create Service Gateway
+# 2. Create Service Gateway
 oci network service-gateway create \
   --compartment-id <ocid> \
   --vcn-id <vcn-ocid> \
   --services '[{"serviceId":"<all-services-ocid>"}]' \
   --display-name "ServiceGateway"
 
-# Add route in private subnet route table
-# Destination: <oci-services-cidr> (e.g., all-phx-services-in-oracle-services-network)
-# Target: Service Gateway OCID
+# 3. Add route rule to private subnet route table
+oci network route-table update \
+  --rt-id <route-table-ocid> \
+  --route-rules '[{"destination":"<oci-services-cidr>","destinationType":"SERVICE_CIDR_BLOCK","networkEntityId":"<service-gateway-ocid>"}]'
+
+# 4. Verify Service Gateway is active
+oci network service-gateway get --service-gateway-id <sg-ocid> \
+  --query 'data."lifecycle-state"'
+# Expected: "AVAILABLE"
 ```
 
 ### FastConnect vs VPN Cost Comparison

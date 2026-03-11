@@ -9,34 +9,9 @@ metadata:
 
 # OCI Landing Zones - Expert Architecture
 
-## ⚠️ OCI Landing Zone Knowledge Gap
+**OCI CLI/API gap**: Do NOT guess compartment hierarchies, network topologies, or IAM policy structures. Use patterns from this skill and load [`landing-zone-cli.md`](references/landing-zone-cli.md) for deployment operations.
 
-**You don't know OCI Landing Zone patterns and tooling.**
-
-Your training data has limited and outdated knowledge of:
-- OCI Landing Zone reference architectures (updated quarterly)
-- Resource Manager stacks for landing zones
-- Compartment design patterns and governance
-- Security Zones and CIS Foundation compliance
-- Multi-tenancy patterns (SaaS, multi-environment)
-- Landing Zone Terraform modules and best practices
-
-**When landing zone design is needed:**
-1. Use patterns and CLI commands from this skill's references
-2. Do NOT guess compartment hierarchies or network topologies
-3. Do NOT assume IAM policy structures
-4. Load [`landing-zone-cli.md`](references/landing-zone-cli.md) for deployment operations
-
-**What you DO know:**
-- General cloud architecture concepts
-- Networking principles (subnets, routing, firewalls)
-- IAM concepts (users, groups, policies)
-
-This skill provides OCI-specific landing zone patterns that differ from AWS/Azure/GCP.
-
----
-
-## 🚨 Top 10 OCI Bad Practices - Solved by Landing Zones
+## Top 10 OCI Bad Practices - Solved by Landing Zones
 
 ### Why Landing Zones Matter
 
@@ -80,10 +55,6 @@ Without a proper Landing Zone, organizations commonly make these critical mistak
 
 **Without Landing Zone**: Compliance audit failures, remediation costs $100k-500k
 **With Landing Zone**: CIS Benchmark aligned by default, audit-ready
-
----
-
-You are an OCI Landing Zone architect. This skill provides knowledge Claude lacks: compartment hierarchies, network topology patterns, security zone requirements, cost segregation strategies, and multi-tenancy anti-patterns.
 
 ## NEVER Do This
 
@@ -364,6 +335,19 @@ Spoke → DRG → Hub VCN → Network Firewall → Internet
 ```
 
 **Security impact**: Uncontrolled egress is #3 cause of data breaches (Verizon DBIR 2023).
+
+## Landing Zone Setup Workflow
+
+```
+1. Create compartment hierarchy → Verify: oci iam compartment list --compartment-id $TENANCY_ID
+2. Configure Security Zones     → Verify: oci cloud-guard security-zone list --compartment-id $PROD_ID
+3. Deploy network topology      → Verify: oci network vcn list --compartment-id $NETWORK_ID
+4. Set up tagging strategy      → Verify: oci iam tag-namespace list --compartment-id $TENANCY_ID
+5. Configure budgets/alerts     → Verify: oci budgets budget list --compartment-id $TENANCY_ID
+6. Enable observability stack   → Verify: oci monitoring alarm list --compartment-id $TENANCY_ID
+```
+
+Each phase must complete and verify before proceeding. Use `landing-zone-cli.md` reference for detailed CLI commands at each step.
 
 ## Progressive Loading References
 

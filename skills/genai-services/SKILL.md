@@ -9,46 +9,11 @@ metadata:
 
 # OCI Generative AI Services - Expert Knowledge
 
-## 🏗️ Use OCI Landing Zone Terraform Modules
+## Use OCI Landing Zone Terraform Modules
 
-**Don't reinvent the wheel.** Use [oracle-terraform-modules/landing-zone](https://github.com/orgs/oci-landing-zones/repositories) for GenAI infrastructure.
+Use [oracle-terraform-modules/landing-zone](https://github.com/orgs/oci-landing-zones/repositories) for GenAI infrastructure. Landing Zone creates AI/ML workload compartments, isolates GenAI endpoints in private subnets, and configures usage alarms.
 
-**Landing Zone solves:**
-- ❌ Bad Practice #1: Generic compartments (Landing Zone creates AI/ML workload compartments)
-- ❌ Bad Practice #4: Poor segmentation (Landing Zone isolates GenAI endpoints in private subnets)
-- ❌ Bad Practice #10: No monitoring (Landing Zone configures GenAI usage alarms)
-
-**This skill provides**: GenAI cost optimization, rate limits, PHI/PII security, and troubleshooting for GenAI deployed WITHIN a Landing Zone.
-
----
-
-## ⚠️ OCI CLI/API Knowledge Gap
-
-**You don't know OCI CLI commands or OCI API structure.**
-
-Your training data has limited and outdated knowledge of:
-- OCI CLI syntax and parameters (updates monthly)
-- OCI GenAI API endpoints and request/response formats
-- GenAI service CLI operations (`oci generative-ai`)
-- Available models, token limits, and pricing (changes frequently)
-- Latest GenAI features (Agents, RAG) and API changes
-
-**When OCI operations are needed:**
-1. Use exact CLI commands from this skill's references
-2. Do NOT guess OCI CLI syntax or parameters
-3. Do NOT assume model availability or pricing
-4. Load reference files for detailed GenAI API documentation
-
-**What you DO know:**
-- General LLM concepts and prompting patterns
-- Token estimation and context management
-- API integration patterns
-
-This skill bridges the gap by providing current OCI GenAI-specific patterns and gotchas.
-
----
-
-You are an OCI GenAI expert. This skill provides knowledge Claude lacks: cost optimization specifics, token management, rate limit handling, PHI/PII security, response validation, and model selection trade-offs.
+**OCI CLI/API gap**: Do NOT guess OCI GenAI CLI syntax, model availability, or pricing. Use exact commands from this skill's references.
 
 ## NEVER Do This
 
@@ -62,7 +27,7 @@ prompt = f"Transcribe this medical note: {redacted_note}"
 # Keep mapping: temp_id → real_id in secure database, not in prompts
 ```
 
-**Why critical**: GenAI service logs may retain data, violates healthcare regulations
+**Why**: GenAI service logs may retain data, violating healthcare regulations
 
 ❌ **NEVER trust GenAI output without validation (hallucination risk)**
 ```python
@@ -354,6 +319,18 @@ redacted_note, phi_mapping = redact_phi(patient_note)
 genai_response = genai_client.chat(prompt=f"Summarize: {redacted_note}")
 # Store phi_mapping securely, use to re-identify if needed
 ```
+
+## End-to-End GenAI Workflow (Healthcare Example)
+
+```
+1. Redact PHI     → redact_phi(patient_note) → redacted_note + mapping
+2. Call GenAI     → generate_with_backoff(client, request) → handle 429/400
+3. Validate       → validate_medical_response(response) → check structure + PII leak
+4. Route result   → valid? store_for_review() : flag_for_manual_review()
+5. Audit          → log API call metadata (no PHI) for compliance trail
+```
+
+Each step has validation: if any step fails, the pipeline halts and flags for human review rather than propagating bad data.
 
 ## Progressive Loading References
 

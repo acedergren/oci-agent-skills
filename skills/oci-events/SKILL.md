@@ -9,47 +9,11 @@ metadata:
 
 # OCI Events Service - Event-Driven Architecture
 
-## ⚠️ OCI Events Knowledge Gap
+**OCI CLI/API gap**: Do NOT guess event filter syntax, event types, or confuse Events with Alarms. Use patterns from this skill and load [`events-cli.md`](references/events-cli.md) for operations.
 
-**You don't know OCI Events service patterns and syntax.**
+## Use OCI Landing Zone Terraform Modules
 
-Your training data has limited and outdated knowledge of:
-- CloudEvents specification format (OCI uses CloudEvents 1.0)
-- Event rule filter syntax (JSON-based attribute matching)
-- Event types by OCI service (100+ event types)
-- Action types and integration patterns
-- Dead letter queue configuration
-- Events vs Alarms distinction
-
-**When event-driven automation is needed:**
-1. Use patterns and CLI commands from this skill's references
-2. Do NOT guess event filter syntax or event types
-3. Do NOT confuse Events with Alarms (different purposes)
-4. Load [`events-cli.md`](references/events-cli.md) for event rule operations
-
-**What you DO know:**
-- General event-driven architecture concepts
-- Pub/sub messaging patterns
-- JSON structure and filtering
-
-This skill provides OCI-specific Events service patterns and CloudEvents integration.
-
----
-
-## 🏗️ IMPORTANT: Use OCI Landing Zone Terraform Modules
-
-### Do NOT Reinvent the Wheel
-
-**❌ WRONG Approach:**
-```bash
-# Manually creating event rules, functions, notifications one by one
-oci events rule create ...
-oci fn application create ...
-oci ons topic create ...
-# Result: Inconsistent, unmaintainable, no governance
-```
-
-**✅ RIGHT Approach: Use Official OCI Landing Zone Terraform Modules**
+Use Landing Zone modules instead of manually creating event rules one by one.
 
 ```hcl
 # Use official OCI Landing Zone modules
@@ -95,10 +59,6 @@ module "landing_zone" {
 - Troubleshooting existing event rules
 - One-off automation tasks
 - Understanding event patterns before implementing in Terraform
-
----
-
-You are an OCI Events service expert. This skill provides knowledge Claude lacks: CloudEvents format, event filter patterns, action types, dead letter queue configuration, and event-driven anti-patterns.
 
 ## NEVER Do This
 
@@ -264,6 +224,19 @@ oci iam policy create \
 ```
 
 **Debugging hell**: Event rule shows "active", function never triggers, no error message. Root cause: Missing IAM policy.
+
+## Event Rule Validation Workflow
+
+```
+1. Create rule       → oci events rule create ...
+2. Verify active     → oci events rule get --rule-id <ocid> --query 'data."lifecycle-state"'
+3. Check IAM policy  → oci iam policy list --compartment-id <ocid> | grep cloudEvents
+4. Test with event   → Trigger sample event (e.g., create test object in bucket)
+5. Confirm delivery  → Check function logs or notification inbox
+6. Configure DLQ     → Set up Streaming for failed event capture
+```
+
+If rule shows "ACTIVE" but function never triggers: check IAM policy first (most common root cause).
 
 ## Progressive Loading References
 
