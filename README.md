@@ -1,3 +1,11 @@
+> ⚠️ **DEPRECATED** — This repository has been consolidated into [acedergren/agentic-tools](https://github.com/acedergren/agentic-tools).
+> 
+> Install all OCI skills with:
+> ```bash
+> npx skills add acedergren/agentic-tools --all -g -y
+> ```
+> This repo is kept for reference only and will no longer be updated.
+
 <div align="center">
 
 ```
