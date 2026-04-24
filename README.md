@@ -28,7 +28,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-Compatible-blueviolet)](https://skills.sh)
 [![Skills.sh](https://img.shields.io/badge/Skills.sh-Install-C74634)](https://skills.sh/acedergren/oci-agent-skills)
-[![Skills Count](https://img.shields.io/badge/Skills-13%2B1%20Agent-brightgreen)](#skills-reference)
+[![Skills Count](https://img.shields.io/badge/Skills-18%2B1%20Agent-brightgreen)](#skills-reference)
 [![Community Project](https://img.shields.io/badge/Community-Maintained-success)](https://github.com/acedergren/oci-agent-skills)
 
 </div>
@@ -56,7 +56,7 @@ Try these prompts:
 
 ## Overview
 
-This community-maintained plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. Created and maintained by Alexander Cedergren, it includes **13 detailed skills** plus an **OCI Cloud Architect orchestrator agent** for intelligent multi-service automation. Skills cover compute, networking, databases, Oracle DBA operations, monitoring, secrets management, GenAI services, IAM/identity management, infrastructure as code, FinOps/cost optimization, Landing Zones architecture, OCI Events automation, and best practices from Oracle's official documentation and technical guides.
+This community-maintained plugin provides expert-level guidance and complete CLI command references for OCI services, compensating for Claude's limited training on Oracle Cloud Infrastructure. Created and maintained by Alexander Cedergren, it now includes **18 detailed skills** plus an **OCI Cloud Architect orchestrator agent** for intelligent multi-service automation. Skills cover compute, networking, databases, Oracle DBA operations, monitoring, secrets management, GenAI services, IAM and Identity Domains, Better Auth integration, infrastructure as code, FinOps/cost optimization, landing zones, OCI Events, migration planning, Oracle-branded presentation work, and best practices from Oracle's official documentation and technical guides.
 
 **This is a community project and is not an official Oracle product or endorsement.**
 
@@ -64,7 +64,7 @@ This community-maintained plugin provides expert-level guidance and complete CLI
 
 ### 🎯 Comprehensive Skills Coverage
 
-**13 Specialized Skills:**
+**18 Specialized Skills:**
 - **Compute Management**: Launch, manage, and troubleshoot compute instances
 - **Networking Management**: VCN, subnet, security group, and gateway configuration
 - **Database Management**: Autonomous Database, DB Systems, Exadata, and PDBs
@@ -72,11 +72,16 @@ This community-maintained plugin provides expert-level guidance and complete CLI
 - **Monitoring & Observability**: Metrics, alarms, logs, and events
 - **Secrets Management**: OCI Vault for secure credential storage
 - **Generative AI**: Foundation models, embeddings, chat, and fine-tuning
-- **IAM & Identity**: Users, groups, policies, dynamic groups, and IDCS integration
+- **IAM & Identity**: Users, groups, policies, dynamic groups, and Identity Domains access patterns
+- **Oracle IAM Auth Foundation**: Better Auth plus OCI IAM Identity Domains setup and callback/bootstrap diagnostics
+- **Fastify Better Auth Bridge**: Session resolution bridge between Better Auth and Fastify 5 request handling
+- **Oracle IAM Org Provisioning**: Claims-to-org mapping, stable role resolution, and first-admin bootstrap
 - **Infrastructure as Code**: Terraform, Resource Manager, and Landing Zones
 - **FinOps & Cost Optimization**: Usage analytics, anomaly detection, budgets, and cost intelligence
 - **Landing Zones**: Compartment hierarchies, hub-spoke topology, Security Zones, CIS compliance
 - **OCI Events**: Event-driven automation, CloudEvents, Functions/Streaming integration
+- **SQLite to Oracle Planner**: Planning-only inventory for Node.js and TypeScript migrations off SQLite
+- **OCI PPTX**: Oracle-branded technical deck guidance for OCI proposals and presentations
 - **Best Practices**: Official Oracle guidance, Well-Architected Framework, CIS compliance
 
 **🤖 Intelligent Orchestrator Agent:**
@@ -167,12 +172,11 @@ You should see OCI skills listed.
 ```
 oci-agent-skills/
 ├── .claude-plugin/
-│   ├── plugin.json           # Plugin manifest
 │   └── marketplace.json      # Marketplace metadata
 ├── .mcp.json                 # MCP server configuration
 ├── agents/                   # Orchestrator agents
 │   └── oci-cloud-architect.md   # Multi-skill orchestration agent
-├── skills/                   # 13 Auto-activating specialist skills
+├── skills/                   # 18 Auto-activating specialist skills
 │   ├── best-practices/
 │   │   ├── SKILL.md
 │   │   └── references/
@@ -189,6 +193,15 @@ oci-agent-skills/
 │   │   ├── SKILL.md
 │   │   └── references/
 │   ├── iam-identity-management/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── oracle-iam-auth-foundation/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── fastify-better-auth-bridge/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── oracle-iam-org-provisioning/
 │   │   ├── SKILL.md
 │   │   └── references/
 │   ├── infrastructure-as-code/
@@ -209,9 +222,17 @@ oci-agent-skills/
 │   ├── oracle-dba/
 │   │   ├── SKILL.md
 │   │   └── references/
+│   ├── sqlite-to-oracle-planner/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   ├── oci-pptx/
+│   │   ├── SKILL.md
+│   │   └── references/
 │   └── secrets-management/
 │       ├── SKILL.md
 │       └── references/
+├── docs/
+│   └── source-skill-evaluation.md
 └── README.md
 ```
 
@@ -288,10 +309,37 @@ Activate when working with:
 Activate when working with:
 - Users, groups, policies
 - Dynamic groups and instance principals
-- IDCS integration and SSO
+- OCI IAM Identity Domains and SSO
 - Access troubleshooting
 
 **Example**: "Create a policy for developers to manage compute"
+
+### Oracle IAM Auth Foundation
+Activate when working with:
+- Better Auth provider bootstrap
+- OIDC callback URLs and trusted origins
+- OCI IAM Identity Domains login flows
+- Shared auth configuration across Fastify and Next.js
+
+**Example**: "My OCI IAM login redirects back but the local session still fails"
+
+### Fastify Better Auth Bridge
+Activate when working with:
+- Fastify 5 `onRequest` auth bridging
+- Cookie forwarding into native Web `Request`
+- `auth.api.getSession()` integration
+- Missing active org context after successful login
+
+**Example**: "Better Auth works, but my Fastify routes still see no session"
+
+### Oracle IAM Org Provisioning
+Activate when working with:
+- Mapping identity-domain groups into local roles
+- Session hook orchestration after login
+- Tenant-to-org resolution and upserts
+- First-admin bootstrap and access gating
+
+**Example**: "Users can log in, but they never land in the right org or role"
 
 ### FinOps & Cost Optimization
 Activate when working with:
@@ -325,11 +373,29 @@ Activate when working with:
 
 **Example**: "Set up an event rule to notify when instances are terminated"
 
+### SQLite to Oracle Planner
+Activate when working with:
+- `better-sqlite3`, `sqlite3`, or SQLite file references
+- ORM schemas that need Oracle-compatible planning
+- Connection-string and migration manifest discovery
+- Phased cutover planning before implementation
+
+**Example**: "Inventory everything we need to change before moving this app from SQLite to Oracle"
+
+### OCI PPTX
+Activate when working with:
+- Oracle-branded architecture decks
+- OCI proposal slides and executive readouts
+- Technical storytelling for CloudWorld-style presentations
+- Converting architecture work into presentation-ready material
+
+**Example**: "Turn this OCI architecture into an Oracle-branded presentation outline"
+
 ## Orchestrator Agent
 
 ### OCI Cloud Architect
 
-The **OCI Cloud Architect** is an intelligent orchestrator agent that coordinates the 10 specialist skills to handle complex, multi-service cloud architecture scenarios. It automatically activates when you need end-to-end solutions that span multiple OCI services.
+The **OCI Cloud Architect** is an intelligent orchestrator agent that coordinates the specialist skills to handle complex, multi-service cloud architecture scenarios. It automatically activates when you need end-to-end solutions that span multiple OCI services.
 
 **When the agent activates:**
 - Designing comprehensive cloud architectures

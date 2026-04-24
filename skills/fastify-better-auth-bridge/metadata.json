@@ -1,0 +1,12 @@
+{
+  "version": "2.3.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "April 2026",
+  "abstract": "Runtime bridge guidance for resolving Better Auth sessions inside Fastify 5, including Web Request construction, cookie forwarding, request decoration, and missing-org patching.",
+  "references": [
+    "https://fastify.dev/docs/latest/Reference/Hooks/",
+    "https://fastify.dev/docs/latest/Reference/Decorators/",
+    "https://www.better-auth.com/docs"
+  ]
+}

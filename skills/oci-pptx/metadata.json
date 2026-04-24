@@ -1,0 +1,11 @@
+{
+  "version": "2.3.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "April 2026",
+  "abstract": "Oracle-branded presentation guidance for converting OCI architecture, migration, and platform work into slide decks that fit Oracle visual and narrative expectations.",
+  "references": [
+    "https://www.oracle.com/corporate/brand/",
+    "https://www.oracle.com/cloud/"
+  ]
+}

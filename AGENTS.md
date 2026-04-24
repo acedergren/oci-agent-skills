@@ -64,11 +64,16 @@ All skills must pass:
 | secrets-management | Vault, keys, secrets |
 | genai-services | OCI GenAI, embeddings, RAG |
 | iam-identity-management | Users, groups, policies, dynamic groups |
+| oracle-iam-auth-foundation | OCI IAM Identity Domains auth foundation |
+| fastify-better-auth-bridge | Better Auth session bridge for Fastify |
+| oracle-iam-org-provisioning | Claim-to-org membership provisioning |
 | infrastructure-as-code | Terraform, Resource Manager |
 | finops-cost-optimization | Cost analysis, budgets, optimization |
 | best-practices | Well-Architected Framework, CIS benchmarks |
 | landing-zones | Compartment hierarchy, hub-spoke topology |
 | oci-events | Event-driven automation, CloudEvents |
+| sqlite-to-oracle-planner | Planning-only SQLite to Oracle migration inventory |
+| oci-pptx | Oracle-branded OCI presentation guidance |
 
 ## Installation
 

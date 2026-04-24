@@ -5,29 +5,34 @@
     "email": "alex@solutionsedge.io"
   },
   "metadata": {
-    "description": "Oracle Cloud Infrastructure agent skills for AI coding agents",
+    "description": "Oracle Cloud Infrastructure agent skills for AI coding agents, including OCI IAM auth, Fastify bridging, SQLite migration planning, and Oracle-branded deck guidance",
     "version": "2.2.4"
   },
   "plugins": [
     {
       "name": "oci-skills",
-      "description": "Complete OCI automation skills covering compute, networking, databases, monitoring, secrets, GenAI, IAM, IaC, FinOps, and best practices",
+      "description": "Complete OCI automation skills covering compute, networking, databases, monitoring, secrets, GenAI, IAM, auth foundations, IaC, FinOps, migration planning, and best practices",
       "source": "./",
       "strict": false,
       "skills": [
         "./skills/compute-management",
         "./skills/networking-management",
         "./skills/database-management",
+        "./skills/sqlite-to-oracle-planner",
         "./skills/oracle-dba",
         "./skills/monitoring-operations",
         "./skills/secrets-management",
         "./skills/genai-services",
         "./skills/iam-identity-management",
+        "./skills/oracle-iam-auth-foundation",
+        "./skills/fastify-better-auth-bridge",
+        "./skills/oracle-iam-org-provisioning",
         "./skills/infrastructure-as-code",
         "./skills/finops-cost-optimization",
         "./skills/best-practices",
         "./skills/landing-zones",
-        "./skills/oci-events"
+        "./skills/oci-events",
+        "./skills/oci-pptx"
       ]
     }
   ]
