@@ -1,0 +1,12 @@
+{
+  "version": "2.3.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "April 2026",
+  "abstract": "Auth-foundation guidance for Better Auth with OCI IAM Identity Domains, covering OIDC callbacks, trusted origins, env-first bootstrap, and shared auth behavior across Fastify and Next.js.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Identity/home.htm",
+    "https://docs.oracle.com/iaas/Content/Identity/domains/overview.htm",
+    "https://www.better-auth.com/docs"
+  ]
+}

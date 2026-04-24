@@ -1,0 +1,11 @@
+{
+  "version": "2.3.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "April 2026",
+  "abstract": "Post-login provisioning guidance for turning OCI IAM Identity Domains claims into stable organization membership, role mapping, and first-admin bootstrap logic.",
+  "references": [
+    "https://docs.oracle.com/en-us/iaas/Content/Identity/home.htm",
+    "https://docs.oracle.com/iaas/Content/Identity/domains/overview.htm"
+  ]
+}

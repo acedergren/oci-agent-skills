@@ -1,0 +1,12 @@
+{
+  "version": "2.3.0",
+  "organization": "Community",
+  "author": "Alexander Cedergren",
+  "date": "April 2026",
+  "abstract": "Planning-only skill for inventorying SQLite usage across Node.js and TypeScript codebases before migrating to Oracle, including ORM, driver, test, and cutover considerations.",
+  "references": [
+    "https://node-oracledb.readthedocs.io/en/latest/",
+    "https://www.sqlite.org/docs.html",
+    "https://docs.oracle.com/en/database/"
+  ]
+}
